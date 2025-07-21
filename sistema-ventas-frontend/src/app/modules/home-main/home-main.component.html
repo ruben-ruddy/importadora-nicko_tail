@@ -1,0 +1,60 @@
+<div class="design-container">
+    <div class="design3">
+        <header class="header">
+            <div class="logo">
+                <div class="logo-img">🦅</div>
+                <div>
+                    <div class="company-name">IMPORTADORA NICKO</div>
+                    <p style="margin: 0; opacity: 0.7; font-size: 14px; color: white;">Global Trade Solutions</p>
+                </div>
+            </div>
+            <nav class="nav">
+                <a href="#">Home</a>
+                <a href="#">Products</a>
+                <a href="#">Solutions</a>
+                <a href="#">Network</a>
+                <a href="#">Contact</a>
+            </nav>
+        </header>
+
+        <section class="hero">
+            <p-carousel [value]="images" 
+                [numVisible]="1" 
+                [numScroll]="1" 
+                [autoplayInterval]="5000"
+                class="primeng-carousel-container"> 
+                <ng-template let-image pTemplate="item">
+                    <div class="carousel-item">
+                        <img [src]="image" alt="Imagen del carrusel">
+                    </div>
+                </ng-template>
+            </p-carousel>
+            
+            <div class="cta-container">
+                <button class="cta-button">Explorar Productos</button>
+                <button class="cta-button cta-secondary">Ver Presentación</button>
+            </div>
+        </section>
+            
+        <section class="services">
+            <h2 style="text-align: center; color: white; margin-bottom: 20px; font-size: 32px;">Nuestros Servicios</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">📦</div>
+                    <h3>Importación</h3>
+                    <p>Gestión completa de procesos de importación internacional</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🚚</div>
+                    <h3>Distribución</h3>
+                    <p>Red de distribución nacional con cobertura total</p>
+                </div>
+                <div class="service-card">
+                    <div class="service-icon">🌐</div>
+                    <h3>Logística</h3>
+                    <p>Soluciones logísticas integrales y personalizadas</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>

@@ -1,0 +1,296 @@
+// // PrimeNG Theme
+// @import 'primeng/resources/themes/vela-blue/theme.css';
+
+// // PrimeNG Core (requerido)
+// @import 'primeng/resources/primeng.min.css';
+
+// // PrimeIcons (opcional, si usas iconos)
+// @import 'primeicons/primeicons.css';
+@layer tw {
+    @tailwind base;
+  }
+@tailwind components;
+@tailwind utilities;
+@import 'theme/buttons.scss';
+@import 'theme/texts.scss';
+// Estilos generales del diseño
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: white;
+}
+
+// .design-container {
+//     // Si necesitas estilos para el contenedor principal
+// }
+
+.design3 {
+    background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+    position: relative;
+    overflow: hidden;
+}
+
+.design3::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(ellipse at top, rgba(41, 128, 185, 0.1) 0%, transparent 70%);
+}
+
+// Estilos del encabezado
+.header {
+    background: rgba(15, 15, 35, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    padding: 20px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    color: white;
+}
+
+.logo-img {
+    width: 55px;
+    height: 55px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 22px;
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+}
+
+.company-name {
+    font-size: 24px;
+    font-weight: bold;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.nav {
+    display: flex;
+    gap: 20px;
+}
+
+.nav a {
+    color: rgba(255,255,255,0.8);
+    text-decoration: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 12px 24px;
+    border-radius: 25px;
+    border: 1px solid transparent;
+}
+
+.nav a:hover {
+    color: white;
+    border: 1px solid rgba(102, 126, 234, 0.5);
+    background: rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+// Estilos de la sección principal (hero)
+.hero {
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    overflow: hidden;
+    padding: 200px 30px;
+    text-align: center;
+    z-index: 5;
+}
+
+.hero h1 {
+    font-size: 52px;
+    margin-bottom: 25px;
+    background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 900;
+    letter-spacing: -1px;
+}
+
+.hero p {
+    font-size: 20px;
+    margin-bottom: 40px;
+    opacity: 0.8;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.6;
+}
+
+.cta-container {
+    display: flex;
+    gap: 50px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.cta-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 18px 40px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+}
+
+.cta-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    padding: 16px 38px;
+}
+
+.cta-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.5);
+}
+
+// Estilos de los servicios
+.services {
+    padding: 40px 30px;
+    background: rgba(255,255,255,0.05);
+}
+
+.services-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+    margin-top: 30px;
+}
+
+.service-card {
+    background: rgba(255,255,255,0.1);
+    padding: 30px;
+    border-radius: 15px;
+    text-align: center;
+    color: white;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: all 0.3s ease;
+}
+
+.service-card:hover {
+    transform: translateY(-5px);
+    background: rgba(255,255,255,0.15);
+}
+
+.service-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(45deg, #667eea, #764ba2);
+    border-radius: 50%;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+}
+
+// Estilos del carrusel de PrimeNG y sus botones
+.primeng-carousel-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+
+.carousel-item {
+    width: 100%;
+    height: 100%;
+}
+
+.carousel-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.p-carousel-prev,
+.p-carousel-next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background-color 0.2s;
+}
+
+.p-carousel-prev {
+    left: 10px;
+}
+
+.p-carousel-next {
+    right: 10px;
+}
+
+.p-carousel-prev:hover,
+.p-carousel-next:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.p-carousel-prev-icon,
+.p-carousel-next-icon {
+    font-size: 20px;
+}
+
+// Media queries
+@media (max-width: 768px) {
+    .hero h1 {
+        font-size: 36px;
+    }
+    
+    .nav {
+        flex-wrap: wrap;
+        gap: 15px !important;
+    }
+    
+    .cta-container {
+        flex-direction: column;
+        align-items: center;
+    }
+}

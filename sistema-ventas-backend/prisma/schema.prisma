@@ -1,0 +1,198 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Modelos de la Base de Datos
+
+model Role {
+  id_rol       String   @id @default(uuid()) @db.Uuid @map("id_rol")
+  nombre_rol   String   @unique @db.VarChar(50) @map("nombre_rol")
+  descripcion  String?  @db.Text
+  activo       Boolean  @default(true)
+  fecha_creacion DateTime @default(now()) @map("fecha_creacion")
+  usuarios     User[]
+
+  @@map("roles")
+}
+
+model User {
+  id_usuario    String    @id @default(uuid()) @db.Uuid @map("id_usuario")
+  id_rol        String    @db.Uuid @map("id_rol") // ¡CAMBIO AQUI!
+  nombre_usuario String   @unique @db.VarChar(50) @map("nombre_usuario")
+  email         String   @unique @db.VarChar(100)
+  password_hash String   @db.VarChar(255) @map("password_hash")
+  nombre_completo String   @db.VarChar(100) @map("nombre_completo")
+  telefono      String?   @db.VarChar(20)
+  activo        Boolean   @default(true)
+  fecha_creacion DateTime  @default(now()) @map("fecha_creacion")
+  ultimo_acceso DateTime? @map("ultimo_acceso")
+  role          Role      @relation(fields: [id_rol], references: [id_rol])
+  ventas        Sale[]
+  compras       Purchase[]
+  movimientos_inventario InventoryMovement[]
+
+  @@map("usuarios")
+}
+
+model Category {
+  id_categoria    String   @id @default(uuid()) @db.Uuid @map("id_categoria")
+  nombre_categoria String   @unique @db.VarChar(100) @map("nombre_categoria")
+  descripcion     String?  @db.Text
+  activo          Boolean  @default(true)
+  fecha_creacion  DateTime @default(now()) @map("fecha_creacion")
+  productos       Product[]
+
+  @@map("categorias")
+}
+
+model Product {
+  id_producto       String    @id @default(uuid()) @db.Uuid @map("id_producto")
+  id_categoria      String    @db.Uuid @map("id_categoria") // ¡CAMBIO AQUI!
+  codigo_producto   String    @unique @db.VarChar(50) @map("codigo_producto")
+  nombre_producto   String    @db.VarChar(150) @map("nombre_producto")
+  descripcion       String?   @db.Text
+  precio_venta      Decimal   @db.Decimal(10, 2) @map("precio_venta")
+  precio_compra     Decimal   @db.Decimal(10, 2) @map("precio_compra")
+  stock_actual      Int       @default(0) @map("stock_actual")
+  stock_minimo      Int       @default(0) @map("stock_minimo")
+  imagen_url        String?   @db.VarChar(255) @map("imagen_url")
+  activo            Boolean   @default(true)
+  fecha_creacion    DateTime  @default(now()) @map("fecha_creacion")
+  fecha_actualizacion DateTime @default(now()) @updatedAt @map("fecha_actualizacion")
+  category          Category  @relation(fields: [id_categoria], references: [id_categoria])
+  detalle_ventas    SaleDetail[]
+  detalle_compras   PurchaseDetail[]
+  movimientos_inventario InventoryMovement[]
+
+  @@map("productos")
+}
+
+model Client {
+  id_cliente         String    @id @default(uuid()) @db.Uuid @map("id_cliente")
+  nombre_completo    String    @db.VarChar(150) @map("nombre_completo")
+  email              String?   @db.VarChar(100)
+  telefono           String?   @db.VarChar(20)
+  direccion          String?   @db.Text
+  documento_identidad String?   @db.VarChar(50) @map("documento_identidad")
+  fecha_registro     DateTime  @default(now()) @map("fecha_registro")
+  activo             Boolean   @default(true)
+  ventas             Sale[]
+
+  @@map("clientes")
+}
+
+model Sale {
+  id_venta      String       @id @default(uuid()) @db.Uuid @map("id_venta")
+  id_usuario    String       @db.Uuid @map("id_usuario") // ¡CAMBIO AQUI!
+  id_cliente    String?      @db.Uuid @map("id_cliente") // ¡CAMBIO AQUI!
+  numero_venta  String       @unique @db.VarChar(50) @map("numero_venta")
+  fecha_venta   DateTime     @default(now()) @map("fecha_venta")
+  subtotal      Decimal      @db.Decimal(10, 2)
+  descuento     Decimal      @default(0) @db.Decimal(10, 2)
+  impuesto      Decimal      @default(0) @db.Decimal(10, 2)
+  total         Decimal      @db.Decimal(10, 2)
+  estado        SaleState    @default(completada)
+  observaciones String?      @db.Text
+  user          User?        @relation(fields: [id_usuario], references: [id_usuario])
+  client        Client?      @relation(fields: [id_cliente], references: [id_cliente])
+  detalle_ventas SaleDetail[]
+
+  @@map("ventas")
+}
+
+enum SaleState {
+  pendiente
+  completada
+  cancelada
+}
+
+model SaleDetail {
+  id_detalle_venta String   @id @default(uuid()) @db.Uuid @map("id_detalle_venta")
+  id_venta         String   @db.Uuid @map("id_venta") // ¡CAMBIO AQUI!
+  id_producto      String   @db.Uuid @map("id_producto") // ¡CAMBIO AQUI!
+  cantidad         Int
+  precio_unitario  Decimal  @db.Decimal(10, 2) @map("precio_unitario")
+  subtotal         Decimal  @db.Decimal(10, 2)
+  venta            Sale     @relation(fields: [id_venta], references: [id_venta], onDelete: Cascade)
+  producto         Product  @relation(fields: [id_producto], references: [id_producto])
+
+  @@map("detalle_ventas")
+}
+
+model Purchase {
+  id_compra      String         @id @default(uuid()) @db.Uuid @map("id_compra")
+  id_usuario     String         @db.Uuid @map("id_usuario") // ¡CAMBIO AQUI!
+  numero_compra  String         @unique @db.VarChar(50) @map("numero_compra")
+  fecha_compra   DateTime       @default(now()) @map("fecha_compra")
+  total          Decimal        @db.Decimal(10, 2)
+  estado         PurchaseState  @default(completada)
+  observaciones  String?        @db.Text
+  user           User           @relation(fields: [id_usuario], references: [id_usuario])
+  detalle_compras PurchaseDetail[]
+
+  @@map("compras")
+}
+
+enum PurchaseState {
+  pendiente
+  completada
+  cancelada
+}
+
+model PurchaseDetail {
+  id_detalle_compra String   @id @default(uuid()) @db.Uuid @map("id_detalle_compra")
+  id_compra         String   @db.Uuid @map("id_compra") // ¡CAMBIO AQUI!
+  id_producto       String   @db.Uuid @map("id_producto") // ¡CAMBIO AQUI!
+  cantidad          Int
+  precio_unitario   Decimal  @db.Decimal(10, 2) @map("precio_unitario")
+  subtotal          Decimal  @db.Decimal(10, 2)
+  compra            Purchase @relation(fields: [id_compra], references: [id_compra], onDelete: Cascade)
+  producto          Product  @relation(fields: [id_producto], references: [id_producto])
+
+  @@map("detalle_compras")
+}
+
+model InventoryMovement {
+  id_movimiento   String        @id @default(uuid()) @db.Uuid @map("id_movimiento")
+  id_producto     String        @db.Uuid @map("id_producto") // ¡CAMBIO AQUI!
+  id_usuario      String        @db.Uuid @map("id_usuario") // ¡CAMBIO AQUI!
+  tipo_movimiento MovementType  @map("tipo_movimiento")
+  cantidad        Int
+  precio_unitario Decimal?      @db.Decimal(10, 2) @map("precio_unitario")
+  referencia      String?       @db.VarChar(100)
+  observaciones   String?       @db.Text
+  fecha_movimiento DateTime     @default(now()) @map("fecha_movimiento")
+  product         Product       @relation(fields: [id_producto], references: [id_producto])
+  user            User          @relation(fields: [id_usuario], references: [id_usuario])
+
+  @@map("movimientos_inventario")
+}
+
+enum MovementType {
+  entrada
+  salida
+  ajuste
+}
+
+// === NUEVO MODELO DMS 
+model DMS {
+  id          String    @id @default(uuid()) @db.Uuid
+  fileName    String    @map("file_name")
+  path        String    @unique // Ruta interna en el servidor
+  url         String    @unique // <--- AÑADE ESTE CAMPO AQUI para guardarlo en la DB
+  mimeType    String    @map("mime_type")
+  type        String
+  user        String?
+  module      String?
+  size        Int?
+  createdAt   DateTime @default(now())
+
+  @@map("dms")
+}
