@@ -6,6 +6,7 @@
 
 // // PrimeIcons (opcional, si usas iconos)
 // @import 'primeicons/primeicons.css';
+@import "primeicons/primeicons.css";
 @layer tw {
     @tailwind base;
   }
@@ -294,3 +295,42 @@ body {
         align-items: center;
     }
 }
+
+// Estilos del los botones de navegacion 
+.custom-nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background-color 0.2s;
+
+    &.left {
+        left: 10px;
+    }
+
+    &.right {
+        right: 10px;
+    }
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.8);
+    }
+    & > .pi { // Estilos específicos para los iconos de PrimeIcons
+        font-size: 1.5em;
+    }
+    
+}
+.primeng-carousel-container .p-carousel-indicators {
+    display: none !important;
+}
+
