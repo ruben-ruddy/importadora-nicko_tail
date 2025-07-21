@@ -176,4 +176,25 @@ export class ProductsService {
     }
     return product;
   }
+  // Método para obtener las últimas imágenes de productos
+  async findLatestProductImages(): Promise<string[]> {
+    const latestProducts = await this.prisma.product.findMany({
+      orderBy: {
+        fecha_creacion: 'desc', // Ordena por la fecha de creación descendente (los más nuevos primero)
+      },
+      take: 10, // Limita a los últimos 10
+      select: {
+        imagen_url: true, // Selecciona solo el campo imagen_url
+      },
+      where: {
+        activo: true, // Opcional: solo productos activos
+        NOT: { // Opcional: asegura que la imagen_url no sea nula
+            imagen_url: null,
+        }
+      }
+    });
+    // Mapea los resultados para devolver solo un array de URLs
+    return latestProducts.map(product => product.imagen_url).filter(url => url !== null) as string[];
+  }
+
 }

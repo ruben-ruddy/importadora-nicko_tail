@@ -13,6 +13,7 @@ import { SalesModule } from './sales/sales.module';
 import { PurchasesModule } from './purchases/purchases.module';
 import { InventoryMovementsModule } from './inventory-movements/inventory-movements.module';
 import { DmsModule } from './dms/dms.module';
+import { PublicProductsModule } from './public-products/public-products.module';
 
 @Module({
   imports: [
@@ -29,7 +30,8 @@ import { DmsModule } from './dms/dms.module';
     SalesModule,
     PurchasesModule,
     InventoryMovementsModule,
-    DmsModule, // <-- ¡Añade UsersModule aquí!
+    DmsModule,
+    PublicProductsModule, // <-- ¡Añade UsersModule aquí!
   ],
   controllers: [AppController],
   providers: [AppService],

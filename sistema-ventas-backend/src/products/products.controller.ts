@@ -31,7 +31,7 @@ export class ProductsController {
   }
 
   @Get()
-  //@Roles('Administrador', 'Vendedor', 'Almacenero', 'Cajero') // Roles que pueden listar productos
+  @Roles('Administrador', 'Vendedor', 'Almacenero', 'Cajero') // Roles que pueden listar productos
   @ApiOperation({ summary: 'Obtiene todos los productos (Roles: Administrador, Vendedor, Almacenero, Cajero)' })
   @ApiQuery({ name: 'search', required: false, type: String, description: 'Término de búsqueda por nombre, descripción o SKU.' })
   @ApiQuery({ name: 'categoryId', required: false, type: String, description: 'Filtrar por ID de categoría (UUID).' })
@@ -84,4 +84,5 @@ export class ProductsController {
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }
+  
 }

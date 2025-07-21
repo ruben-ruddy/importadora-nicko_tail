@@ -2,19 +2,16 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import { ValidationPipe } from '@nestjs/common'; // Importa ValidationPipe
+import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 
 async function bootstrap() {
-  // const app = await NestFactory.create(AppModule);
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
-/////
-
-app.useStaticAssets(join(__dirname, '..', 'uploads'), {
+  app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
-    });
+  });
 
   app.enableCors({
     origin: '*',
@@ -22,13 +19,14 @@ app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     allowedHeaders: '*',
     credentials: true,
   });
-/////
+
+  app.setGlobalPrefix('api'); // <--- ¡AÑADE ESTA LÍNEA AQUÍ!
 
   // Habilita la validación global de DTOs
   app.useGlobalPipes(new ValidationPipe({
-    whitelist: true, // Remueve propiedades que no están definidas en el DTO
-    forbidNonWhitelisted: true, // Lanza un error si hay propiedades no permitidas
-    transform: true, // Transforma los payloads a instancias del DTO
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transform: true,
   }));
 
   const config = new DocumentBuilder()
@@ -49,7 +47,7 @@ app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document);
+  SwaggerModule.setup('api/docs', app, document); // Swagger ya usa 'api/docs', pero esto solo es para su UI.
 
   await app.listen(3000);
   console.log(`Aplicación ejecutándose en: ${await app.getUrl()}`);
