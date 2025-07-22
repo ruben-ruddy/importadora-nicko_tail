@@ -5,6 +5,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
 import { Product as PrismaProduct } from '@prisma/client'; // Alias para el tipo Product de Prisma
+import { LatestProductImageDto } from './dto/latest-product-image.dto';
 
 @Injectable()
 export class ProductsService {
@@ -177,24 +178,31 @@ export class ProductsService {
     return product;
   }
   // Método para obtener las últimas imágenes de productos
-  async findLatestProductImages(): Promise<string[]> {
+  async findLatestProductImages(): Promise<LatestProductImageDto[]> {
     const latestProducts = await this.prisma.product.findMany({
       orderBy: {
-        fecha_creacion: 'desc', // Ordena por la fecha de creación descendente (los más nuevos primero)
+        fecha_creacion: 'desc',
       },
-      take: 10, // Limita a los últimos 10
+      take: 10,
       select: {
-        imagen_url: true, // Selecciona solo el campo imagen_url
+        imagen_url: true, // Asegúrate de que este campo tenga la URL
+        nombre_producto: true, // <-- ¡Añadido!
+        descripcion: true,    // <-- ¡Añadido!
       },
       where: {
-        activo: true, // Opcional: solo productos activos
-        NOT: { // Opcional: asegura que la imagen_url no sea nula
-            imagen_url: null,
+        activo: true,
+        NOT: {
+            imagen_url: null, // Solo productos con imagen
         }
       }
     });
-    // Mapea los resultados para devolver solo un array de URLs
-    return latestProducts.map(product => product.imagen_url).filter(url => url !== null) as string[];
+
+    // Mapea los resultados para asegurar el formato deseado
+    return latestProducts.map(product => ({
+      imagen_url: product.imagen_url as string, // Aseguramos que sea string, ya que lo filtramos por NOT null
+      nombre_producto: product.nombre_producto,
+      descripcion: product.descripcion || 'Sin descripción.' // Provee un fallback si es nulo
+    }));
   }
 
 }

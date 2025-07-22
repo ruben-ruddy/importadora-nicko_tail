@@ -2,8 +2,9 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { map, tap, catchError } from 'rxjs/operators'; // Importa 'map'
+import { map, tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
+import { ProductCarouselItem } from '../interfaces/product.interface'; // <-- ¡Importa la nueva interfaz!
 
 @Injectable({
   providedIn: 'root'
@@ -11,23 +12,27 @@ import { of } from 'rxjs';
 export class ImageService {
   
   private apiUrl = 'http://localhost:3000/api/public/products/latest-images'; 
-  // ¡Define la URL base de tu servidor donde se sirven las imágenes!
-  private serverBaseUrl = 'http://localhost:3000'; // <--- ¡AÑADE ESTO!
+  private serverBaseUrl = 'http://localhost:3000'; 
 
   constructor(private http: HttpClient) { }
 
-  getLatestProductImages(): Observable<string[]> {
+  // Cambia el tipo de retorno a Observable<ProductCarouselItem[]>
+  getLatestProductImages(): Observable<ProductCarouselItem[]> {
     console.log('ImageService: Realizando petición a:', this.apiUrl);
-    return this.http.get<string[]>(this.apiUrl).pipe(
+    // Cambia el tipo genérico de get a ProductCarouselItem[]
+    return this.http.get<ProductCarouselItem[]>(this.apiUrl).pipe(
       tap(data => console.log('ImageService: Datos recibidos (antes de procesar):', data)),
       map(data => {
-        // Mapea cada ruta para añadir la URL base del servidor
-        const fullImageUrls = data.map(path => `${this.serverBaseUrl}${path}`);
-        //console.log('ImageService: URLs de imágenes completas:', fullImageUrls);
+        // Mapea cada objeto para prefijar la imagen_url y asegurar el tipo
+        const fullImageUrls = data.map(product => ({
+          ...product, // Copia todas las propiedades del producto
+          imagen_url: `${this.serverBaseUrl}${product.imagen_url}` // Actualiza la URL de la imagen
+        }));
+        console.log('ImageService: Objetos de producto con URLs de imagen completas:', fullImageUrls);
         return fullImageUrls;
       }),
       catchError(error => {
-       // console.error('ImageService: Error al obtener imágenes:', error);
+        console.error('ImageService: Error al obtener imágenes:', error);
         return of([]);
       })
     );

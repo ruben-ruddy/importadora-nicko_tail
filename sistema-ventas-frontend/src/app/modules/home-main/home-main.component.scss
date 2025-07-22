@@ -1,0 +1,298 @@
+// src/app/modules/home-main/home-main.component.scss
+
+// --- Variables para Breakpoints ---
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1200px;
+
+// --- Estilos por defecto (Desktop First) ---
+
+.hero {
+    position: relative;
+    overflow: hidden;
+    height: 75vh; // Mantenemos la altura responsiva para desktop.
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0;
+}
+
+.primeng-carousel-container {
+    flex-grow: 1;
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+
+    .p-carousel-items-content {
+        height: 100%;
+    }
+}
+
+.custom-nav-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background-color 0.2s;
+    font-size: 1.5em;
+    line-height: 1;
+
+    &.left {
+        left: 20px;
+    }
+
+    &.right {
+        right: 20px;
+    }
+
+    &:hover {
+        background: rgba(0, 0, 0, 0.8);
+    }
+
+    & > .pi {
+        font-size: 1.5em;
+    }
+}
+
+.carousel-item {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row; // Desktop: lado a lado
+    align-items: center;
+    padding: 20px 40px; // Aumentamos padding horizontal para estética y mejor espaciado inicial
+    box-sizing: border-box;
+    background-color: #f8f8f8;
+}
+
+.carousel-content-left {
+    flex: 1.2;
+    min-width: 300px;
+    padding-right: 30px;
+    color: #333; // Este color es para el texto en el fondo claro del carousel-item
+    text-align: center; // Mantiene alineación izquierda en desktop
+
+    h2 {
+        font-size: 2.5em;
+        margin-bottom: 15px;
+        color: #333; // Color original. Si está sobre la imagen, no se verá bien.
+        // Aplicar la fuente Montserrat para el título
+        font-family: 'Montserrat', sans-serif;
+        font-weight: 800; // Un peso más fuerte para destacar el título
+        line-height: 1.2; // Mejorar el interlineado
+
+        // OPCIONAL: Sombra de texto para mejorar la legibilidad sobre imágenes
+        // text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.6);
+    }
+
+    p {
+        font-size: 1.2em;
+        line-height: 1.6;
+        color: #666; // Color original. Si está sobre la imagen, no se verá bien.
+        // Aplicar la fuente Inter para la descripción
+        font-family: 'Inter', sans-serif;
+        font-weight: 400; // Peso normal para la descripción
+
+        // OPCIONAL: Sombra de texto para mejorar la legibilidad sobre imágenes
+        // text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+    }
+}
+
+.carousel-image-right {
+    flex: 0.8; // Podría tomar un poco menos de espacio que el contenido (ej: 40% vs 60%)
+    min-width: 250px; // Asegura un ancho mínimo para la imagen en desktop
+    display: flex;
+    justify-content: center; // Centrado horizontal
+    align-items: center;    // Centrado vertical
+    overflow: hidden; // Previene desbordamiento visual del contenido hijo.
+    height: 100%; // Ocupa toda la altura disponible en .carousel-item
+    background-color: transparent; // Asegura que no haya un fondo inesperado que tape la imagen
+
+    img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; // Escala la imagen para que quepa completamente sin recortar.
+                             // Este es el comportamiento deseado para ver la imagen completa.
+        display: block;
+        // Si la imagen todavía se ve cortada, podría ser que el contenedor sea demasiado pequeño
+        // o que la imagen tenga un espacio transparente grande que hace parecer que se recorta.
+        transform: translateY(-50px); // Ajusta este valor (ej. -10px, -30px)
+    }
+}
+
+.cta-container {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    bottom: 40px;
+    z-index: 3;
+    display: flex;
+    gap: 15px;
+    padding: 10px 0;
+    width: fit-content;
+}
+
+.cta-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 18px 40px;
+    border: none;
+    border-radius: 50px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: bold;
+    position: relative;
+    overflow: hidden;
+    font-family: 'Inter', Arial, sans-serif; // O 'Montserrat' si quieres un estilo más audaz
+    font-weight: bold;
+}
+
+.cta-button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
+}
+
+.cta-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid rgba(255,255,255,0.3);
+    padding: 16px 38px;
+}
+
+.cta-secondary:hover {
+    background: rgba(255,255,255,0.1);
+    border-color: rgba(255,255,255,0.5);
+}
+
+
+// --- Media Query para Tablet (769px a 1200px) ---
+@media (min-width: ($mobile-breakpoint + 1)) and (max-width: $tablet-breakpoint) {
+    .hero {
+        height: 65vh;
+    }
+
+    .carousel-item {
+        padding: 15px 30px; // Ajusta padding para tablets
+    }
+
+    .carousel-content-left {
+        // En móviles, ya está centrado con 'text-align: center;' en '.carousel-item'
+        // pero podemos especificar la fuente y pesos aquí también para asegurar
+        h2 {
+            font-size: 1.8em;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700; // Ajuste de peso para móviles
+            line-height: 1.2;
+            // text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.6); // Opcional para móviles
+        }
+        p {
+            font-size: 1em;
+            font-family: 'Inter', sans-serif;
+            font-weight: 400;
+            // text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5); // Opcional para móviles
+        }
+    }
+
+    .carousel-image-right {
+        flex: 0.8; // Mantiene la proporción
+        min-width: 200px; // Ancho mínimo ajustado
+    }
+
+    .custom-nav-button {
+        width: 35px;
+        height: 35px;
+        font-size: 1.2em;
+    }
+
+    .cta-container {
+        bottom: 60px;
+        gap: 10px;
+    }
+
+    .cta-button {
+        padding: 15px 30px;
+        font-size: 15px;
+    }
+}
+
+
+// --- Media Query para Móviles (hasta 768px) ---
+@media (max-width: $mobile-breakpoint) {
+    .hero {
+        height: 60vh;
+    }
+
+    .carousel-item {
+        flex-direction: column; // Apila contenido verticalmente
+        padding: 15px; // Padding para móvil
+        text-align: center; // Centra el texto y la imagen al apilar
+        justify-content: center; // Asegura que el contenido apilado se centre verticalmente.
+    }
+
+    .carousel-content-left {
+        flex: unset; // Elimina la distribución flex, toma el ancho natural o auto.
+        width: 100%; // Ocupa todo el ancho disponible para el texto.
+        padding-right: 0; // Elimina el padding derecho
+        margin-bottom: 20px; // Añade espacio entre el texto y la imagen
+        h2 {
+            font-size: 1.8em;
+        }
+        p {
+            font-size: 1em;
+        }
+    }
+
+    .carousel-image-right {
+        flex: unset; // Elimina la distribución flex.
+        width: 100%; // Ocupa todo el ancho disponible para la imagen.
+        height: auto; // Deja que la altura se ajuste automáticamente.
+        // Si la imagen en móvil sigue siendo muy grande, puedes aplicar un max-height:
+        img {
+            max-height: 200px; // Limita la altura de la imagen en móviles si es necesario.
+            width: auto; // Asegura que el ancho se ajuste proporcionalmente para mantener el aspecto.
+            margin: 0 auto; // Centra la imagen horizontalmente si hay espacio.
+        }
+    }
+
+    .custom-nav-button {
+        width: 30px;
+        height: 30px;
+        font-size: 1em;
+        &.left {
+            left: 10px;
+        }
+        &.right {
+            right: 10px;
+        }
+    }
+
+    .cta-container {
+        flex-direction: column;
+        gap: 10px;
+        width: 90%;
+        bottom: 30px;
+    }
+
+    .cta-button {
+        width: 100%;
+        padding: 12px 20px;
+        font-size: 14px;
+    }
+
+    .cta-secondary {
+        padding: 10px 18px;
+    }
+}

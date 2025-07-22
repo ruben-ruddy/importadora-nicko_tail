@@ -1,34 +1,55 @@
-// // PrimeNG Theme
+// src/styles.scss (o similar, para estilos globales)
+
+// --- Variables para Breakpoints ---
+$mobile-breakpoint: 768px;
+$tablet-breakpoint: 1200px; // Tabletas grandes y desktops pequeños
+
+// PrimeNG Theme (Descomenta y ajusta si usas un tema específico)
 // @import 'primeng/resources/themes/vela-blue/theme.css';
 
-// // PrimeNG Core (requerido)
+// PrimeNG Core (requerido si usas componentes de PrimeNG)
+// Ya tienes los estilos principales de PrimeNG incluidos en los componentes
+// de Angular o a través de un tema. Si usas PrimeNG sin un tema, descomenta:
 // @import 'primeng/resources/primeng.min.css';
 
-// // PrimeIcons (opcional, si usas iconos)
-// @import 'primeicons/primeicons.css';
-@import "primeicons/primeicons.css";
+// PrimeIcons (requerido si usas iconos de PrimeIcons)
+@import "primeicons/primeicons.css"; // Solo una vez
+
+// Tailwind CSS imports (asegúrate de que tu configuración de Tailwind esté correcta en Angular.json)
 @layer tw {
     @tailwind base;
-  }
+}
 @tailwind components;
 @tailwind utilities;
+
+// Importa tus archivos de estilos personalizados (botonería, tipografía, etc.)
 @import 'theme/buttons.scss';
 @import 'theme/texts.scss';
-// Estilos generales del diseño
-body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    color: white;
+
+/*
+    ----------------------------------------------------------------------
+    ESTILOS GENERALES DE LA APLICACIÓN
+    ----------------------------------------------------------------------
+*/
+
+html {
+    // Definir el tamaño base de la fuente para usar rem de forma más controlada
+    font-size: 16px; // 1rem = 16px
 }
 
-// .design-container {
-//     // Si necesitas estilos para el contenedor principal
-// }
+body {
+    margin: 0;
+    // ¡CAMBIO AQUÍ! Fuente principal para todo el cuerpo
+    font-family: 'Inter', Arial, sans-serif;
+    color: white; // Color de texto predeterminado para el body
+    overflow-x: hidden;
+}
 
 .design3 {
     background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
     position: relative;
     overflow: hidden;
+    min-height: 100vh; // Asegura que el contenedor ocupe al menos toda la altura de la vista
 }
 
 .design3::before {
@@ -41,12 +62,12 @@ body {
     background: radial-gradient(ellipse at top, rgba(41, 128, 185, 0.1) 0%, transparent 70%);
 }
 
-// Estilos del encabezado
+// Estilos del encabezado (Header)
 .header {
     background: rgba(15, 15, 35, 0.95);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding: 20px 30px;
+    padding: 20px 30px; // Padding base para desktop
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -64,7 +85,7 @@ body {
 .logo-img {
     width: 55px;
     height: 55px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #667eea 0%, #ff4ba2 100%);
     border-radius: 15px;
     display: flex;
     align-items: center;
@@ -75,9 +96,19 @@ body {
     box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
 }
 
+.logo-icon-img {
+    max-width: 80%;   /* Limita el ancho de la imagen para que quepa dentro del .logo-img */
+    max-height: 80%;  /* Limita la altura de la imagen para que quepa dentro del .logo-img */
+    object-fit: contain; /* Asegura que la imagen se escale sin recortarse y manteniendo su proporción */
+    display: block; /* Importante para eliminar espacios extra */
+}
+
+
 .company-name {
     font-size: 24px;
     font-weight: bold;
+    // ¡CAMBIO AQUÍ! Fuente para el nombre de la compañía
+    font-family: 'Montserrat', sans-serif;
     background: linear-gradient(45deg, #667eea, #764ba2);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -106,18 +137,15 @@ body {
     transform: translateY(-2px);
 }
 
-// Estilos de la sección principal (hero)
+// Estilos de la sección principal (Hero) - General, no específica del carrusel
+// NOTA: El layout específico del carrusel se maneja en home-main.component.scss
 .hero {
-    min-height: 80vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    padding: 200px 30px;
+    min-height: 80vh; // Altura mínima general del hero para desktop
+    padding: 200px 30px; // Padding general del hero para desktop
     text-align: center;
     z-index: 5;
+    position: relative;
+    overflow: hidden;
 }
 
 .hero h1 {
@@ -127,7 +155,9 @@ body {
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-weight: 900;
+    // ¡CAMBIO AQUÍ! Fuente para el título principal del hero
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900; // Puedes ajustar el peso según los que importaste (500..900 para Montserrat)
     letter-spacing: -1px;
 }
 
@@ -139,69 +169,56 @@ body {
     margin-left: auto;
     margin-right: auto;
     line-height: 1.6;
+    // ¡CAMBIO OPCIONAL AQUÍ! Podrías mantener 'Inter' o usar otra para el párrafo
+    font-family: 'Inter', Arial, sans-serif;
 }
 
-.cta-container {
-    display: flex;
-    gap: 50px;
-    justify-content: center;
-    flex-wrap: wrap;
-}
-
-.cta-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-    padding: 18px 40px;
-    border: none;
-    border-radius: 50px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: bold;
-    position: relative;
-    overflow: hidden;
-}
-
-.cta-button:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 20px 40px rgba(102, 126, 234, 0.3);
-}
-
-.cta-secondary {
-    background: transparent;
-    color: white;
-    border: 2px solid rgba(255,255,255,0.3);
-    padding: 16px 38px;
-}
-
-.cta-secondary:hover {
-    background: rgba(255,255,255,0.1);
-    border-color: rgba(255,255,255,0.5);
-}
-
-// Estilos de los servicios
+// Estilos de los servicios (Services)
 .services {
-    padding: 40px 30px;
+    padding: 80px 30px;
     background: rgba(255,255,255,0.05);
+    color: white;
+    h2 { // Título de la sección de servicios
+        font-size: 3em;
+        text-align: center;
+        margin-bottom: 50px;
+        background: linear-gradient(45deg, #667eea, #764ba2);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        // ¡CAMBIO AQUÍ! Fuente para el título de la sección de servicios
+        font-family: 'Montserrat', sans-serif;
+        font-weight: bold; // O un peso específico como 700 o 800
+    }
 }
 
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); // Mayor min-width para desktop
     gap: 30px;
     margin-top: 30px;
+    max-width: 1200px; // Limita el ancho del grid en pantallas muy grandes
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .service-card {
-    background: rgba(255,255,255,0.1);
-    padding: 30px;
-    border-radius: 15px;
-    text-align: center;
-    color: white;
-    border: 1px solid rgba(255,255,255,0.1);
-    transition: all 0.3s ease;
+    /* ...otras propiedades... */
+    h3 { // Título de la tarjeta de servicio
+        font-size: 1.5em;
+        margin-top: 15px;
+        margin-bottom: 10px;
+        color: white;
+        // ¡CAMBIO AQUÍ! Fuente para el título de la tarjeta de servicio
+        font-family: 'Montserrat', sans-serif;
+    }
+    p { // Párrafo de la tarjeta de servicio
+        font-size: 1em;
+        line-height: 1.5;
+        color: rgba(255,255,255,0.7);
+        // ¡CAMBIO OPCIONAL AQUÍ! Puedes mantener 'Inter' o usar otra
+        font-family: 'Inter', Arial, sans-serif;
+    }
 }
 
 .service-card:hover {
@@ -221,116 +238,180 @@ body {
     font-size: 24px;
 }
 
-// Estilos del carrusel de PrimeNG y sus botones
-.primeng-carousel-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-}
 
-.carousel-item {
-    width: 100%;
-    height: 100%;
-}
+/*
+    ----------------------------------------------------------------------
+    MEDIA QUERIES GLOBALES
+    ----------------------------------------------------------------------
+*/
 
-.carousel-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-.p-carousel-prev,
-.p-carousel-next {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    z-index: 2;
-    transition: background-color 0.2s;
-}
-
-.p-carousel-prev {
-    left: 10px;
-}
-
-.p-carousel-next {
-    right: 10px;
-}
-
-.p-carousel-prev:hover,
-.p-carousel-next:hover {
-    background: rgba(0, 0, 0, 0.8);
-}
-
-.p-carousel-prev-icon,
-.p-carousel-next-icon {
-    font-size: 20px;
-}
-
-// Media queries
-@media (max-width: 768px) {
-    .hero h1 {
-        font-size: 36px;
+// --- Media Query para Tabletas y Desktops Pequeños (769px a 1200px) ---
+@media (min-width: ($mobile-breakpoint + 1)) and (max-width: $tablet-breakpoint) {
+    html {
+        font-size: 15px; // Reducir un poco el tamaño base para tablets
     }
-    
+
+    .header {
+        padding: 15px 20px; // Menos padding en el header
+    }
+
+    .logo-img {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
+
+    .company-name {
+        font-size: 22px;
+    }
+
     .nav {
-        flex-wrap: wrap;
-        gap: 15px !important;
+        gap: 15px; // Espacio entre elementos de navegación
     }
-    
-    .cta-container {
-        flex-direction: column;
-        align-items: center;
+
+    .nav a {
+        padding: 10px 20px; // Padding de enlaces más pequeño
+        font-family: 'Inter', Arial, sans-serif;
+        font-weight: 500;
+    }
+
+    .hero {
+        min-height: 65vh; // Altura mínima más pequeña
+        padding: 150px 20px; // Padding reducido
+    }
+
+    .hero h1 {
+        font-size: 44px; // Título más pequeño
+        margin-bottom: 20px;
+    }
+
+    .hero p {
+        font-size: 18px; // Párrafo más pequeño
+        margin-bottom: 30px;
+        max-width: 500px;
+    }
+
+    .services {
+        padding: 60px 20px; // Padding reducido
+        h2 {
+            font-size: 2.5em; // Título de sección más pequeño
+            margin-bottom: 40px;
+        }
+    }
+
+    .services-grid {
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); // Min-width de columnas más pequeño
+        gap: 25px;
+    }
+
+    .service-card {
+        padding: 25px;
+        h3 {
+            font-size: 1.4em;
+        }
+        p {
+            font-size: 0.95em;
+        }
+    }
+
+    .service-icon {
+        width: 55px;
+        height: 55px;
+        font-size: 22px;
     }
 }
 
-// Estilos del los botones de navegacion 
-.custom-nav-button {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0, 0, 0, 0.5);
-    color: white;
-    border: none;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    z-index: 2;
-    transition: background-color 0.2s;
 
-    &.left {
-        left: 10px;
+// --- Media Query para Móviles (hasta 768px) ---
+@media (max-width: $mobile-breakpoint) {
+    html {
+        font-size: 14px; // Reducir aún más el tamaño base para móviles
     }
 
-    &.right {
-        right: 10px;
+    .header {
+        flex-direction: column; // Apila el logo y la navegación
+        align-items: flex-start; // Alinea a la izquierda al apilar
+        padding: 15px 15px; // Menor padding
     }
 
-    &:hover {
-        background: rgba(0, 0, 0, 0.8);
+    .logo {
+        margin-bottom: 15px; // Espacio entre logo y nav al apilar
+        gap: 10px;
     }
-    & > .pi { // Estilos específicos para los iconos de PrimeIcons
-        font-size: 1.5em;
+
+    .logo-img {
+        width: 45px; /* Más pequeño para móviles */
+        height: 45px;
+        border-radius: 10px; /* Ajusta el radio si es necesario */
     }
-    
+
+    .logo-img {
+        width: 45px; /* Más pequeño para móviles */
+        height: 45px;
+        border-radius: 10px; /* Ajusta el radio si es necesario */
+    }
+
+    .company-name {
+        font-size: 20px;
+    }
+
+    .logo p { /* Estilo para "Global Trade Solutions" en móvil */
+        font-size: 12px;
+    }
+    .nav {
+        flex-direction: column; // Apila los enlaces de navegación
+        width: 100%; // Ocupa todo el ancho
+        gap: 8px; // Espacio entre enlaces apilados
+    }
+
+    .nav a {
+        width: calc(100% - 20px); // Ancho completo con padding
+        text-align: center; // Centra el texto
+        padding: 10px; // Menor padding para enlaces
+    }
+
+    .hero {
+        min-height: 50vh; // Altura mínima para móviles
+        padding: 100px 15px; // Menor padding
+    }
+
+    .hero h1 {
+        font-size: 32px; // Título mucho más pequeño
+        margin-bottom: 15px;
+    }
+
+    .hero p {
+        font-size: 16px; // Párrafo más pequeño
+        margin-bottom: 25px;
+        max-width: 90%; // Ancho adaptable
+    }
+
+    .services {
+        padding: 40px 15px; // Padding reducido para móviles
+        h2 {
+            font-size: 2em; // Título de sección más pequeño
+            margin-bottom: 30px;
+        }
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr; // Una columna en móvil
+        gap: 20px;
+    }
+
+    .service-card {
+        padding: 20px;
+        h3 {
+            font-size: 1.3em;
+        }
+        p {
+            font-size: 0.9em;
+        }
+    }
+
+    .service-icon {
+        width: 50px;
+        height: 50px;
+        font-size: 20px;
+    }
 }
-.primeng-carousel-container .p-carousel-indicators {
-    display: none !important;
-}
-

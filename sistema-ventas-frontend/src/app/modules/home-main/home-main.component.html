@@ -2,7 +2,10 @@
     <div class="design3">
         <header class="header">
             <div class="logo">
-                <div class="logo-img">🦅</div>
+                <div class="logo-img">
+                    <a href="/" class="logo-link"> <img src="/nicko.png" alt="Logo de IMPORTADORA NICKO" class="main-logo-image">
+                     </a>
+                </div>
                 <div>
                     <div class="company-name">IMPORTADORA NICKO</div>
                     <p style="margin: 0; opacity: 0.7; font-size: 14px; color: white;">Global Trade Solutions</p>
@@ -19,15 +22,20 @@
 
 <section class="hero">
     <p-carousel #carousel 
-        [value]="images" 
-        [numVisible]="1" 
+        [value]="products" [numVisible]="1" 
         [numScroll]="1" 
         [autoplayInterval]="5000"
         [showNavigators]="false"
         class="primeng-carousel-container">
-        <ng-template let-image pTemplate="item">
-            <div class="carousel-item">
-                <img [src]="image" alt="Imagen del carrusel">
+        <ng-template let-product pTemplate="item"> 
+            <div class="carousel-item two-columns"> 
+                <div class="carousel-content-left">
+                    <h2>{{ product.nombre_producto }}</h2>
+                    <p>{{ product.descripcion }}</p>
+                    </div>
+                <div class="carousel-image-right">
+                    <img [src]="product.imagen_url" [alt]="product.nombre_producto">
+                </div>
             </div>
         </ng-template>
     </p-carousel>
@@ -40,8 +48,8 @@
     </button>
 
     <div class="cta-container">
-        <button class="cta-button">Explorar Productos</button>
-        <button class="cta-button cta-secondary">Ver Presentación</button>
+        <button class="cta-button">Productos</button>
+        <button class="cta-button">Categorias</button>
     </div>
 </section>
             

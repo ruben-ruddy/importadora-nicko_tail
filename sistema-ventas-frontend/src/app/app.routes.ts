@@ -12,7 +12,7 @@ export const routes: Routes = [
     {
         path: 'home-main',
         loadChildren: () => import('./modules/home-main/home-main.routes').then(m => m.routes),
-        title: 'Principal'
+        title: 'Importadora Nicko'
     },
     {
         path: 'home',
