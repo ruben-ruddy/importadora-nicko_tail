@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { of } from 'rxjs';
-import { ProductCarouselItem } from '../interfaces/product.interface'; // <-- ¡Importa la nueva interfaz!
+import { ProductCarouselItem } from '../../interfaces/product.interface'; // <-- ¡Importa la nueva interfaz!
 
 @Injectable({
   providedIn: 'root'

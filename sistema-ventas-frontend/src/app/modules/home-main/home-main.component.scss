@@ -6,16 +6,6 @@ $tablet-breakpoint: 1200px;
 
 // --- Estilos por defecto (Desktop First) ---
 
-.hero {
-    position: relative;
-    overflow: hidden;
-    height: 75vh; // Mantenemos la altura responsiva para desktop.
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    padding: 0;
-}
-
 .primeng-carousel-container {
     flex-grow: 1;
     width: 100%;
@@ -128,18 +118,6 @@ $tablet-breakpoint: 1200px;
         // o que la imagen tenga un espacio transparente grande que hace parecer que se recorta.
         transform: translateY(-50px); // Ajusta este valor (ej. -10px, -30px)
     }
-}
-
-.cta-container {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    bottom: 40px;
-    z-index: 3;
-    display: flex;
-    gap: 15px;
-    padding: 10px 0;
-    width: fit-content;
 }
 
 .cta-button {
