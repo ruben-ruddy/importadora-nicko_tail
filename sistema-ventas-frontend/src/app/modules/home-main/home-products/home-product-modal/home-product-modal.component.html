@@ -1,0 +1,35 @@
+<div class="product-details-modal p-4
+             bg-dark-blue-bg text-white rounded-lg shadow-xl border border-white/10
+             bg-opacity-95 max-w-xl"> <div *ngIf="product">
+    <div class="text-center mb-6">
+      <img [src]="product.imageUrl || 'assets/placeholder.png'"
+           [alt]="product.name"
+           class="modal-image mx-auto w-64 h-64 object-contain mb-4 border border-white/20 p-2 rounded-lg bg-gray-900">
+      <h2 class="text-2xl font-bold text-white">{{ product.name }}</h2>
+      <p class="text-md text-white/70">{{ product.category || 'Sin categoría' }}</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <div>
+        <h3 class="font-semibold text-white/90 mb-1">Descripción:</h3>
+        <p class="text-white/80 text-sm leading-relaxed">{{ product.description || 'Sin descripción.' }}</p>
+      </div>
+      <div>
+        <h3 class="font-semibold text-white/90 mb-1">Precio:</h3>
+        <p class="text-2xl font-bold text-primary-600">{{ product.price | currency:'Bs: ':'symbol':'1.2-2' }}</p>
+        <h3 class="font-semibold text-white/90 mb-1 mt-4">Stock Disponible:</h3>
+        <p class="text-white/80 text-lg">{{ product.stock || 0 }} unidades</p>
+      </div>
+    </div>
+
+    <div class="flex justify-end gap-3 pt-4 border-t border-white/20">
+      <p-button label="Cerrar" icon="pi pi-times"
+                styleClass="p-button-secondary bg-gray-600 hover:bg-gray-700 text-white border-none"
+                (onClick)="closeModal()">
+      </p-button>
+    </div>
+  </div>
+  <div *ngIf="!product" class="text-center text-white/70 py-10">
+    No se pudo cargar la información del producto.
+  </div>
+</div>

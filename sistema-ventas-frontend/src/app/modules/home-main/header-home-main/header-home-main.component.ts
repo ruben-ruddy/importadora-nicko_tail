@@ -2,11 +2,12 @@ import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core
 import { isPlatformBrowser, CommonModule } from '@angular/common'; // Asegúrate de importar CommonModule
 import { fromEvent, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
+import { RouterModule } from '@angular/router'; // ¡Importante!
 
 @Component({
   selector: 'app-header-home-main', // Selector ajustado para este componente específico
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, RouterModule],
   templateUrl: './header-home-main.component.html',
   styleUrls: ['./header-home-main.component.scss']
 })

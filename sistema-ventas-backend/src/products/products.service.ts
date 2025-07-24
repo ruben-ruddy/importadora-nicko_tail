@@ -1,18 +1,22 @@
 // src/products/products.service.ts
-import { ConflictException, Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { ProductQueryDto } from './dto/product-query.dto';
-import { Product as PrismaProduct } from '@prisma/client'; // Alias para el tipo Product de Prisma
+import { Product as PrismaProduct } from '@prisma/client';
 import { LatestProductImageDto } from './dto/latest-product-image.dto';
 
 @Injectable()
 export class ProductsService {
+  // Define la URL base de tu backend aquí
+  // Es CRUCIAL que esta URL coincida con la URL donde tu backend está sirviendo los archivos estáticos.
+  private readonly baseUrl: string = 'http://localhost:3000'; // <--- ¡AÑADE ESTA LÍNEA!
+
   constructor(private prisma: PrismaService) {}
 
+  // --- Métodos CRUD Existentes ---
   async create(createProductDto: CreateProductDto): Promise<PrismaProduct> {
-    // 1. Verificar si la categoría existe
     const category = await this.prisma.category.findUnique({
       where: { id_categoria: createProductDto.id_categoria },
     });
@@ -21,35 +25,33 @@ export class ProductsService {
       throw new NotFoundException(`La categoría con ID "${createProductDto.id_categoria}" no existe.`);
     }
 
-    // 2. Verificar si ya existe un producto con el mismo nombre o codigo_producto
     const existingProduct = await this.prisma.product.findFirst({
-        where: {
-            OR: [
-                { nombre_producto: createProductDto.nombre_producto },
-                ...(createProductDto.codigo_producto ? [{ codigo_producto: createProductDto.codigo_producto }] : []) // <-- CAMBIADO DE 'sku' A 'codigo_producto'
-            ]
-        }
+      where: {
+        OR: [
+          { nombre_producto: createProductDto.nombre_producto },
+          ...(createProductDto.codigo_producto ? [{ codigo_producto: createProductDto.codigo_producto }] : [])
+        ]
+      }
     });
 
     if (existingProduct) {
-        if (existingProduct.nombre_producto === createProductDto.nombre_producto) {
-            throw new ConflictException(`El producto con nombre "${createProductDto.nombre_producto}" ya existe.`);
-        }
-        if (createProductDto.codigo_producto && existingProduct.codigo_producto === createProductDto.codigo_producto) { // <-- CAMBIADO DE 'sku' A 'codigo_producto'
-            throw new ConflictException(`El producto con código "${createProductDto.codigo_producto}" ya existe.`);
-        }
+      if (existingProduct.nombre_producto === createProductDto.nombre_producto) {
+        throw new ConflictException(`El producto con nombre "${createProductDto.nombre_producto}" ya existe.`);
+      }
+      if (createProductDto.codigo_producto && existingProduct.codigo_producto === createProductDto.codigo_producto) {
+        throw new ConflictException(`El producto con código "${createProductDto.codigo_producto}" ya existe.`);
+      }
     }
 
-    // 3. Crear el producto
     return this.prisma.product.create({
       data: {
         id_categoria: createProductDto.id_categoria,
         nombre_producto: createProductDto.nombre_producto,
-        codigo_producto: createProductDto.codigo_producto || '', // <-- Usa codigo_producto
+        codigo_producto: createProductDto.codigo_producto || '',
         descripcion: createProductDto.descripcion,
-        precio_venta: createProductDto.precio_venta, // <-- Mapeado de 'precio' a 'precio_venta'
+        precio_venta: createProductDto.precio_venta,
         precio_compra: createProductDto.precio_compra,
-        stock_actual: createProductDto.stock_actual,   // <-- Mapeado de 'stock' a 'stock_actual'
+        stock_actual: createProductDto.stock_actual,
         imagen_url: createProductDto.imagen_url,
         activo: createProductDto.activo,
       },
@@ -68,7 +70,7 @@ export class ProductsService {
       where.OR = [
         { nombre_producto: { contains: search, mode: 'insensitive' } },
         { descripcion: { contains: search, mode: 'insensitive' } },
-        { codigo_producto: { contains: search, mode: 'insensitive' } }, // <-- CAMBIADO DE 'sku' A 'codigo_producto'
+        { codigo_producto: { contains: search, mode: 'insensitive' } },
       ];
     }
 
@@ -106,64 +108,60 @@ export class ProductsService {
   }
 
   async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<PrismaProduct> {
-    // 1. Verificar si la categoría existe si se está actualizando
     if (updateProductDto.id_categoria) {
-        const category = await this.prisma.category.findUnique({
-            where: { id_categoria: updateProductDto.id_categoria },
-        });
-        if (!category) {
-            throw new NotFoundException(`La categoría con ID "${updateProductDto.id_categoria}" no existe.`);
-        }
+      const category = await this.prisma.category.findUnique({
+        where: { id_categoria: updateProductDto.id_categoria },
+      });
+      if (!category) {
+        throw new NotFoundException(`La categoría con ID "${updateProductDto.id_categoria}" no existe.`);
+      }
     }
 
-    // 2. Verificar duplicidad de nombre o codigo_producto si se están actualizando
-    if (updateProductDto.nombre_producto || updateProductDto.codigo_producto) { // <-- CAMBIADO DE 'sku' A 'codigo_producto'
-        const existingProduct = await this.prisma.product.findFirst({
-            where: {
-                AND: [
-                    { id_producto: { not: id_producto } }, // Excluye el producto actual
-                    {
-                        OR: [
-                            ...(updateProductDto.nombre_producto ? [{ nombre_producto: updateProductDto.nombre_producto }] : []),
-                            ...(updateProductDto.codigo_producto ? [{ codigo_producto: updateProductDto.codigo_producto }] : []) // <-- CAMBIADO DE 'sku' A 'codigo_producto'
-                        ]
-                    } ]
-                }
-            });
-
-            if (existingProduct) {
-                if (updateProductDto.nombre_producto && existingProduct.nombre_producto === updateProductDto.nombre_producto) {
-                    throw new ConflictException(`El producto con nombre "${updateProductDto.nombre_producto}" ya existe.`);
-                }
-                if (updateProductDto.codigo_producto && existingProduct.codigo_producto === updateProductDto.codigo_producto) { // <-- CAMBIADO DE 'sku' A 'codigo_producto'
-                    throw new ConflictException(`El producto con código "${updateProductDto.codigo_producto}" ya existe.`);
-                }
+    if (updateProductDto.nombre_producto || updateProductDto.codigo_producto) {
+      const existingProduct = await this.prisma.product.findFirst({
+        where: {
+          AND: [
+            { id_producto: { not: id_producto } },
+            {
+              OR: [
+                ...(updateProductDto.nombre_producto ? [{ nombre_producto: updateProductDto.nombre_producto }] : []),
+                ...(updateProductDto.codigo_producto ? [{ codigo_producto: updateProductDto.codigo_producto }] : [])
+              ]
             }
+          ]
         }
+      });
 
-    // Mapear los campos del DTO a los del modelo de Prisma
+      if (existingProduct) {
+        if (updateProductDto.nombre_producto && existingProduct.nombre_producto === updateProductDto.nombre_producto) {
+          throw new ConflictException(`El producto con nombre "${updateProductDto.nombre_producto}" ya existe.`);
+        }
+        if (updateProductDto.codigo_producto && existingProduct.codigo_producto === updateProductDto.codigo_producto) {
+          throw new ConflictException(`El producto con código "${updateProductDto.codigo_producto}" ya existe.`);
+        }
+      }
+    }
+
     const dataToUpdate: any = {};
     if (updateProductDto.id_categoria !== undefined) dataToUpdate.id_categoria = updateProductDto.id_categoria;
     if (updateProductDto.nombre_producto !== undefined) dataToUpdate.nombre_producto = updateProductDto.nombre_producto;
     if (updateProductDto.codigo_producto !== undefined) {
-        dataToUpdate.codigo_producto = updateProductDto.codigo_producto || ''; // Mantiene si codigo_producto es requerido
+      dataToUpdate.codigo_producto = updateProductDto.codigo_producto || '';
     }
     if (updateProductDto.descripcion !== undefined) dataToUpdate.descripcion = updateProductDto.descripcion;
-    if (updateProductDto.precio_venta !== undefined) dataToUpdate.precio_venta = updateProductDto.precio_venta; // <-- Mapeado
-    if (updateProductDto.precio_compra !== undefined) dataToUpdate.precio_compra = updateProductDto.precio_compra; // <-- ¡NUEVO CAMPO!
-    if (updateProductDto.stock_actual !== undefined) dataToUpdate.stock_actual = updateProductDto.stock_actual;   // <-- Mapeado
+    if (updateProductDto.precio_venta !== undefined) dataToUpdate.precio_venta = updateProductDto.precio_venta;
+    if (updateProductDto.precio_compra !== undefined) dataToUpdate.precio_compra = updateProductDto.precio_compra;
+    if (updateProductDto.stock_actual !== undefined) dataToUpdate.stock_actual = updateProductDto.stock_actual;
     if (updateProductDto.imagen_url !== undefined) dataToUpdate.imagen_url = updateProductDto.imagen_url;
     if (updateProductDto.activo !== undefined) dataToUpdate.activo = updateProductDto.activo;
 
-
-    // 3. Actualizar el producto
     const product = await this.prisma.product.update({
       where: { id_producto },
-      data: dataToUpdate, // Usar el objeto mapeado
+      data: dataToUpdate,
     });
 
     if (!product) {
-        throw new NotFoundException(`Producto con ID "${id_producto}" no encontrado para actualizar.`);
+      throw new NotFoundException(`Producto con ID "${id_producto}" no encontrado para actualizar.`);
     }
     return product;
   }
@@ -173,36 +171,132 @@ export class ProductsService {
       where: { id_producto },
     });
     if (!product) {
-        throw new NotFoundException(`Producto con ID "${id_producto}" no encontrado para eliminar.`);
+      throw new NotFoundException(`Producto con ID "${id_producto}" no encontrado para eliminar.`);
     }
     return product;
   }
-  // Método para obtener las últimas imágenes de productos
-  async findLatestProductImages(): Promise<LatestProductImageDto[]> {
-    const latestProducts = await this.prisma.product.findMany({
-      orderBy: {
-        fecha_creacion: 'desc',
-      },
-      take: 10,
-      select: {
-        imagen_url: true, // Asegúrate de que este campo tenga la URL
-        nombre_producto: true, // <-- ¡Añadido!
-        descripcion: true,    // <-- ¡Añadido!
-      },
-      where: {
-        activo: true,
-        NOT: {
-            imagen_url: null, // Solo productos con imagen
-        }
-      }
-    });
 
-    // Mapea los resultados para asegurar el formato deseado
-    return latestProducts.map(product => ({
-      imagen_url: product.imagen_url as string, // Aseguramos que sea string, ya que lo filtramos por NOT null
-      nombre_producto: product.nombre_producto,
-      descripcion: product.descripcion || 'Sin descripción.' // Provee un fallback si es nulo
-    }));
+  // --- Métodos para el Frontend Público (Home y Carrusel) ---
+
+  // Método existente para el carrusel (lo modificamos ligeramente)
+  async findLatestProductImages(): Promise<LatestProductImageDto[]> {
+    try {
+      const latestProducts = await this.prisma.product.findMany({
+        orderBy: {
+          fecha_creacion: 'desc',
+        },
+        take: 10, // Puedes ajustar la cantidad que quieras para el carrusel
+        select: {
+          imagen_url: true,
+          nombre_producto: true,
+          descripcion: true,
+        },
+        where: {
+          activo: true,
+          NOT: {
+            imagen_url: null, // Solo productos con imagen
+          },
+        },
+      });
+
+      // Mapea los resultados para asegurar el formato del DTO.
+      // Aquí devolvemos la URL relativa como viene de la DB ('/uploads/...')
+      return latestProducts.map(product => ({
+        imagen_url: product.imagen_url as string, // Ya filtramos por NOT null
+        nombre_producto: product.nombre_producto,
+        descripcion: product.descripcion || 'Sin descripción.',
+      }));
+    } catch (error) {
+      console.error('Error in ProductsService.findLatestProductImages:', error);
+      throw new InternalServerErrorException('Error al obtener las últimas imágenes de productos para el carrusel.');
+    }
   }
 
+  // NUEVO Método para obtener TODOS los productos públicos (para la página principal de productos)
+  async findAllPublicProducts(): Promise<any[]> {
+    try {
+      const products = await this.prisma.product.findMany({
+        where: {
+          activo: true, // Solo productos que estén marcados como activos
+        },
+        include: {
+          category: {
+            select: {
+              nombre_categoria: true,
+            },
+          },
+        },
+      });
+
+      // Mapear los productos para añadir la URL completa de la imagen
+      return products.map(product => {
+        let imageUrl: string | null = null;
+        if (product.imagen_url) {
+          // Construye la URL ABSOLUTA utilizando la baseUrl del servicio
+          imageUrl = `${this.baseUrl}${product.imagen_url}`;
+          console.log(`Backend Product ${product.nombre_producto}: imageUrl = ${imageUrl}`); 
+        }
+
+        return {
+          id: product.id_producto, // Mapea el ID de Prisma a un nombre más genérico
+          name: product.nombre_producto,
+          category: product.category?.nombre_categoria || 'Sin categoría', // Acceso seguro a la categoría
+          price: parseFloat(product.precio_venta.toString()), // Convertir Decimal a número flotante
+          stock: product.stock_actual,
+          description: product.descripcion,
+          imageUrl: imageUrl, // Esta es la URL completa que el frontend necesita
+          // Puedes añadir más campos del producto si son necesarios en la UI principal
+        };
+      });
+    } catch (error) {
+      console.error('Error in ProductsService.findAllPublicProducts:', error);
+      throw new InternalServerErrorException('Error al obtener todos los productos públicos.');
+    }
+  }
+
+  // NUEVO Método para obtener un producto público por ID (para el pop-up modal si hace su propia llamada)
+  async findPublicProductById(id_producto: string): Promise<any> {
+    try {
+      const product = await this.prisma.product.findUnique({
+        where: {
+          id_producto: id_producto,
+          activo: true, // Asegúrate de que el producto esté activo
+        },
+        include: {
+          category: {
+            select: {
+              nombre_categoria: true,
+            },
+          },
+        },
+      });
+
+      if (!product) {
+        throw new NotFoundException(`Producto con ID "${id_producto}" no encontrado o no está activo.`);
+      }
+
+      let imageUrl: string | null = null;
+      if (product.imagen_url) {
+        // Construye la URL ABSOLUTA para la imagen del producto detallado
+        imageUrl = `${this.baseUrl}${product.imagen_url}`;
+      }
+
+      return {
+        id: product.id_producto,
+        name: product.nombre_producto,
+        category: product.category?.nombre_categoria || 'Sin categoría',
+        price: parseFloat(product.precio_venta.toString()),
+        stock: product.stock_actual,
+        description: product.descripcion,
+        imageUrl: imageUrl,
+        // Puedes añadir aquí otros campos del producto que sean relevantes para el pop-up/detalle
+      };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error; // Propaga la excepción NotFoundException
+      }
+      console.error(`Error in ProductsService.findPublicProductById for ID ${id_producto}:`, error);
+      throw new InternalServerErrorException('Error al obtener el producto público por ID.');
+    }
+  }
 }

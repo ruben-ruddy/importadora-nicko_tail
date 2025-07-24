@@ -1,0 +1,58 @@
+<div class="design-container">
+  <div class="design3 min-h-screen relative overflow-hidden
+              bg-gradient-to-br from-dark-blue-bg via-medium-blue-bg to-light-blue-bg">
+
+    <div class="absolute inset-0 z-0 radial-gradient-overlay"></div>
+    
+    <app-header-home-main></app-header-home-main>
+
+    <div class="product-page-content relative z-10 p-8 pt-24 text-white">
+      <h2 class="text-3xl font-bold text-center mb-8 text-white">Nuestros Productos</h2>
+
+      <div class="search-bar flex justify-center mb-8 gap-4">
+        <p-inputText
+          [(ngModel)]="searchTerm"
+          (input)="filterProducts()"
+          placeholder="Buscar producto por nombre..."
+          class="w-full max-w-md p-inputtext-lg text-gray-900 bg-white rounded-lg p-3"
+        ></p-inputText>
+      </div>
+
+      <div class="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
+        <p-card *ngFor="let product of filteredProducts"
+                styleClass="p-card-shadow hover:shadow-xl transition-shadow duration-300 cursor-pointer bg-white/10 border border-white/5 text-white"
+                (click)="openProductDetailsModal(product)">
+
+          <ng-template pTemplate="header">
+            <div class="image-container w-full h-48 overflow-hidden flex items-center justify-center bg-gray-100">
+              <img [src]="product.imageUrl || 'assets/placeholder.png'"
+                   [alt]="product.name"
+                   class="object-contain h-full w-full">
+            </div>
+          </ng-template>
+
+          <ng-template pTemplate="title">
+            <h3 class="text-lg font-semibold text-white truncate">{{ product.name }}</h3>
+          </ng-template>
+
+          <ng-template pTemplate="subtitle">
+            <p class="text-sm text-white/70">{{ product.category || 'Sin categoría' }}</p>
+          </ng-template>
+
+          <ng-template pTemplate="content">
+            <p class="text-xl font-bold text-primary-600 mt-2">{{ product.price | currency:'Bs: ':'symbol':'1.2-2' }}</p>
+          </ng-template>
+
+          <ng-template pTemplate="footer">
+          </ng-template>
+        </p-card>
+
+        <div *ngIf="filteredProducts?.length === 0" class="col-span-full text-center text-white/70 text-lg py-10">
+          No se encontraron productos.
+        </div>
+      </div>
+    </div>
+
+    <app-footer-home-main></app-footer-home-main>
+  </div>
+</div>

@@ -4,7 +4,7 @@
             <div class="logo flex items-center gap-4 text-white
                          mb-0 md:mb-0">
                 <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-start to-pink-end flex items-center justify-center text-white font-bold text-xl">
-                    <a href="http://localhost:4200/login"><img src="/nicko.png" alt="Logo de IMPORTADORA NICKO" class="max-w-[100%] max-h-[100%] object-contain block"></a>
+                    <a routerLink="/login" routerLinkActive="active-link"  ><img src="/nicko.png" alt="Logo de IMPORTADORA NICKO" class="max-w-[100%] max-h-[100%] object-contain block"></a>
                 </div>
                 <div>
                     <div class="company-name text-2xl font-bold font-montserrat
@@ -23,30 +23,37 @@
             <nav class="nav fixed top-0 right-0 h-full w-[280px] bg-dark-blue-bg p-6 flex flex-col gap-4
                          transform translate-x-full transition-transform duration-300 ease-in-out z-20
                          md:relative md:h-auto md:w-auto md:bg-transparent md:p-0 md:flex-row md:gap-5 md:transform-none md:z-auto"
-                 [class.translate-x-0]="isMenuOpen && !isDesktop"
-                 [class.translate-x-full]="!isMenuOpen && !isDesktop">
+         [class.translate-x-0]="isMenuOpen && !isDesktop"
+         [class.translate-x-full]="!isMenuOpen && !isDesktop">
 
-                <a href="#" class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-                                 py-3 px-6 rounded-3xl border border-transparent
-                                 hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-                                 text-left md:w-auto md:px-3">INICIO</a>
-                <a href="#" class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-                                 py-3 px-6 rounded-3xl border border-transparent
-                                 hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-                                 text-left md:w-auto md:px-3">PRODUCTOS</a>
-                <a href="#" class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-                                 py-3 px-6 rounded-3xl border border-transparent
-                                 hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-                                 text-left md:w-auto md:px-3">CATEGORÍAS</a>
-                <a href="#" class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-                                 py-3 px-6 rounded-3xl border border-transparent
-                                 hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-                                 text-left md:w-auto md:px-3">QUIENES SOMOS</a>
-                <a href="#" class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-                                 py-3 px-6 rounded-3xl border border-transparent
-                                 hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-                                 text-left md:w-auto md:px-3">CONTACTO</a>
-            </nav>
+    <a routerLink="/home-main"                           routerLinkActive="active-link"               class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
+              py-3 px-6 rounded-3xl border border-transparent
+              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+              text-left md:w-auto md:px-3">INICIO</a>
+
+    <a routerLink="/products"                       routerLinkActive="active-link"               class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
+              py-3 px-6 rounded-3xl border border-transparent
+              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+              text-left md:w-auto md:px-3">PRODUCTOS</a>
+
+    <a routerLink="/categories"                      routerLinkActive="active-link"
+       class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
+              py-3 px-6 rounded-3xl border border-transparent
+              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+              text-left md:w-auto md:px-3">CATEGORÍAS</a>
+
+    <a routerLink="/about-us"                        routerLinkActive="active-link"
+       class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
+              py-3 px-6 rounded-3xl border border-transparent
+              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+              text-left md:w-auto md:px-3">QUIENES SOMOS</a>
+
+    <a routerLink="/contact"                        routerLinkActive="active-link"
+       class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
+              py-3 px-6 rounded-3xl border border-transparent
+              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+              text-left md:w-auto md:px-3">CONTACTO</a>
+</nav>
 
             <div *ngIf="isMenuOpen && !isDesktop" (click)="toggleMenu()"
                  class="fixed inset-0 bg-black/50 z-10 transition-opacity duration-300 ease-in-out opacity-0"
