@@ -1,5 +1,5 @@
 // src/categories/dto/create-category.dto.ts
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, MaxLength, IsOptional, IsBoolean } from 'class-validator';
 
 export class CreateCategoryDto {
@@ -27,4 +27,10 @@ export class CreateCategoryDto {
   @IsBoolean({ message: 'El estado activo debe ser un valor booleano.' })
   @IsOptional()
   activo?: boolean = true; // Por defecto es true
+
+  @ApiPropertyOptional({ description: 'URL de la imagen del producto (obtenida del DMS)', example: '/uploads/1678912345-mi-imagen.jpg' })
+  @IsOptional()
+  @IsString()
+  icono_url?: string; // Ahora contendrá la URL devuelta por el servicio DMS
+
 }

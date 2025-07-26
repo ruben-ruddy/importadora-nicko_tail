@@ -14,6 +14,7 @@ import { PurchasesModule } from './purchases/purchases.module';
 import { InventoryMovementsModule } from './inventory-movements/inventory-movements.module';
 import { DmsModule } from './dms/dms.module';
 import { PublicProductsModule } from './public-products/public-products.module';
+import { PublicCategoriesModule } from './public-categories/public-categories.module';
 
 @Module({
   imports: [
@@ -31,7 +32,8 @@ import { PublicProductsModule } from './public-products/public-products.module';
     PurchasesModule,
     InventoryMovementsModule,
     DmsModule,
-    PublicProductsModule, // <-- ¡Añade UsersModule aquí!
+    PublicProductsModule,
+    PublicCategoriesModule, // <-- ¡Añade UsersModule aquí!
   ],
   controllers: [AppController],
   providers: [AppService],

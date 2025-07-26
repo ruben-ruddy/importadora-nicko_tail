@@ -45,9 +45,11 @@ model Category {
   id_categoria    String   @id @default(uuid()) @db.Uuid @map("id_categoria")
   nombre_categoria String   @unique @db.VarChar(100) @map("nombre_categoria")
   descripcion     String?  @db.Text
+  icono_url       String?  @db.VarChar(255) @map("icono_url")
   activo          Boolean  @default(true)
   fecha_creacion  DateTime @default(now()) @map("fecha_creacion")
   productos       Product[]
+
 
   @@map("categorias")
 }

@@ -7,32 +7,15 @@
 }
 @tailwind components;
 @tailwind utilities;
-
-body {
-    // Puedes dejar propiedades globales aquí si no quieres aplicarlas con clases en el body tag
-    color: white;
-    overflow-x: hidden;
-}
-.radial-gradient-overlay {
-    @apply absolute inset-0 z-0;
-    background: radial-gradient(ellipse at top, rgba(41, 128, 185, 0.1) 0%, transparent 70%);
-}
-.company-name-gradient {
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.services-title-gradient {
-  background: linear-gradient(45deg, #667eea, #764ba2);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.hero-h1-gradient {
-    background: linear-gradient(45deg, #667eea, #764ba2, #f093fb);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
+// .p-inputtext {
+//   @apply w-full max-w-md bg-white text-gray-900 rounded-lg p-3;
+//   /* Puedes añadir o sobrescribir más estilos aquí si las clases en el HTML no son suficientes */
+//   /* Por ejemplo, un borde si lo quieres explícitamente y PrimeNG no lo está poniendo */
+//   border: 1px solid #d1d5db; /* border-gray-300 */
+//   /* Si quieres que se vea siempre, incluso si PrimeNG lo oculta */
+//   display: block !important;
+//   box-sizing: border-box !important;
+// }
+// .p-card {
+//   @apply shadow-lg rounded-xl bg-white/10 border border-white/5 text-white;
+// }

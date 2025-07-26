@@ -8,6 +8,7 @@ import { RippleModule } from 'primeng/ripple';
 import { HttpClientModule } from '@angular/common/http';
 import { ImageService } from '../../project/services/image.service';
 import { ProductCarouselItem } from '../../interfaces/product.interface';
+import { RouterModule } from '@angular/router'; // ¡Importante!
 
 // ¡ASEGÚRATE DE QUE ESTAS IMPORTACIONES ESTÉN PRESENTES!
 import { HeaderHomeMainComponent } from './header-home-main/header-home-main.component';
@@ -23,7 +24,8 @@ import { FooterHomeMainComponent } from './footer-home-main/footer-home-main.com
     RippleModule,
     HttpClientModule,
     HeaderHomeMainComponent, // Asegúrate de que este también esté
-    FooterHomeMainComponent // <--- ¡DEBE ESTAR AQUÍ!
+    FooterHomeMainComponent, // <--- ¡DEBE ESTAR AQUÍ!
+    RouterModule
   ],
   templateUrl: './home-main.component.html',
   styleUrl: './home-main.component.scss'

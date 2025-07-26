@@ -69,6 +69,9 @@ module.exports = {
         'pink-end': '#EE99C2', // Si usas pink-end en algún lugar
         'gray-text-dark': '#333',
         'gray-text-medium': '#666',
+        // 'dark-blue-bg': '#1e3a8a',    // Ejemplo: azul oscuro
+        // 'medium-blue-bg': '#3b82f6',  // azul medio
+        // 'light-blue-bg': '#93c5fd',   // azul claro
       },
       fontFamily: {
         // **Nuevas fuentes personalizadas**
@@ -144,6 +147,9 @@ module.exports = {
       },
       boxShadow: {
         '2xl-purple': '0 20px 40px rgba(102, 126, 234, 0.3)', // Para el hover del cta-button
+      },
+       backgroundImage: {
+        'services-title-gradient': 'linear-gradient(to right, #a855f7, #ec4899)', // Ejemplo: gradiente púrpura-rosa
       },
     },
   },

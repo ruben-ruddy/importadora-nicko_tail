@@ -17,6 +17,7 @@ import { DmsService } from './dms.service';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { ApiTags, ApiOperation, ApiResponse, ApiConsumes, ApiBody } from '@nestjs/swagger';
 import { DmsResponseDto } from './dto/dms-response.dto'; // <-- ¡Importa el DTO!
+import { Roles } from 'src/auth/decorators/roles.decorator';
 
 @ApiTags('DMS')
 @Controller('dms')
@@ -24,6 +25,7 @@ export class DmsController {
   constructor(private readonly dmsService: DmsService) {}
 
   @Post('upload')
+  @Roles('Administrador') // Solo administradores pueden crear categorías
   @UseInterceptors(FileInterceptor('file'))
   @ApiOperation({ summary: 'Sube un archivo al Digital Media Storage (DMS)' })
   @ApiConsumes('multipart/form-data')
@@ -58,6 +60,7 @@ export class DmsController {
   }
 
   @Get(':id')
+  @Roles('Administrador') // Solo administradores pueden crear categorías
   @ApiOperation({ summary: 'Obtiene los metadatos de un archivo DMS por su ID' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Metadatos del archivo DMS.', type: DmsResponseDto }) // <-- Usa el DTO aquí
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Entrada DMS no encontrada.' })
@@ -67,6 +70,7 @@ export class DmsController {
   }
 
   @Delete(':id')
+  @Roles('Administrador') // Solo administradores pueden crear categorías
   @ApiOperation({ summary: 'Elimina una entrada DMS y su archivo asociado por su ID' })
   @ApiResponse({ status: HttpStatus.OK, description: 'Entrada DMS y archivo eliminados exitosamente.' })
   @ApiResponse({ status: HttpStatus.NOT_FOUND, description: 'Entrada DMS no encontrada.' })

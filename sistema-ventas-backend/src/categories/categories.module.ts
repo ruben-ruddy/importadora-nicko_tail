@@ -8,5 +8,6 @@ import { PrismaModule } from '../prisma/prisma.module'; // <-- ¡Importa PrismaM
   imports: [PrismaModule], // <-- Aquí es donde se importa PrismaModule
   controllers: [CategoriesController],
   providers: [CategoriesService], // <-- Solo CategoriesService aquí
+  exports: [CategoriesService],  // Asegúrate de exportar el servicio
 })
 export class CategoriesModule {}

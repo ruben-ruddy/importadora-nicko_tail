@@ -7,16 +7,19 @@
     <app-header-home-main></app-header-home-main>
 
     <div class="product-page-content relative z-10 p-8 pt-24 text-white">
-      <h2 class="text-3xl font-bold text-center mb-8 text-white">Nuestros Productos</h2>
+      <h2 class="text-3xl font-bold text-center mb-8 text-white">NUESTROS PRODUCTOS</h2>
 
-      <div class="search-bar flex justify-center mb-8 gap-4">
-        <p-inputText
-          [(ngModel)]="searchTerm"
-          (input)="filterProducts()"
-          placeholder="Buscar producto por nombre..."
-          class="w-full max-w-md p-inputtext-lg text-gray-900 bg-white rounded-lg p-3"
-        ></p-inputText>
-      </div>
+      <div class="search-bar flex justify-center mb-8 gap-4 px-4 w-full">
+                <input
+                    type="text"
+                    [(ngModel)]="searchTerm"
+                    (input)="filterProducts()"
+                    placeholder="Buscar producto por nombre..."
+                    class="w-full max-w-md p-3 text-gray-900 bg-white rounded-lg
+                           focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent
+                           shadow-md"
+                />
+                </div>
 
       <div class="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
         <p-card *ngFor="let product of filteredProducts"
