@@ -3,7 +3,7 @@ import { Routes } from '@angular/router';
 import { authGuard } from './core/auth.guard';
 import { HomeProductsComponent } from './modules/home-main/home-products/home-products.component';
 import { HomeCategoriesComponent } from './modules/home-main/home-categories/home-categories.component';
-import { CategoryProductsPageComponent } from './modules/home-main/category-products/category-products.component';
+import { CategoryProductsComponent } from './modules/home-main/category-products/category-products.component';
 
 
 export const routes: Routes = [
@@ -19,9 +19,9 @@ export const routes: Routes = [
         title: 'Importadora Nicko'
     },
     {
-    path: 'products', // La ruta para la nueva página de productos (con buscador, etc.)
+         path: 'products', // La ruta para la nueva página de productos (con buscador, etc.)
                       // Esta ruta no debe colisionar con el módulo 'product' existente si lo tienes
-    component: HomeProductsComponent, // Usa el NUEVO componente de productos
+        component: HomeProductsComponent, // Usa el NUEVO componente de productos
           title: 'Productos - Importadora Nicko'
     },
     {
@@ -34,8 +34,10 @@ export const routes: Routes = [
       component: HomeCategoriesComponent, 
       title: 'Categorías'
     },
-    { path: 'products/:categoryName',
-      component: CategoryProductsPageComponent, 
-      title: 'Productos por Categoría' },
+    {
+        path: 'products/:categoryName/:categoryId', // <--- ¡CAMBIO AQUÍ!
+        component: CategoryProductsComponent,
+        title: 'Productos por Categoría'
+    },
 
 ];

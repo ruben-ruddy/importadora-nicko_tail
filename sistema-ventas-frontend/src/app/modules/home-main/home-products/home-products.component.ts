@@ -1,106 +1,139 @@
-import { Component, OnInit } from '@angular/core';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { CommonModule } from '@angular/common';
-import { lastValueFrom } from 'rxjs'; // Necesario para lastValueFrom
+// src/app/modules/home-main/home-products/home-products.component.ts
+// (o src/app/modules/home-main/public-products/public-products.component.ts)
 
-// Componentes del mismo módulo
-import { HomeProductModalComponent } from './home-product-modal/home-product-modal.component';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule, CurrencyPipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClientModule } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
+import { Observable, Subscription } from 'rxjs';
+import { environment } from '../../../../environments/environment'; // Asegúrate de que esta ruta es correcta
+
+// PrimeNG imports
+//import { CardModule } from 'primeng/card';
+import { InputTextModule } from 'primeng/inputtext';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+
+// Tus interfaces y servicios
+import { ProductCarouselItem } from '../../../interfaces/product.interface';
+import { ImageService } from '../../../project/services/image.service'; // Tu servicio que obtiene productos
 import { HeaderHomeMainComponent } from "../header-home-main/header-home-main.component";
 import { FooterHomeMainComponent } from "../footer-home-main/footer-home-main.component";
+import { HomeProductModalComponent } from './home-product-modal/home-product-modal.component'; // Tu componente modal
 
-// Importa el ImageService centralizado (asegúrate de la ruta correcta)
-import { ImageService } from '../../../project/services/image.service'; // <-- ¡IMPORTANTE!
-
-// Servicios generales
-import { GeneralService } from '../../../core/gerneral.service';
-
-// PrimeNG Modules
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { FormsModule } from '@angular/forms';
 
 @Component({
-  selector: 'app-home-products',
+  selector: 'app-home-products', // Verifica que este sea el selector correcto para tu componente
   standalone: true,
   imports: [
     CommonModule,
-    CardModule,
-    ButtonModule,
-    InputTextModule,
     FormsModule,
-    FooterHomeMainComponent,
+    HttpClientModule,
+    RouterModule,
+    //CardModule,
+    InputTextModule,
     HeaderHomeMainComponent,
-   // HomeProductModalComponent // Asegúrate de que el modal también se importe aquí si se usa como stand-alone
+    FooterHomeMainComponent,
+    //CurrencyPipe
   ],
   templateUrl: './home-products.component.html',
-  styleUrl: './home-products.component.scss',
-  providers: [DialogService], // DialogService debe estar aquí
+  styleUrls: ['./home-products.component.scss'],
+  providers: [DialogService]
 })
-export class HomeProductsComponent implements OnInit {
-  products: any[] = [];
-  filteredProducts: any[] = [];
-  ref!: DynamicDialogRef; // `ref` para la referencia al modal
+export class HomeProductsComponent implements OnInit, OnDestroy { // O el nombre de tu clase
+  products: ProductCarouselItem[] = [];
+  filteredProducts: ProductCarouselItem[] = [];
   searchTerm: string = '';
+  isLoading = true;
+  errorMessage: string | null = null;
+
+  // --- ¡CLAVE! La URL base de tu backend ---
+  // Ajusta esto si tu backend no está en http://localhost:3000
+  backendBaseUrl: string = environment.backend.replace('/api', ''); // Asumiendo que environment.backend es ej. http://localhost:3000/api
+
+
+  ref: DynamicDialogRef | undefined;
+  private modalSubscription: Subscription | undefined;
 
   constructor(
-    // ¡Ahora inyectamos el ImageService!
-    private imageService: ImageService, // <--- ¡CAMBIO CLAVE AQUÍ!
-    private dialogService: DialogService,
-    private generalService: GeneralService
+    private imageService: ImageService,
+    private dialogService: DialogService
   ) { }
 
   ngOnInit(): void {
-    this.generalService.show(); // Mostrar spinner o indicador de carga
-    this.loadProducts();
+    this.loadAllProducts();
   }
 
-  async loadProducts() {
-    this.generalService.show(); // Mostrar spinner o indicador de carga antes de la llamada
-    try {
-      // Usamos el nuevo método getAllPublicProducts() del ImageService
-      const fetchedProducts = await lastValueFrom(this.imageService.getAllPublicProducts());
-
-      if (fetchedProducts) {
-        this.products = fetchedProducts;
-        this.filteredProducts = [...this.products]; // Inicializar filteredProducts
-        console.log('HomeProductsComponent: Productos cargados:', this.products);
-      } else {
-        this.products = [];
-        this.filteredProducts = [];
-        console.log('HomeProductsComponent: La carga de productos no devolvió datos.');
-      }
-    } catch (error) {
-      console.error('HomeProductsComponent: Error al cargar productos:', error);
-      this.products = []; // Asegurarse de que el array esté vacío en caso de error
-      this.filteredProducts = [];
-    } finally {
-      this.generalService.hide(); // Ocultar spinner o indicador de carga
+  ngOnDestroy(): void {
+    if (this.modalSubscription) {
+      this.modalSubscription.unsubscribe();
+    }
+    if (this.ref) {
+      this.ref.close();
     }
   }
 
-  filterProducts() {
+  loadAllProducts(): void {
+    this.isLoading = true;
+    this.errorMessage = null;
+    // Asumiendo que ImageService.getAllPublicProducts() devuelve ProductCarouselItem[]
+    this.imageService.getAllPublicProducts().subscribe({
+      next: data => {
+        this.products = data;
+        this.filterProducts();
+        this.isLoading = false;
+        if (this.products.length === 0) {
+            this.errorMessage = 'No se encontraron productos.';
+        }
+      },
+      error: err => {
+        console.error('Error al cargar todos los productos:', err);
+        this.errorMessage = 'No se pudieron cargar los productos. Inténtalo de nuevo más tarde.';
+        this.isLoading = false;
+      }
+    });
+  }
+
+  filterProducts(): void {
     if (!this.searchTerm) {
       this.filteredProducts = [...this.products];
     } else {
+      const lowerCaseSearchTerm = this.searchTerm.toLowerCase();
       this.filteredProducts = this.products.filter(product =>
-        product.name.toLowerCase().includes(this.searchTerm.toLowerCase())
+        product.nombre_producto.toLowerCase().includes(lowerCaseSearchTerm)
       );
     }
   }
 
-  openProductDetailsModal(product: any) {
+  // --- ¡CLAVE! Método para construir la URL completa de la imagen ---
+  getFullImageUrl(relativeUrl: string | null | undefined): string {
+    if (relativeUrl) {
+      // Si la URL ya es absoluta (ej. empieza con http), úsala directamente
+      if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
+        return relativeUrl;
+      }
+      // Si es una ruta relativa (ej. /uploads/...), concaténala con la base del backend
+      return `${this.backendBaseUrl}${relativeUrl}`;
+    }
+    // Si no hay URL, usa un placeholder
+    return 'assets/placeholder-product.png';
+  }
+
+  openProductModal(product: ProductCarouselItem): void {
     this.ref = this.dialogService.open(HomeProductModalComponent, {
-      data: { product: product }, // Pasamos el objeto producto completo al modal
-      header: product.name,
-      width: '40%',
+      data: {
+        product: product
+      },
+      header: '',
+      width: '50vw',
       modal: true,
-      closable: true
+      closable: false,
+      position: 'center' // Opcional: posición del modal
     });
 
-    this.ref.onClose.subscribe((data: any) => {
-      // Lógica a ejecutar cuando el modal se cierra
-      console.log('Modal de producto cerrado, datos de retorno (si los hay):', data);
+    this.modalSubscription = this.ref.onClose.subscribe((result: any) => {
+      console.log('Modal de producto cerrado. Resultado:', result);
+      this.ref = undefined;
     });
   }
 }

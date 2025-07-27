@@ -5,11 +5,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 import { RouterModule, Router } from '@angular/router';
-import { environment } from '../../../../environments/environment'; // Importa el entorno
+import { environment } from '../../../../environments/environment';
 
-// Rutas ajustadas según tu esquema y código actual
-import { CategoriesService } from './home-categories.service'; // Mantenemos tu ruta actual para este servicio
-import { Category } from '../../../interfaces/category.interface'; // CORRECCIÓN DE LA RUTA DEL INTERFACE
+import { CategoriesService } from './home-categories.service';
+import { Category } from '../../../interfaces/category.interface'; // Asegúrate de que esta ruta sea correcta
 
 import { HeaderHomeMainComponent } from "../header-home-main/header-home-main.component";
 import { FooterHomeMainComponent } from "../footer-home-main/footer-home-main.component";
@@ -27,7 +26,6 @@ export class HomeCategoriesComponent implements OnInit {
   isLoading: boolean = true;
   errorMessage: string | null = null;
 
-  // --- CORRECCIÓN AQUÍ: Usar environment.backend y quitar /api ---
   backendBaseUrl: string = environment.backend.replace('/api', '');
 
   constructor(
@@ -48,7 +46,7 @@ export class HomeCategoriesComponent implements OnInit {
           id_categoria: cat.id_categoria,
           nombre_categoria: cat.nombre_categoria,
           descripcion: cat.descripcion ?? null,
-          icono_url: this.getFullImageUrl(cat.icono_url), // Prefija la URL del icono
+          icono_url: this.getFullImageUrl(cat.icono_url),
           activo: cat.activo ?? true,
           fecha_creacion: cat.fecha_creacion ?? '',
         }));
@@ -73,8 +71,11 @@ export class HomeCategoriesComponent implements OnInit {
     }
   }
 
-  viewProductsByCategory(categoryId: string): void {
-    this.router.navigate(['/products/:categoryName'], { queryParams: { categoryId: categoryId } });
+  // --- CORRECCIÓN AQUÍ: Navegar con parámetros de ruta ---
+  viewProductsByCategory(categoryId: string, categoryName: string): void {
+    // Para una URL amigable, limpia el nombre de la categoría (ej. "Equipo Táctico" -> "Equipo-Tactico")
+    const cleanedCategoryName = categoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    this.router.navigate(['/products', cleanedCategoryName, categoryId]); // <--- ¡CAMBIO AQUÍ!
   }
 
   getFullImageUrl(relativeUrl: string | null | undefined): string {

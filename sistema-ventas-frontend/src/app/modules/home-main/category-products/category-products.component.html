@@ -1,43 +1,37 @@
 <div class="design3 min-h-screen relative overflow-hidden bg-gradient-to-br from-dark-blue-bg via-medium-blue-bg to-light-blue-bg">
 
     <div class="absolute inset-0 z-0 radial-gradient-overlay"></div>
-    
+
     <app-header-home-main></app-header-home-main>
 
     <main class="relative z-10 py-16 px-8 min-h-[calc(100vh-120px)] flex flex-col items-center">
-        <h1 class="text-4xl font-extrabold text-white mb-8 text-center services-title-gradient">
-            Productos de Categoría: <span class="capitalize">{{ categoryName }}</span>
-        </h1>
+        <h1 class="text-4xl font-extrabold text-white mb-8 text-center products-title-gradient">{{ categoryName }}</h1>
 
-        <div class="search-bar flex justify-center mb-12 w-full max-w-2xl px-4">
-            <input
-                type="text"
-                [(ngModel)]="searchTerm"
-                (input)="filterProducts()"
-                placeholder="Buscar productos en esta categoría..."
-                class="w-full p-3 text-gray-900 bg-white rounded-lg shadow-lg
-                       focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-        </div>
+        <div *ngIf="isLoading" class="text-white text-center col-span-full text-lg mb-4">Cargando productos...</div>
+        <div *ngIf="errorMessage" class="text-red-500 text-center col-span-full text-lg mb-4">{{ errorMessage }}</div>
 
-        <div class="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-7xl w-full">
-            <div *ngFor="let product of productsByCategory"
-                 class="product-card bg-white/10 rounded-xl shadow-lg p-6 flex flex-col items-center text-center
+        <div *ngIf="!isLoading && !errorMessage" class="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-6xl w-full">
+            <div *ngFor="let product of products"
+                 class="product-card flex flex-col items-center p-6 bg-white/10 rounded-xl shadow-lg
                         hover:bg-white/20 transition-all duration-300 ease-in-out transform hover:-translate-y-1
-                        border border-white/5 text-white">
-                <img [src]="product.imagen_url" [alt]="product.nombre_producto"
-                     class="w-32 h-32 object-contain mb-4 rounded-lg">
-                <h3 class="text-xl font-semibold font-montserrat mb-2">{{ product.nombre_producto }}</h3>
-                <p class="text-sm text-white/70 flex-grow">{{ product.descripcion }}</p>
-                <p class="text-lg font-bold text-purple-300 mt-2">Bs: {{ product.price | number:'1.2-2' }}</p>
+                        border border-white/5 text-white cursor-pointer"
+                 (click)="openProductModal(product)"> <img [src]="product.imagen_url"
+                     [alt]="product.nombre_producto"
+                     class="w-40 h-40 object-cover rounded-md mb-4 border-2 border-green-400 p-1">
+
+                <span class="text-xl font-semibold font-montserrat text-center mb-2">{{ product.nombre_producto }}</span>
+
+                <span *ngIf="product.category" class="text-sm text-gray-300 mb-2">{{ product.category }}</span>
+
+                <!-- <span class="text-2xl font-bold text-yellow-300">{{ product.price | currency:'Bs. ':'symbol':'1.2-2' }}</span> -->
             </div>
 
-            <p *ngIf="productsByCategory.length === 0" class="text-white text-center col-span-full text-lg">
-                No se encontraron productos en la categoría "{{ categoryName }}"
-                <span *ngIf="searchTerm"> para "{{ searchTerm }}"</span>.
+            <p *ngIf="products.length === 0 && !isLoading && !errorMessage" class="text-white text-center col-span-full text-lg">
+                No se encontraron productos para esta categoría.
             </p>
         </div>
     </main>
 
     <app-footer-home-main></app-footer-home-main>
-</div>
+
+    </div>

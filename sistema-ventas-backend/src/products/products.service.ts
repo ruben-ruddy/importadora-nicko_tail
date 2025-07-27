@@ -212,13 +212,19 @@ export class ProductsService {
     }
   }
 
-  // NUEVO Método para obtener TODOS los productos públicos (para la página principal de productos)
-  async findAllPublicProducts(): Promise<any[]> {
+  // Método unificado para obtener productos públicos (todos o filtrados por categoría)
+  async findAllPublicProducts(categoryId?: string): Promise<any[]> { // <--- ¡CAMBIO AQUÍ! Acepta categoryId opcional
     try {
+      const where: any = {
+        activo: true, // Siempre solo productos activos para el público
+      };
+
+      if (categoryId) {
+        where.id_categoria = categoryId; // Filtra por categoría si se proporciona
+      }
+
       const products = await this.prisma.product.findMany({
-        where: {
-          activo: true, // Solo productos que estén marcados como activos
-        },
+        where,
         include: {
           category: {
             select: {
@@ -226,31 +232,34 @@ export class ProductsService {
             },
           },
         },
+        orderBy: {
+          fecha_creacion: 'desc', // O por nombre_producto, según tu preferencia
+        }
       });
 
       // Mapear los productos para añadir la URL completa de la imagen
+      // y ajustarlos al formato de ProductCarouselItem esperado por el frontend
       return products.map(product => {
         let imageUrl: string | null = null;
         if (product.imagen_url) {
-          // Construye la URL ABSOLUTA utilizando la baseUrl del servicio
           imageUrl = `${this.baseUrl}${product.imagen_url}`;
-          console.log(`Backend Product ${product.nombre_producto}: imageUrl = ${imageUrl}`); 
         }
 
+        // Retorna un objeto que se parezca a ProductCarouselItem del frontend
+        // Asegúrate de que los nombres de las propiedades coincidan con tu interfaz ProductCarouselItem
         return {
-          id: product.id_producto, // Mapea el ID de Prisma a un nombre más genérico
-          name: product.nombre_producto,
-          category: product.category?.nombre_categoria || 'Sin categoría', // Acceso seguro a la categoría
-          price: parseFloat(product.precio_venta.toString()), // Convertir Decimal a número flotante
-          stock: product.stock_actual,
-          description: product.descripcion,
-          imageUrl: imageUrl, // Esta es la URL completa que el frontend necesita
-          // Puedes añadir más campos del producto si son necesarios en la UI principal
+          // id: product.id_producto, // ProductCarouselItem no tiene 'id'
+          category: product.category?.nombre_categoria || 'Sin categoría', // Propiedad 'category'
+          imagen_url: imageUrl, // Propiedad 'imagen_url'
+          nombre_producto: product.nombre_producto, // Propiedad 'nombre_producto'
+          descripcion: product.descripcion, // Propiedad 'descripcion'
+          price: parseFloat(product.precio_venta.toString()), // Propiedad 'price'
+          // No hay 'stock' en ProductCarouselItem, así que lo omitimos
         };
       });
     } catch (error) {
       console.error('Error in ProductsService.findAllPublicProducts:', error);
-      throw new InternalServerErrorException('Error al obtener todos los productos públicos.');
+      throw new InternalServerErrorException('Error al obtener productos públicos.');
     }
   }
 
