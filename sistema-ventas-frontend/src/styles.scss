@@ -1,5 +1,4 @@
-// PrimeIcons (requerido si usas iconos de PrimeIcons)
-@import "primeicons/primeicons.css"; // Solo una vez
+@import "primeicons/primeicons.css"; 
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Montserrat:wght@500..900&display=swap');
 // Tailwind CSS imports (asegúrate de que tu configuración de Tailwind esté correcta en Angular.json)
 @layer tw {
@@ -7,15 +6,3 @@
 }
 @tailwind components;
 @tailwind utilities;
-// .p-inputtext {
-//   @apply w-full max-w-md bg-white text-gray-900 rounded-lg p-3;
-//   /* Puedes añadir o sobrescribir más estilos aquí si las clases en el HTML no son suficientes */
-//   /* Por ejemplo, un borde si lo quieres explícitamente y PrimeNG no lo está poniendo */
-//   border: 1px solid #d1d5db; /* border-gray-300 */
-//   /* Si quieres que se vea siempre, incluso si PrimeNG lo oculta */
-//   display: block !important;
-//   box-sizing: border-box !important;
-// }
-// .p-card {
-//   @apply shadow-lg rounded-xl bg-white/10 border border-white/5 text-white;
-// }

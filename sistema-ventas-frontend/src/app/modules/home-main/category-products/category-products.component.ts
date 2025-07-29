@@ -23,7 +23,7 @@ import { HomeProductModalComponent } from '../home-products/home-product-modal/h
     HttpClientModule,
     HeaderHomeMainComponent,
     FooterHomeMainComponent,
-    CurrencyPipe
+    //CurrencyPipe
   ],
   templateUrl: './category-products.component.html',
   styleUrls: ['./category-products.component.scss'],

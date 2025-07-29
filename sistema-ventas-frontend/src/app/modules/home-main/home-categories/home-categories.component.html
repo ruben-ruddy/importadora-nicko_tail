@@ -29,7 +29,7 @@
                            border border-white/5 text-white cursor-pointer">
                 <img [src]="getFullImageUrl(category.icono_url)"
                      [alt]="category.nombre_categoria"
-                     class="w-24 h-24 object-cover rounded-full mb-4 border-2 border-purple-400 p-1">
+                     class="w-50 h-50 object-cover rounded-xl mb-4 border-2 border-purple-400 p-1">
                 <span class="text-xl font-semibold font-montserrat">{{ category.nombre_categoria }}</span>
                 <span *ngIf="category.descripcion" class="text-sm text-gray-300 mt-2">{{ category.descripcion }}</span>
             </button>

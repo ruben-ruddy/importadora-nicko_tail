@@ -9,7 +9,12 @@ import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { DateFnsConfigurationService } from 'ngx-date-fns';
 import localeEs from '@angular/common/locales/es';
 import { registerLocaleData } from '@angular/common';
-import { es } from 'date-fns/locale';
+import { es } from 'date-fns/locale'; 
+
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { providePrimeNG } from 'primeng/config';
+import Aura from '@primeuix/themes/aura';
+
 registerLocaleData(localeEs, 'es');
 
 const datefnConfig = new DateFnsConfigurationService();
@@ -29,6 +34,12 @@ export function HttpLoaderFactory(_httpBackend: HttpBackend) {
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    provideAnimationsAsync(),
+    providePrimeNG({
+            theme: {
+                preset: Aura
+            }
+        }),
    /*  MessageService, */
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
