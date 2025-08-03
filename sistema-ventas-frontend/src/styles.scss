@@ -1,8 +1,10 @@
-@import "primeicons/primeicons.css"; 
+
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Montserrat:wght@500..900&display=swap');
-// Tailwind CSS imports (asegúrate de que tu configuración de Tailwind esté correcta en Angular.json)
+
+
 @layer tw {
     @tailwind base;
 }
 @tailwind components;
 @tailwind utilities;
+

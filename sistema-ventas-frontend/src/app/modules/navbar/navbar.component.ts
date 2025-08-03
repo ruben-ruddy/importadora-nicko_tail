@@ -1,102 +1,58 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { RouterLink, RouterLinkActive } from '@angular/router';
 import { GeneralService } from '../../core/gerneral.service';
 import { ApiService } from '../../project/services/api.service';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterLink, RouterLinkActive,RouterOutlet],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './navbar.component.html',
   styleUrl: './navbar.component.scss'
 })
 export class NavbarComponent implements OnInit {
-public user:any
-public navItems:any
-isMenuOpen = false;
-constructor(private generalService:GeneralService, private service:ApiService){
-
-}
-
-ngOnInit(): void {
- this.user =  this.generalService.getUser()
- if(this.user?.role?.nombre_rol =="Administrador"){
- this.navItems= [
-    {
-      path: 'products',
-      title: 'Productos',
-      activeClass: 'border-indigo-500 text-gray-900',
-      inactiveClass: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-    },
-    {
-      path: 'category',
-      title: 'Categorías',
-      activeClass: 'border-indigo-500 text-gray-900',
-      inactiveClass: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-    },
-
-    {
-      path: 'user',
-      title: 'Usuarios',
-      activeClass: 'border-indigo-500 text-gray-900',
-      inactiveClass: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-    },
-
-    {
-      path: 'client',
-      title: 'Clientes',
-      activeClass: 'border-indigo-500 text-gray-900',
-      inactiveClass: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-    },
-
-    {
-      path: 'sale',
-      title: 'Ventas',
-      activeClass: 'border-indigo-500 text-gray-900',
-      inactiveClass: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-    },
-
-    {
-      path: 'parchase',
-      title: 'Compras',
-      activeClass: 'border-indigo-500 text-gray-900',
-      inactiveClass: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-    },
-
-    {
-      path: 'style',
-      title: 'Estilos',
-      activeClass: 'border-indigo-500 text-gray-900',
-      inactiveClass: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-    },
-   
-  ];
- }else{
-this.navItems= [
+  public user: any;
+  public navItems: any;
   
-    {
-      path: 'sale',
-      title: 'Ventas',
-      activeClass: 'border-indigo-500 text-gray-900',
-      inactiveClass: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
-    },
-    {
-      path: 'style',
-      title: 'Estilos',
-      activeClass: 'border-indigo-500 text-gray-900',
-      inactiveClass: 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700'
+  @Input() isMenuOpen = false;
+  @Output() sidebarToggled = new EventEmitter<boolean>();
+
+  constructor(private generalService: GeneralService, private service: ApiService) {}
+
+  ngOnInit(): void {
+    this.user = this.generalService.getUser();
+    this.loadNavItems();
+  }
+
+  loadNavItems() {
+    if (this.user?.role?.nombre_rol == "Administrador") {
+      this.navItems = [
+        { path: 'products', title: 'Productos' },
+        { path: 'category', title: 'Categorías' },
+        { path: 'user', title: 'Usuarios' },
+        { path: 'client', title: 'Clientes' },
+        { path: 'sale', title: 'Ventas' },
+        { path: 'parchase', title: 'Compras' },
+        { path: 'style', title: 'Estilos' }
+      ];
+    } else {
+      this.navItems = [
+        { path: 'sale', title: 'Ventas' },
+        { path: 'style', title: 'Estilos' }
+      ];
     }
-  ];
+  }
 
- }
- 
+  closeMenu() {
+    this.sidebarToggled.emit(false);
+  }
 
-  
-}
+  toggleMenu() {
+    this.sidebarToggled.emit(!this.isMenuOpen);
+  }
 
-logout() {
-this.service.logout();
-}
- 
+  logout() {
+    this.service.logout();
+  }
 }

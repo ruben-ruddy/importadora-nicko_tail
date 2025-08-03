@@ -23,13 +23,15 @@ export class ProductComponent {
             ) { }
 
   ngOnInit(): void {
-    this.generalService.show(); // option
+    //this.generalService.show(); // option
     this.loadProducts();
   }
 
   async loadProducts() {
     this.products = await this.productService.getProducts()
-    this.generalService.hide(); // option
+    console.log(this.products);
+    
+    //this.generalService.hide(); // option
   }
 
   openAddProductModal() {

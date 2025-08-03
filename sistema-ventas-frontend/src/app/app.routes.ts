@@ -4,7 +4,7 @@ import { authGuard } from './core/auth.guard';
 import { HomeProductsComponent } from './modules/home-main/home-products/home-products.component';
 import { HomeCategoriesComponent } from './modules/home-main/home-categories/home-categories.component';
 import { CategoryProductsComponent } from './modules/home-main/category-products/category-products.component';
-
+import { QuienesSomosComponent } from './modules/home-main/quienes-somos/quienes-somos.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home-main', pathMatch: 'full' },
@@ -39,5 +39,10 @@ export const routes: Routes = [
         component: CategoryProductsComponent,
         title: 'Productos por Categoría'
     },
+    
+    { path: 'quienes-somos', 
+      component: QuienesSomosComponent,
+      title: 'Quiénes Somos'
+    }
 
 ];

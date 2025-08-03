@@ -9,6 +9,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { ImageService } from '../../project/services/image.service';
 import { ProductCarouselItem } from '../../interfaces/product.interface';
 import { RouterModule } from '@angular/router'; // ¡Importante!
+import { ImageModule } from 'primeng/image';
 
 // ¡ASEGÚRATE DE QUE ESTAS IMPORTACIONES ESTÉN PRESENTES!
 import { HeaderHomeMainComponent } from './header-home-main/header-home-main.component';
@@ -25,7 +26,8 @@ import { FooterHomeMainComponent } from './footer-home-main/footer-home-main.com
     HttpClientModule,
     HeaderHomeMainComponent, // Asegúrate de que este también esté
     FooterHomeMainComponent, // <--- ¡DEBE ESTAR AQUÍ!
-    RouterModule
+    RouterModule,
+    ImageModule // Asegúrate de que ImageModule esté importado si usas imágenes
   ],
   templateUrl: './home-main.component.html',
   styleUrl: './home-main.component.scss'
@@ -34,6 +36,24 @@ export class HomeMainComponent implements OnInit, OnDestroy {
   @ViewChild('carousel') carousel!: Carousel;
 
   products: ProductCarouselItem[] = [];
+  // Opciones responsivas para el carousel
+  responsiveOptions = [
+    {
+      breakpoint: '1199px',
+      numVisible: 1,
+      numScroll: 1
+    },
+    {
+      breakpoint: '991px',
+      numVisible: 1,
+      numScroll: 1
+    },
+    {
+      breakpoint: '767px',
+      numVisible: 1,
+      numScroll: 1
+    }
+  ];
 
   constructor(
     private imageService: ImageService

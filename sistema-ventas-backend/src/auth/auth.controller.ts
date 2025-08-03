@@ -31,6 +31,8 @@ export class AuthController {
   @ApiResponse({ status: 401, description: 'Credenciales inválidas o usuario inactivo.' })
   @ApiResponse({ status: 400, description: 'Solicitud inválida (errores de validación).' })
   async login(@Body() loginDto: LoginDto) {
+    console.log('Login attempt with:', loginDto);
     return this.authService.login(loginDto);
+
   }
 }

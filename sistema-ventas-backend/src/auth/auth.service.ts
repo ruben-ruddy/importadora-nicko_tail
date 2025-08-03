@@ -7,11 +7,14 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from '@prisma/client';
 
+import { HttpService } from '@nestjs/axios'; // <-- Importa HttpService
+import { ConfigService } from '@nestjs/config'
+
 @Injectable()
 export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
-  constructor(private prisma: PrismaService, private jwtService: JwtService) {}
+  constructor(private prisma: PrismaService, private jwtService: JwtService, private httpService: HttpService, private configService: ConfigService,) {}
 
   async register(registerDto: RegisterDto) {
     const { nombre_usuario, email, password, nombre_completo, telefono, id_rol } = registerDto;
@@ -82,6 +85,7 @@ export class AuthService {
 
   async login(loginDto: LoginDto) {
     const { nombre_usuario, password } = loginDto;
+   
 
     const user = await this.prisma.user.findUnique({
       where: { nombre_usuario },

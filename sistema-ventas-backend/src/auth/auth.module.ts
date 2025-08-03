@@ -7,9 +7,13 @@ import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtStrategy } from './jwt.strategy'; // Importa la nueva estrategia JWT
+import { HttpModule } from '@nestjs/axios';
+import { config } from 'process';
 
 @Module({
   imports: [
+    HttpModule, // Importa el módulo HTTP para realizar solicitudes HTTP  
+    ConfigModule,
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],

@@ -6,93 +6,118 @@
         
         <app-header-home-main></app-header-home-main>
 
-        <section class="hero relative overflow-hidden h-[80vh] flex flex-col justify-center p-0
-                        xl:h-[80vh] xl:px-5 xl:py-[0px]
-                        md:h-[60vh] md:px-4 md:py-[100px]">
+<section class="hero relative overflow-hidden h-[80vh] flex flex-column justify-content-center p-0
+                        lg:h-[80vh] lg:px-5
+                        md:h-[60vh] md:px-4 md:pt-8">
             <p-carousel #carousel
-                [value]="products" [numVisible]="1"
+                [value]="products" 
+                [numVisible]="1"
                 [numScroll]="1"
                 [autoplayInterval]="5000"
+                [circular]="true"
+                [showIndicators]="false"
                 [showNavigators]="false"
-                class="primeng-carousel-container flex-grow w-full h-full relative z-10">
+                [responsiveOptions]="responsiveOptions"
+                class="w-full h-full flex-grow-1 relative z-1">
+                
                 <ng-template let-product pTemplate="item">
-                    <div class="carousel-item
-                                w-full h-full flex flex-row items-center px-10 py-5 box-border bg-gray-50
-                                xl:flex-row xl:px-8 xl:py-4
-                                md:flex-col md:px-4 md:py-4 md:text-center md:justify-center">
-                        <div class="carousel-content-left flex-[1.2] min-w-[300px] pr-8 text-gray-text-dark text-center
-                                     md:flex-none md:w-full md:pr-0 md:mb-5">
-                            <h2 class="text-4xl mb-4 text-gray-text-dark font-montserrat font-extrabold leading-tight
-                                         xl:text-3xl md:text-2xl">{{ product.nombre_producto }}</h2>
-                            <p class="text-lg leading-relaxed text-gray-text-medium font-inter font-normal
-                                         xl:text-base md:text-base">{{ product.descripcion }}</p>
+                    <div class="carousel-item h-full flex flex-row align-items-center px-5 py-0 surface-card border-round
+                                lg:flex-row lg:px-5
+                                md:flex-column md:px-3 md:py-3 md:text-center md:justify-content-center">
+                        
+                        <div class="carousel-content-left flex-1 flex flex-column justify-content-center pr-0 text-900 text-center
+                                        lg:pr-5
+                                        md:w-full md:pr-0 md:mb-3">
+                            <h2 class="text-4xl mb-3 text-primary font-bold line-height-3
+                                             lg:text-3xl 
+                                             md:text-2xl">{{ product.nombre_producto }}</h2>
+                            <p class="text-lg text-700 line-height-3 mb-4
+                                         lg:text-base 
+                                         md:text-sm">{{ product.descripcion }}</p>
+                            <!-- <p-button label="Ver detalles" icon="pi pi-eye" 
+                                [rounded]="true" severity="info" size="small" class="mt-3 w-full md:w-auto"></p-button> -->
                         </div>
-                        <div class="carousel-image-right flex-[0.8] min-w-[250px] flex justify-center items-center overflow-hidden h-full bg-transparent
-                                     xl:min-w-[200px]
-                                     md:flex-none md:w-full md:h-auto">
-                            <img [src]="product.imagen_url" [alt]="product.nombre_producto"
-                                 class="max-w-full max-h-full object-contain block -translate-y-[50px]
-                                         md:max-h-[200px] md:w-auto md:mx-auto md:translate-y-0">
+                        
+                        <div class="carousel-image-right flex-1 flex justify-content-center align-items-center overflow-hidden
+                                        lg:min-h-[400px]
+                                        md:min-h-[200px] md:mt-3">
+                            <p-image [src]="product.imagen_url" [alt]="product.nombre_producto" 
+                                width="100%" [preview]="true"
+                                class="block max-w-full max-h-[400px] shadow-4 border-round
+                                       lg:max-h-[350px]
+                                       md:max-h-[200px]"></p-image>
                         </div>
                     </div>
                 </ng-template>
             </p-carousel>
 
-            <button (click)="prevSlide()" class="custom-nav-button left absolute top-1/2 -translate-y-1/2 bg-black/50 text-white border-none w-10 h-10 rounded-full flex items-center justify-center cursor-pointer z-20 transition-colors duration-200 text-2xl leading-none
-                                hover:bg-black/80
-                                xl:w-9 xl:h-9 xl:text-xl
-                                md:w-8 md:h-8 md:text-lg md:left-2">
-                <i class="pi pi-angle-left text-2xl"></i>
+            <!-- Botones de navegación responsivos -->
+            <button (click)="prevSlide()" pRipple
+                class="custom-nav-button left absolute top-50% -translate-y-50% bg-primary text-white border-none w-3rem h-3rem border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
+                                lg:left-2
+                                md:left-1 md:w-2.5rem md:h-2.5rem">
+                <i class="pi pi-angle-left text-xl"></i>
             </button>
-            <button (click)="nextSlide()" class="custom-nav-button right absolute top-1/2 -translate-y-1/2 bg-black/50 text-white border-none w-10 h-10 rounded-full flex items-center justify-center cursor-pointer z-20 transition-colors duration-200 text-2xl leading-none
-                                hover:bg-black/80
-                                xl:w-9 xl:h-9 xl:text-xl
-                                md:w-8 md:h-8 md:text-lg md:right-2">
-                <i class="pi pi-angle-right text-2xl"></i>
+            
+            <button (click)="nextSlide()" pRipple
+                class="custom-nav-button right absolute top-50% -translate-y-50% bg-primary text-white border-none w-3rem h-3rem border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
+                                lg:right-2
+                                md:right-1 md:w-2.5rem md:h-2.5rem">
+                <i class="pi pi-angle-right text-xl"></i>
             </button>
 
-            <div class="cta-container absolute left-1/2 -translate-x-1/2 bottom-[10px] z-30 flex gap-[15px] py-[10px] w-fit
-                                xl:bottom-[10px] xl:gap-3 button-10
-                                md:w-auto md:bottom-16 md:gap-2">
-                <a routerLink="/products" routerLinkActive="active-link"><button class="cta-button bg-gradient-to-r from-purple-start to-purple-end text-white py-4 px-10 rounded-full text-base cursor-pointer transition-all duration-300 ease-in-out uppercase tracking-wider font-bold font-inter relative overflow-hidden
-                                        hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-start/30
-                                        xl:py-4 xl:px-8 xl:text-base
-                                        md:w-auto md:py-3 md:px-5 md:text-sm">PRODUCTOS</button></a>
-                <a routerLink="/categories" routerLinkActive="active-link"><button class="cta-button bg-gradient-to-r from-purple-start to-purple-end text-white py-4 px-10 rounded-full text-base cursor-pointer transition-all duration-300 ease-in-out uppercase tracking-wider font-bold font-inter relative overflow-hidden
-                                        hover:-translate-y-1 hover:shadow-2xl hover:shadow-purple-start/30
-                                        xl:py-4 xl:px-8 xl:text-base
-                                        md:w-auto md:py-3 md:px-5 md:text-sm">CATEGORÍAS</button></a>
+            <!-- CTA Container responsivo -->
+            <div class="cta-container absolute left-50% -translate-x-50% bottom-3 z-3 flex gap-3 py-2 w-full justify-content-center
+                            lg:bottom-3
+                            md:bottom-4 md:flex-wrap">
+                <a routerLink="/products" routerLinkActive="active-link">
+                    <!-- <button pButton type="button" label="PRODUCTOS" icon="pi pi-box" class="p-button-rounded p-button-info"></button> -->
+                    <button pButton type="button" label="PRODUCTOS" icon="pi pi-box" class="p-button-rounded p-button-info" 
+                        styleClass="p-button-raised p-button-rounded uppercase font-bold text-sm
+                                   lg:text-sm lg:py-2
+                                   md:text-xs md:py-1 md:px-2">
+                    </button>
+                </a>
+                <a routerLink="/categories" routerLinkActive="active-link">
+                    <!-- <button pButton type="button" label="CATEGORÍAS" icon="pi pi-tags" class="p-button-rounded p-button-info"></button> -->
+                    <button pButton type="button" label="CATEGORÍAS" icon="pi pi-tags" class="p-button-rounded p-button-info" 
+                        styleClass="p-button-raised p-button-rounded uppercase font-bold text-sm
+                                   lg:text-sm lg:py-2
+                                   md:text-xs md:py-1 md:px-2"
+                       >
+                    </button>
+                </a>
             </div>
         </section>
+
 
         <section class="services py-20 px-8 bg-white/5 text-white
                         xl:py-16 xl:px-6
                         md:py-10 md:px-4">
-            <h2 class="text-center text-3xl mb-10 font-montserrat font-bold
-                                services-title-gradient
-                                xl:text-2xl xl:mb-8
-                                md:text-xl md:mb-6">Nuestros Servicios</h2>
+            <h2 class="text-center text-4xl mb-3 text-primary font-bold line-height-3
+                                             lg:text-3xl 
+                                             md:text-2xl">NUESTROS SERVICIOS</h2>
             <div class="services-grid grid grid-cols-auto-fit-minmax-280 gap-8 mt-8 max-w-7xl mx-auto
-                                xl:gap-6
-                                md:grid-cols-1 md:gap-5">
+                        xl:gap-6
+                        md:grid-cols-1 md:gap-5">
                 <div class="service-card text-center p-8 bg-white/5 rounded-xl transition-all duration-300 ease-in-out border border-white/5
-                                 hover:-translate-y-1 hover:bg-white/15">
+                            hover:-translate-y-1 hover:bg-white/15">
                     <div class="service-icon w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center text-3xl
-                                     bg-gradient-to-br from-purple-start to-purple-end">📦</div>
+                                bg-gradient-to-br from-purple-start to-purple-end">📦</div>
                     <h3 class="text-xl mt-4 mb-2 text-white font-montserrat">Importación</h3>
                     <p class="text-base leading-relaxed text-white/70 font-inter">Gestión completa de procesos de importación internacional</p>
                 </div>
                 <div class="service-card text-center p-8 bg-white/5 rounded-xl transition-all duration-300 ease-in-out border border-white/5
-                                 hover:-translate-y-1 hover:bg-white/15">
+                            hover:-translate-y-1 hover:bg-white/15">
                     <div class="service-icon w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center text-3xl
-                                     bg-gradient-to-br from-purple-start to-purple-end">🚚</div>
+                                bg-gradient-to-br from-purple-start to-purple-end">🚚</div>
                     <h3 class="text-xl mt-4 mb-2 text-white font-montserrat">Distribución</h3>
                     <p class="text-base leading-relaxed text-white/70 font-inter">Red de distribución nacional con cobertura total</p>
                 </div>
                 <div class="service-card text-center p-8 bg-white/5 rounded-xl transition-all duration-300 ease-in-out border border-white/5
-                                 hover:-translate-y-1 hover:bg-white/15">
+                            hover:-translate-y-1 hover:bg-white/15">
                     <div class="service-icon w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center text-3xl
-                                     bg-gradient-to-br from-purple-start to-purple-end">🌐</div>
+                                bg-gradient-to-br from-purple-start to-purple-end">🌐</div>
                     <h3 class="text-xl mt-4 mb-2 text-white font-montserrat">Logística</h3>
                     <p class="text-base leading-relaxed text-white/70 font-inter">Soluciones logísticas integrales y personalizadas</p>
                 </div>

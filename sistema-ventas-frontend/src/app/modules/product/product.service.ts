@@ -13,7 +13,9 @@ export class ProductService {
     private generalService: GeneralService) { }
 
        getProducts() {
-        return firstValueFrom(this.http.get(`${environment.backend}/productos`));
+        console.log('Fetching products from backend:', environment.backend);
+        
+        return firstValueFrom(this.http.get(`${environment.backend}/products`));
        }
 
        createProducts(data:any) {

@@ -1,8 +1,13 @@
+// sistema-ventas-frontend/src/environments/environment.ts
 import { environmentDefault } from "./default";
 
 export const environment = {
-    ...environmentDefault,
+    ...environmentDefault, 
     production: false,
-    backend: 'http://localhost:3000/api', // Asegúrate que coincida con tu basePath en Nest
-    jwtKey: 'jwtToken' // Key para localStorage
-  };
+    backend: 'http://localhost:3000/api',
+    jwtKey: 'jwtToken',
+    // ELIMINA ESTE OBJETO PARA QUE SE USE LA CLAVE DEL DEFAULT.TS
+    // recaptcha: {
+    //   siteKey: '6Lebp5grAAAAAMS_4bwZ54er5eGPJRIHbIQviKRO',
+    // },
+};

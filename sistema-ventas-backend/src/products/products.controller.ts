@@ -10,14 +10,14 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Productos') // Etiqueta para Swagger UI
-@ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
-@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador
+// @ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
+// @UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador
 @Controller('products') // Prefijo de ruta para todos los endpoints de este controlador
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
   @Post()
-  @Roles('Administrador', 'Almacenero') // Solo administradores y almaceneros pueden crear productos
+  //@Roles('Administrador', 'Almacenero') // Solo administradores y almaceneros pueden crear productos
   @HttpCode(HttpStatus.CREATED) // Código de estado 201 para creación exitosa
   @ApiOperation({ summary: 'Crea un nuevo producto (Roles: Administrador, Almacenero)' })
   @ApiResponse({ status: 201, description: 'Producto creado exitosamente.' })
@@ -31,7 +31,7 @@ export class ProductsController {
   }
 
   @Get()
-  @Roles('Administrador', 'Vendedor', 'Almacenero', 'Cajero') // Roles que pueden listar productos
+  //@Roles('Administrador', 'Vendedor', 'Almacenero', 'Cajero') // Roles que pueden listar productos
   @ApiOperation({ summary: 'Obtiene todos los productos (Roles: Administrador, Vendedor, Almacenero, Cajero)' })
   @ApiQuery({ name: 'search', required: false, type: String, description: 'Término de búsqueda por nombre, descripción o SKU.' })
   @ApiQuery({ name: 'categoryId', required: false, type: String, description: 'Filtrar por ID de categoría (UUID).' })
@@ -42,11 +42,13 @@ export class ProductsController {
   @ApiResponse({ status: 401, description: 'No autorizado.' })
   @ApiResponse({ status: 403, description: 'Prohibido.' })
   findAll(@Query() query: ProductQueryDto) {
+    console.log('Query parameters: yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy', query);
+    
     return this.productsService.findAll(query);
   }
 
   @Get(':id')
-  @Roles('Administrador', 'Vendedor', 'Almacenero', 'Cajero') // Roles que pueden ver un producto específico
+ // @Roles('Administrador', 'Vendedor', 'Almacenero', 'Cajero') // Roles que pueden ver un producto específico
   @ApiOperation({ summary: 'Obtiene un producto por ID (Roles: Administrador, Vendedor, Almacenero, Cajero)' })
   @ApiParam({ name: 'id', description: 'ID del producto (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Producto encontrado.' })
@@ -58,7 +60,7 @@ export class ProductsController {
   }
 
   @Patch(':id')
-  @Roles('Administrador', 'Almacenero') // Solo administradores y almaceneros pueden actualizar productos
+  //@Roles('Administrador', 'Almacenero') // Solo administradores y almaceneros pueden actualizar productos
   @ApiOperation({ summary: 'Actualiza un producto por ID (Roles: Administrador, Almacenero)' })
   @ApiParam({ name: 'id', description: 'ID del producto (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Producto actualizado exitosamente.' })
@@ -72,7 +74,7 @@ export class ProductsController {
   }
 
   @Delete(':id')
-  @Roles('Administrador', 'Almacenero') // Solo administradores y almaceneros pueden eliminar productos
+  //º@Roles('Administrador', 'Almacenero') // Solo administradores y almaceneros pueden eliminar productos
   @HttpCode(HttpStatus.NO_CONTENT) // Código de estado 204 para eliminación exitosa (sin contenido de respuesta)
   @ApiOperation({ summary: 'Elimina un producto por ID (Roles: Administrador, Almacenero)' })
   @ApiParam({ name: 'id', description: 'ID del producto (UUID)', type: 'string' })
