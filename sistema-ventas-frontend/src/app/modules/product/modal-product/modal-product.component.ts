@@ -37,20 +37,21 @@ export class ModalProductComponent implements OnInit {
 
   async ngOnInit() {
     if(this.initiaData){
-      const fileMetadata:any = await this.apiService.getDmsById(this.initiaData.file)
-      this.initiaData.file = `${environment.backend}/dms/${fileMetadata.path}`;
+      //const fileMetadata:any = await this.apiService.getDmsById(this.initiaData.file)
+      console.log("initiaData", this.initiaData );
+      this.initiaData.imagen_url = `${environment.backend_file}${this.initiaData.imagen_url}`;
+      
+      
     }
+    
     const category: any = await this.productService.getCategories()
-    const marca:any = await this.productService.getMarca()
 
-    this.catalogs.marca=marca.map((m:any)=>({
-      label: m.name,
-      value: m.id,
-    }))
     this.catalogs.category = category.map((res: any) => ({
-      label: res.name,
-      value: res.id,
+      label: res.nombre_categoria,
+      value: res.id_categoria,
     }));
+    console.log("catalogs", this.catalogs );
+    
     this.view = true
   }
 
@@ -76,15 +77,28 @@ export class ModalProductComponent implements OnInit {
 
   async save() {
     if (this.formData?.valid) {
-      if (this.initiaData?.id) {
-        const file = await this.saveFile(this.formData.data.file);
-        this.formData.data.file = file.id;
-        this.productService.updateProducts(this.initiaData.id,this.formData.data).then(res => {
+      console.log("formData", this.initiaData );
+      this.formData.data.precio_compra = parseInt(this.formData.data.precio_compra);
+       this.formData.data.precio_venta = parseInt(this.formData.data.precio_venta);
+       this.formData.data.stock_actual = parseInt(this.formData.data.stock_actual);
+       this.formData.data.stock_minimo = parseInt(this.formData.data.stock_minimo);
+      if (this.initiaData?.id_producto) {
+      const file = await this.saveFile(this.formData.data.imagen_url);
+       
+       this.formData.data.imagen_url = file.url;
+        this.productService.updateProducts(this.initiaData.id_producto,this.formData.data).then(res => {
           this.ref.close(res);
         });
       } else {
-        const file = await this.saveFile(this.formData.data.file);
-        this.formData.data.file = file.id;
+        const file = await this.saveFile(this.formData.data.imagen_url);
+        console.log("file", file );
+        
+       this.formData.data.imagen_url = file.url;
+       console.log("formData.data", this.formData.data );
+       
+       
+       console.log("formData", this.formData );
+       
         this.productService.createProducts(this.formData.data).then(res => {
           this.toaster.showToast({
             severity: 'success',

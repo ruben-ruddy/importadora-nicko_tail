@@ -19,18 +19,18 @@ export class ProductService {
        }
 
        createProducts(data:any) {
-        return firstValueFrom(this.http.post(`${environment.backend}/productos`, data));
+        return firstValueFrom(this.http.post(`${environment.backend}/products`, data));
       }
 
        updateProducts(id:string,data:any) {
-        return firstValueFrom(this.http.patch(`${environment.backend}/productos/${id}`, data));
+        return firstValueFrom(this.http.patch(`${environment.backend}/products/${id}`, data));
       }
 
       getCategories() {
-        return firstValueFrom(this.http.get(`${environment.backend}/categorias`));
+        return firstValueFrom(this.http.get(`${environment.backend}/categories`));
       } 
 
-       getMarca() {
-        return firstValueFrom(this.http.get(`${environment.backend}/marca`));
-      } 
+      //  getMarca() {
+      //   return firstValueFrom(this.http.get(`${environment.backend}/marca`));
+      // } 
 }

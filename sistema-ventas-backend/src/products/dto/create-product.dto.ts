@@ -47,23 +47,22 @@ export class CreateProductDto {
   @ApiProperty({ description: 'Precio de venta unitario del producto', example: 799.99 })
   @IsNumber({}, { message: 'El precio de venta debe ser un número.' })
   @IsNotEmpty({ message: 'El precio de venta es obligatorio.' })
-  @Min(0, { message: 'El precio de venta no puede ser negativo.' })
-  @Max(9999999.99, { message: 'El precio de venta excede el valor máximo permitido.' })
   precio_venta: number; // Renombrado a 'precio_venta' para claridad con el schema
 
   @ApiProperty({ description: 'Precio de compra unitario del producto', example: 600.00 })
   @IsNumber({}, { message: 'El precio de compra debe ser un número.' })
   @IsNotEmpty({ message: 'El precio de compra es obligatorio.' })
-  @Min(0, { message: 'El precio de compra no puede ser negativo.' })
-  @Max(9999999.99, { message: 'El precio de compra excede el valor máximo permitido.' })
   precio_compra: number; // <-- ¡NUEVO CAMPO!
 
   @ApiProperty({ description: 'Stock inicial disponible del producto', example: 150 })
   @IsNumber({}, { message: 'El stock debe ser un número.' })
   @IsNotEmpty({ message: 'El stock es obligatorio.' })
-  @Min(0, { message: 'El stock no puede ser negativo.' })
   stock_actual: number; // Renombrado a 'stock_actual' para claridad con el schema
 
+  @ApiProperty({ description: 'Stock inicial disponible del producto', example: 150 })
+  @IsNumber({}, { message: 'El stock debe ser un número.' })
+  @IsNotEmpty({ message: 'El stock es obligatorio.' })
+  stock_minimo: number; // Renombrado a 'stock_actual' para claridad con el schema
   // @ApiProperty({ description: 'URL de la imagen principal del producto (opcional)', example: 'http://example.com/image.jpg', required: false })
   // @IsUrl({}, { message: 'La URL de la imagen principal debe ser una URL válida.' })
   // @IsOptional()

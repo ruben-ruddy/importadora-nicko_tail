@@ -1,3 +1,4 @@
+// sistema-ventas-frontend/src/app/modules/categories/categories.component.ts
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { CategoriesService } from './categories.service';

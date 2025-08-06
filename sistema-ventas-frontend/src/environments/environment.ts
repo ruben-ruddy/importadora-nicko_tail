@@ -5,6 +5,7 @@ export const environment = {
     ...environmentDefault, 
     production: false,
     backend: 'http://localhost:3000/api',
+    backend_file: 'http://localhost:3000',
     jwtKey: 'jwtToken',
     // ELIMINA ESTE OBJETO PARA QUE SE USE LA CLAVE DEL DEFAULT.TS
     // recaptcha: {
