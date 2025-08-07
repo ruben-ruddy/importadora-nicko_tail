@@ -1,3 +1,4 @@
+// sistema-ventas-frontend/src/app/modules/product/modal-product/modal-product.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -37,7 +38,6 @@ export class ModalProductComponent implements OnInit {
 
   async ngOnInit() {
     if(this.initiaData){
-      //const fileMetadata:any = await this.apiService.getDmsById(this.initiaData.file)
       console.log("initiaData", this.initiaData );
       this.initiaData.imagen_url = `${environment.backend_file}${this.initiaData.imagen_url}`;
       
@@ -67,11 +67,6 @@ export class ModalProductComponent implements OnInit {
     dirty: boolean;
     complete: boolean;
   }) {
-    /*   console.log('Datos:', event.data);
-      console.log('¿Válido?', event.valid);
-      console.log('¿Tocado?', event.touched);
-      console.log('¿Modificado?', event.dirty);
-      console.log('¿Completo?', event.complete); */
     this.formData = event;
   }
 

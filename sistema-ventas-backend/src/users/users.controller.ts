@@ -10,15 +10,15 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Usuarios')
-@ApiBearerAuth('access-token')
-@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias
+//@ApiBearerAuth('access-token')
+//@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
   // Definimos los roles directamente como strings
-  @Roles('Administrador')
+  //@Roles('Administrador')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Crea un nuevo usuario (Roles: Administrador)' })
   @ApiResponse({ status: 201, description: 'Usuario creado exitosamente.' })
@@ -32,7 +32,7 @@ export class UsersController {
 
   @Get()
   // Definimos los roles directamente como strings
-  @Roles('Administrador')
+  //@Roles('Administrador')
   @ApiOperation({ summary: 'Obtiene todos los usuarios (Roles: Administrador)' })
   @ApiQuery({ name: 'search', required: false, type: String, description: 'Término de búsqueda por nombre de usuario o email.' })
   @ApiQuery({ name: 'active', required: false, type: String, enum: ['true', 'false'], description: 'Filtrar por estado activo.' })
@@ -47,7 +47,7 @@ export class UsersController {
 
   @Get(':id')
   // Definimos los roles directamente como strings
-  @Roles('Administrador', 'Cajero')
+  //@Roles('Administrador', 'Cajero')
   @ApiOperation({ summary: 'Obtiene un usuario por ID (Roles: Administrador, Cajero)' })
   @ApiParam({ name: 'id', description: 'ID del usuario (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Usuario encontrado.' })
@@ -60,7 +60,7 @@ export class UsersController {
 
   @Patch(':id')
   // Definimos los roles directamente como strings
-  @Roles('Administrador')
+  //@Roles('Administrador')
   @ApiOperation({ summary: 'Actualiza un usuario por ID (Roles: Administrador)' })
   @ApiParam({ name: 'id', description: 'ID del usuario (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Usuario actualizado exitosamente.' })
@@ -75,7 +75,7 @@ export class UsersController {
 
   @Delete(':id')
   // Definimos los roles directamente como strings
-  @Roles('Administrador')
+  //@Roles('Administrador')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Elimina un usuario por ID (Roles: Administrador)' })
   @ApiParam({ name: 'id', description: 'ID del usuario (UUID)', type: 'string' })

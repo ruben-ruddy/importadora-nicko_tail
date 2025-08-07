@@ -30,7 +30,4 @@ export class ProductService {
         return firstValueFrom(this.http.get(`${environment.backend}/categories`));
       } 
 
-      //  getMarca() {
-      //   return firstValueFrom(this.http.get(`${environment.backend}/marca`));
-      // } 
 }

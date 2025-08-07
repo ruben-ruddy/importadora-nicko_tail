@@ -1,0 +1,35 @@
+<!-- // sistema-ventas-frontend/src/app/modules/users/users.component.html -->
+<div class="container mx-auto px-4 py-2">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Lista de Usuarios</h2> 
+    <button (click)="openAddUserModal()" class="bg-green-500 text-white px-4 py-2 rounded mb-4">
+      Agregar Usuario
+    </button>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white rounded-lg overflow-hidden">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre de Rol</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Descripción de Rol</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre de Usuario</th>
+            <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Venta</th> -->
+            <!-- <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Correo</th> -->
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Celular</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          @for (users of users.users; track $index) {
+          <tr class="hover:bg-gray-100 transition-colors" (click)="openEditUserModal(users)" >
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ users.nombre_completo }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ users.role.nombre_rol }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ users.role.descripcion }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ users.nombre_usuario }}</td>
+            <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ users.email }}</td> -->
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ users.telefono }}</td>
+          </tr>
+          }
+          
+        </tbody>
+      </table>
+    </div>
+  </div>

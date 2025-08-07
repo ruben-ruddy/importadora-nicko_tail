@@ -1,4 +1,4 @@
-
+// sistema-ventas-frontend/src/app/core/auth.interceptor.ts
 import {
   HttpRequest,
   HttpEvent,

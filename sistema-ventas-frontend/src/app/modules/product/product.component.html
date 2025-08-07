@@ -23,10 +23,10 @@
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.precio_compra }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.precio_venta }}</td>
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.category.nombre_categoria }}</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.stock_actual }}</td>
+            <!-- <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ product.stock_actual }}</td> -->
             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-              <span [class]="product.stock > 0 ? 'text-green-600' : 'text-red-600'">
-                {{ product.stock }}
+              <span [class]="product.stock_actual > 10 ? 'text-green-600' : 'text-red-600'">
+                {{ product.stock_actual }}
               </span>
             </td>
           </tr>

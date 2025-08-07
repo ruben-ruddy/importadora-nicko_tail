@@ -1,0 +1,30 @@
+<!-- sistema-ventas-frontend/src/app/modules/users/modal-user/modal-user.component.html -->
+<div class="p-4">
+    <div>
+        <dynamic-form
+            [fields]="UsersFormFields(catalogs)"
+            [initialData]="initialData"
+            [askfor]="onFormCreated"
+            (onFormChange)="handleFormChange($event)">
+        </dynamic-form>
+    </div>
+    
+    <div class="flex justify-end gap-4 mt-4">
+        <button 
+            (click)="close()" 
+            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors">
+            Cancelar
+        </button>
+        
+        <button 
+            (click)="save()"
+            [disabled]="!formData?.valid"
+            [ngClass]="{
+                'bg-blue-500 hover:bg-blue-600 text-white': formData?.valid,
+                'bg-gray-300 cursor-not-allowed text-gray-500': !formData?.valid
+            }"
+            class="px-4 py-2 rounded transition-colors">
+            {{ initialData ? 'Actualizar' : 'Guardar' }}
+        </button>
+    </div>
+</div>

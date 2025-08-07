@@ -5,6 +5,7 @@ import { ExampleCssComponent } from '../example-css/example-css.component';
 import { CategoriesComponent } from '../categories/categories.component';
 import { ClientsComponent } from '../clients/clients.component';
 import { HomeMainComponent } from '../home-main/home-main.component';
+import { UsersComponent } from '../users/users.component';
 
 
 
@@ -29,6 +30,10 @@ export const routes: Routes = [
       {
         path: 'category',
         component: CategoriesComponent,
+      },
+      {
+        path: 'users',
+        component: UsersComponent,
       },
       {
         path: 'clients',

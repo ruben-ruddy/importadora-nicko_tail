@@ -15,6 +15,7 @@ import { InventoryMovementsModule } from './inventory-movements/inventory-moveme
 import { DmsModule } from './dms/dms.module';
 import { PublicProductsModule } from './public-products/public-products.module';
 import { PublicCategoriesModule } from './public-categories/public-categories.module';
+import { RolesModule } from './roles/roles.module';
 
 @Module({
   imports: [
@@ -33,7 +34,8 @@ import { PublicCategoriesModule } from './public-categories/public-categories.mo
     InventoryMovementsModule,
     DmsModule,
     PublicProductsModule,
-    PublicCategoriesModule, // <-- ¡Añade UsersModule aquí!
+    PublicCategoriesModule,
+    RolesModule, // <-- ¡Añade UsersModule aquí!
   ],
   controllers: [AppController],
   providers: [AppService],

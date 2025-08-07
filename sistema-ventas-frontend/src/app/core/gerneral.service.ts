@@ -1,3 +1,4 @@
+// sistema-ventas-frontend/src/app/core/gerneral.service.ts
 import { Inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { environment } from '../../environments/environment';

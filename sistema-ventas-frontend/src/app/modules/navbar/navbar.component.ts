@@ -30,7 +30,7 @@ export class NavbarComponent implements OnInit {
       this.navItems = [
         { path: 'products', title: 'Productos' },
         { path: 'category', title: 'Categorías' },
-        { path: 'user', title: 'Usuarios' },
+        { path: 'users', title: 'Usuarios' },
         { path: 'client', title: 'Clientes' },
         { path: 'sale', title: 'Ventas' },
         { path: 'parchase', title: 'Compras' },
