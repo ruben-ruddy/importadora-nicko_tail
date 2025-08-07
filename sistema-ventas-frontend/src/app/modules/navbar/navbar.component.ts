@@ -31,7 +31,7 @@ export class NavbarComponent implements OnInit {
         { path: 'products', title: 'Productos' },
         { path: 'category', title: 'Categorías' },
         { path: 'users', title: 'Usuarios' },
-        { path: 'client', title: 'Clientes' },
+        { path: 'clients', title: 'Clientes' },
         { path: 'sale', title: 'Ventas' },
         { path: 'parchase', title: 'Compras' },
         { path: 'style', title: 'Estilos' }

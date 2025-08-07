@@ -12,15 +12,15 @@ import { Roles } from '../auth/decorators/roles.decorator'; // Importa el decora
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Clientes') // Etiqueta para Swagger UI
-@ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
-@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador
+//@ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
+//@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador
 @Controller('clients') // Prefijo de ruta para todos los endpoints de este controlador
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
 
   @Post()
   // Solo los Administradores y Vendedores pueden crear clientes
-  @Roles('Administrador', 'Vendedor')
+  //@Roles('Administrador', 'Vendedor')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Crea un nuevo cliente (Roles: Administrador, Vendedor)' })
   @ApiResponse({ status: 201, description: 'Cliente creado exitosamente.' })
@@ -34,7 +34,7 @@ export class ClientsController {
 
   @Get()
   // Administradores, Vendedores y Cajeros pueden listar clientes
-  @Roles('Administrador', 'Vendedor', 'Cajero')
+ // @Roles('Administrador', 'Vendedor', 'Cajero')
   @ApiOperation({ summary: 'Obtiene todos los clientes (Roles: Administrador, Vendedor, Cajero)' })
   @ApiQuery({ name: 'search', required: false, type: String, description: 'Término de búsqueda por nombre, cédula o email.' })
   @ApiQuery({ name: 'active', required: false, type: String, enum: ['true', 'false'], description: 'Filtrar por estado activo.' })
@@ -49,7 +49,7 @@ export class ClientsController {
 
   @Get(':id')
   // Administradores, Vendedores y Cajeros pueden ver un cliente específico
-  @Roles('Administrador', 'Vendedor', 'Cajero')
+  //@Roles('Administrador', 'Vendedor', 'Cajero')
   @ApiOperation({ summary: 'Obtiene un cliente por ID (Roles: Administrador, Vendedor, Cajero)' })
   @ApiParam({ name: 'id', description: 'ID del cliente (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Cliente encontrado.' })
@@ -62,7 +62,7 @@ export class ClientsController {
 
   @Patch(':id')
   // Solo los Administradores y Vendedores pueden actualizar clientes
-  @Roles('Administrador', 'Vendedor')
+  //@Roles('Administrador', 'Vendedor')
   @ApiOperation({ summary: 'Actualiza un cliente por ID (Roles: Administrador, Vendedor)' })
   @ApiParam({ name: 'id', description: 'ID del cliente (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Cliente actualizado exitosamente.' })
@@ -77,7 +77,7 @@ export class ClientsController {
 
   @Delete(':id')
   // Solo los Administradores pueden eliminar clientes
-  @Roles('Administrador')
+  //@Roles('Administrador')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Elimina un cliente por ID (Roles: Administrador)' })
   @ApiParam({ name: 'id', description: 'ID del cliente (UUID)', type: 'string' })

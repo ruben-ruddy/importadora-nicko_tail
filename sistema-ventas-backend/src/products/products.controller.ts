@@ -42,8 +42,6 @@ export class ProductsController {
   @ApiResponse({ status: 401, description: 'No autorizado.' })
   @ApiResponse({ status: 403, description: 'Prohibido.' })
   findAll(@Query() query: ProductQueryDto) {
-    console.log('Query parameters: yyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyyy', query);
-    
     return this.productsService.findAll(query);
   }
 

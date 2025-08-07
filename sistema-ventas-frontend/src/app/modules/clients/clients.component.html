@@ -1,1 +1,30 @@
-<p>clients works!</p>
+<!-- // sistema-ventas-frontend/src/app/modules/clients/clients.component.html -->
+<div class="container mx-auto px-4 py-2">
+    <h2 class="text-2xl font-bold mb-6 text-gray-800">Lista de Clientes</h2> 
+    <button (click)="openAddClientsModal()" class="bg-green-500 text-white px-4 py-2 rounded mb-4">
+      Agregar Cliente
+    </button>
+    <div class="overflow-x-auto">
+      <table class="min-w-full bg-white rounded-lg overflow-hidden">
+        <thead class="bg-gray-100">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Completo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Celular</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Direccíon</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cédula de Identidad</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          @for (clients of clients.clients; track $index) {
+          <tr class="hover:bg-gray-100 transition-colors" (click)="openEditClientsModal(clients)" >
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ clients.nombre_completo }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ clients.telefono }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ clients.direccion }}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ clients.documento_identidad }}</td>
+          </tr>
+          }
+          
+        </tbody>
+      </table>
+    </div>
+  </div>

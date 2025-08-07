@@ -39,6 +39,10 @@ export const routes: Routes = [
         path: 'clients',
         component: ClientsComponent,
       },
+      // {
+      //   path: 'clients',
+      //   component: ClientsComponent,
+      // },
       {
         path: 'home-main',
         component: HomeMainComponent,
