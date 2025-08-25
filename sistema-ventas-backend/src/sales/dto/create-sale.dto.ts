@@ -68,11 +68,13 @@ export class CreateSaleDto {
   @IsUUID()
   id_cliente?: string; // Coincide con schema.prisma (es opcional)
 
-  @ApiProperty({ description: 'Número único de la venta', example: 'VENTA-2024-0001' })
-  @IsString()
-  @IsNotEmpty()
-  @MaxLength(50) // Limite de varchar
-  numero_venta: string; // Coincide con schema.prisma
+  // @ApiProperty({ description: 'Número único de la venta', example: 'VENTA-2024-0001' })
+  // @IsString()
+  // @IsNotEmpty()
+  // @MaxLength(50) // Limite de varchar
+  // numero_venta: string; // Coincide con schema.prisma
+
+  
 
   @ApiProperty({ description: 'Subtotal de la venta antes de descuentos e impuestos', type: Number, format: 'float', example: 100.00 })
   @IsNumber()

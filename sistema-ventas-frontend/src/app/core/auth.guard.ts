@@ -1,3 +1,4 @@
+// sistema-ventas-frontend/src/app/core/auth.guard.ts
 import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { GeneralService } from './gerneral.service';

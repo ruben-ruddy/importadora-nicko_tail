@@ -1,0 +1,11 @@
+// sistema-ventas-frontend/src/app/modules/sales/sale-detail/sale-detail.component.scss
+:host {
+  display: block;
+}
+
+.sale-detail {
+  .product-item {
+    background: #f8f9fa;
+    border: 1px solid #dee2e6;
+  }
+}

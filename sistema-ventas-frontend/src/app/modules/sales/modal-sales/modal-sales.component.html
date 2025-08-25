@@ -1,0 +1,155 @@
+<!-- sistema-ventas-frontend/src/app/modules/sales/modal-sales/modal-sales.component.html -->
+<div class="bg-gray-200 rounded-lg shadow-xl min-h-[500px] w-full">
+  <div class="p-6">
+    <h2 class="text-2xl font-bold mb-6 text-black border-b border-gray-200 pb-4">
+      {{ initiaData ? 'Editar' : 'Nueva' }} Venta
+    </h2>
+
+    <form [formGroup]="form" class="grid gap-6">
+      <!-- Información básica de la venta -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <label class="block mb-2 font-semibold text-black">Cliente</label>
+          <select 
+            formControlName="id_cliente"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white">
+            <option value="" class="text-white">Seleccionar cliente</option>
+            <option *ngFor="let client of catalogs.clients" [value]="client.value" class="text-white">
+              {{ client.label }}
+            </option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block mb-2 font-semibold text-black">Vendedor *</label>
+          <select 
+            formControlName="id_usuario"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white">
+            <option value="" class="text-white">Seleccionar vendedor
+                <!-- <p class="text-sm font-medium text-gray-700 truncate">{{ user?.firstName }} {{ user?.nombre_usuario }}</p> -->
+            </option>
+            
+            <option *ngFor="let user of catalogs.users" [value]="user.value" class="text-white">
+              {{ user.label }}
+            </option>
+          </select>
+          <small *ngIf="form.get('id_usuario')?.invalid && form.get('id_usuario')?.touched" class="text-red-500 text-sm">
+            Vendedor es requerido
+          </small>
+        </div>
+
+        <!-- <div>
+          <label class="block mb-2 font-semibold text-black">Número de Venta *</label>
+          <input 
+            type="text"
+            formControlName="numero_venta" 
+            placeholder="Ej: VENTA-001"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white">
+          <small *ngIf="form.get('numero_venta')?.invalid && form.get('numero_venta')?.touched" class="text-red-500 text-sm">
+            Número de venta es requerido
+          </small>
+        </div> -->
+
+        <!-- <div>
+          <label class="block mb-2 font-semibold text-black">Fecha de Venta</label>
+          <input 
+            type="date"
+            formControlName="fecha_venta" 
+            class="w-full p-3 border border-black rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white">
+        </div> -->
+
+        <div>
+          <label class="block mb-2 font-semibold text-black">Estado *</label>
+          <select 
+            formControlName="estado"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-gray-800 text-white">
+            <option value="pendiente" class="text-white">Pendiente</option>
+            <option value="completada" class="text-white">Completada</option>
+            <option value="cancelada" class="text-white">Cancelada</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Detalle de productos -->
+      <div class="bg-white p-4 rounded-lg border border-gray-200">
+        <app-sale-detail 
+          [products]="catalogs.products"
+          [formArray]="detalleVentas"
+          (totalUpdated)="onTotalUpdated($event)">
+        </app-sale-detail>
+      </div>
+
+      <!-- Totales -->
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4 p-6 bg-gray-50 rounded-lg border border-gray-200">
+        <div>
+          <label class="block mb-2 font-semibold text-black">Subtotal</label>
+          <input 
+            type="number"
+            formControlName="subtotal" 
+            [disabled]="true"
+            class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-black">
+        </div>
+
+        <div>
+          <label class="block mb-2 font-semibold text-black">Descuento</label>
+          <input 
+            type="number"
+            formControlName="descuento" 
+            min="0"
+            step="0.01"
+            (input)="onTotalUpdated(form.get('subtotal')?.value || 0)"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-black">
+        </div>
+
+        <div>
+          <label class="block mb-2 font-semibold text-black">Impuesto</label>
+          <input 
+            type="number"
+            formControlName="impuesto" 
+            min="0"
+            step="0.01"
+            (input)="onTotalUpdated(form.get('subtotal')?.value || 0)"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-black">
+        </div>
+
+        <div>
+          <label class="block mb-2 font-semibold text-black">Total</label>
+          <input 
+            type="number"
+            formControlName="total" 
+            [disabled]="true"
+            class="w-full p-3 border border-gray-300 rounded-lg bg-gray-100 text-black">
+        </div>
+      </div>
+
+      <!-- Observaciones -->
+      <div class="bg-white p-4 rounded-lg border border-gray-200">
+        <label class="block mb-2 font-semibold text-black">Observaciones</label>
+        <textarea 
+          formControlName="observaciones" 
+          rows="3"
+          placeholder="Observaciones adicionales..."
+          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-black">
+        </textarea>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end gap-4 pt-6 border-t border-gray-200">
+        <button 
+          type="button" 
+          (click)="close()"
+          class="px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-colors font-semibold">
+          Cancelar
+        </button>
+        
+        <button 
+          type="button" 
+          [disabled]="!form.valid || detalleVentas.length === 0"
+          (click)="save()"
+          class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:bg-gray-400 disabled:cursor-not-allowed transition-colors font-semibold">
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,4 +1,4 @@
-
+//sistema-ventas-frontend/src/app/modules/product/modal-product/schema.ts
 
 export const productFormFields=(catalogs: any)=> {
     

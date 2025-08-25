@@ -1,3 +1,4 @@
+//sistema-ventas-frontend/src/app/modules/product/product.component.ts
 import { Component } from '@angular/core';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CommonModule } from '@angular/common';

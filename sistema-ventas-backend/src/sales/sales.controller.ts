@@ -1,4 +1,4 @@
-// src/sales/sales.controller.ts (o la ruta correcta)
+// src/sales/sales.controller.ts 
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
 import { SalesService } from './sales.service'; // Asegúrate de que esta ruta sea correcta
 import { CreateSaleDto } from './dto/create-sale.dto'; // Asumiendo que tienes estos DTOs
@@ -12,15 +12,15 @@ import { Roles } from '../auth/decorators/roles.decorator'; // Importa el decora
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Ventas') // Etiqueta para Swagger UI
-@ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
-@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador
+//@ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
+//@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador
 @Controller('sales') // Prefijo de ruta para todos los endpoints de este controlador
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
   @Post()
   // Solo los Vendedores y Administradores pueden crear ventas
-  @Roles('Administrador', 'Vendedor')
+  //@Roles('Administrador', 'Vendedor')
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Crea una nueva venta (Roles: Administrador, Vendedor)' })
   @ApiResponse({ status: 201, description: 'Venta creada exitosamente.' })
@@ -34,7 +34,7 @@ export class SalesController {
 
   @Get()
   // Administradores, Vendedores y Cajeros pueden listar ventas
-  @Roles('Administrador', 'Vendedor', 'Cajero')
+  //@Roles('Administrador', 'Vendedor', 'Cajero')
   @ApiOperation({ summary: 'Obtiene todas las ventas (Roles: Administrador, Vendedor, Cajero)' })
   @ApiQuery({ name: 'clientId', required: false, type: String, description: 'Filtrar por ID de cliente.' })
   @ApiQuery({ name: 'userId', required: false, type: String, description: 'Filtrar por ID de usuario que realizó la venta.' })
@@ -51,7 +51,7 @@ export class SalesController {
 
   @Get(':id')
   // Administradores, Vendedores y Cajeros pueden ver una venta específica
-  @Roles('Administrador', 'Vendedor', 'Cajero')
+  //@Roles('Administrador', 'Vendedor', 'Cajero')
   @ApiOperation({ summary: 'Obtiene una venta por ID (Roles: Administrador, Vendedor, Cajero)' })
   @ApiParam({ name: 'id', description: 'ID de la venta (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Venta encontrada.' })
@@ -64,7 +64,7 @@ export class SalesController {
 
   @Patch(':id')
   // Solo los Administradores y Vendedores pueden actualizar ventas (con mucha precaución)
-  @Roles('Administrador', 'Vendedor')
+  //@Roles('Administrador', 'Vendedor')
   @ApiOperation({ summary: 'Actualiza una venta por ID (Roles: Administrador, Vendedor)' })
   @ApiParam({ name: 'id', description: 'ID de la venta (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Venta actualizada exitosamente.' })
@@ -81,7 +81,7 @@ export class SalesController {
 
   @Delete(':id')
   // Solo los Administradores pueden eliminar ventas (con extrema precaución)
-  @Roles('Administrador')
+  //@Roles('Administrador')
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Elimina una venta por ID (Roles: Administrador)' })
   @ApiParam({ name: 'id', description: 'ID de la venta (UUID)', type: 'string' })

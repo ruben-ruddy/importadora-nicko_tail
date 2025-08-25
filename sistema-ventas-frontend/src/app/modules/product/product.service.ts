@@ -1,3 +1,4 @@
+//sistema-ventas-frontend/src/app/modules/product/product.service.ts
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { GeneralService } from '../../core/gerneral.service';

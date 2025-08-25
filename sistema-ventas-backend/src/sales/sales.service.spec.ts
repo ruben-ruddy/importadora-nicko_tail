@@ -1,3 +1,4 @@
+//sistema-ventas-backend/src/sales/sales.service.spec.ts
 import { Test, TestingModule } from '@nestjs/testing';
 import { SalesService } from './sales.service';
 

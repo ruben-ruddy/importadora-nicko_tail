@@ -24,7 +24,7 @@ export class SalesService {
     const {
       id_usuario,
       id_cliente,
-      numero_venta,
+      //numero_venta,
       detalle_ventas,
       observaciones,
       subtotal, // asumiendo que el cliente puede enviarlos, pero los recalculamos
@@ -48,11 +48,28 @@ export class SalesService {
       }
     }
 
-    // 3. Verificar que el numero_venta sea único
-    const existingSaleByNumber = await this.prisma.sale.findUnique({ where: { numero_venta } });
-    if (existingSaleByNumber) {
-      throw new ConflictException(`El número de venta '${numero_venta}' ya existe.`);
+    // 3. Generar número de venta automático
+  const lastSale = await this.prisma.sale.findFirst({
+    orderBy: { fecha_venta: 'desc' },
+    select: { numero_venta: true }
+  });
+
+  let nextSaleNumber = 'VEN-0001';
+  if (lastSale && lastSale.numero_venta) {
+    const match = lastSale.numero_venta.match(/VEN-(\d+)/);
+    if (match && match[1]) {
+      const nextNum = parseInt(match[1]) + 1;
+      nextSaleNumber = `VEN-${nextNum.toString().padStart(4, '0')}`;
     }
+  }
+
+
+
+
+    // 4. Verificar que el numero_venta generado sea único
+  const existingSale = await this.prisma.sale.findUnique({
+    where: { numero_venta: nextSaleNumber }
+  });
 
     // 4. Pre-procesar los detalles de la venta y verificar stock
     let calculatedSubtotal = 0;
@@ -97,7 +114,7 @@ export class SalesService {
         data: {
           id_usuario,
           id_cliente, // Puede ser null
-          numero_venta,
+          numero_venta: nextSaleNumber, // Usar el número de venta generado
           fecha_venta: new Date(), // Siempre usa la fecha del servidor, o createSaleDto.fecha_venta si la mandan
           subtotal: finalSubtotal, // Ahora sí están definidos
           descuento: finalDescuento, // Ahora sí están definidos
@@ -338,4 +355,5 @@ export class SalesService {
       throw error;
     }
   }
+  
 }

@@ -1,0 +1,99 @@
+<!-- sistema-ventas-frontend/src/app/modules/sales/sale-detail/sale-detail.component.html -->
+<div class="sale-detail bg-white rounded-lg p-4 border border-gray-200">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div>
+      <label class="block mb-2 font-semibold text-black">Producto *</label>
+      <select 
+        [(ngModel)]="selectedProduct"
+        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-black">
+        <option [value]="null" class="text-black">Seleccionar producto</option>
+        <option *ngFor="let option of getProductOptions()" [value]="option.value" class="text-black">
+          {{ option.label }}
+        </option>
+      </select>
+    </div>
+
+    <div>
+      <label class="block mb-2 font-semibold text-black">Cantidad *</label>
+      <input 
+        type="number" 
+        [(ngModel)]="cantidad" 
+        min="1"
+        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white text-black">
+    </div>
+
+    <div class="flex items-end">
+      <button 
+        (click)="addProduct()"
+        class="w-full bg-blue-500 text-white p-3 rounded-lg hover:bg-blue-600 transition-colors font-semibold">
+        Agregar Producto
+      </button>
+    </div>
+  </div>
+
+  <div class="mb-6" *ngIf="productsDetail.length > 0">
+    <div class="overflow-x-auto border border-gray-200 rounded-lg">
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="bg-gray-50">
+            <th class="p-3 text-left font-semibold border-b border-gray-200 text-black">Producto</th>
+            <th class="p-3 text-left font-semibold border-b border-gray-200 w-32 text-black">Código</th>
+            <th class="p-3 text-left font-semibold border-b border-gray-200 w-24 text-black">Cantidad</th>
+            <th class="p-3 text-left font-semibold border-b border-gray-200 w-32 text-black">Precio Unit.</th>
+            <th class="p-3 text-left font-semibold border-b border-gray-200 w-32 text-black">Subtotal</th>
+            <th class="p-3 text-left font-semibold border-b border-gray-200 w-20 text-black">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let product of productsDetail; let rowIndex = index" class="hover:bg-gray-50 border-b border-gray-200">
+            <td class="p-3 text-black">{{ product.nombre_producto }}</td>
+            <td class="p-3 text-black">{{ product.codigo_producto }}</td>
+            <td class="p-3">
+              <input 
+                type="number" 
+                [value]="product.cantidad" 
+                min="1"
+                [max]="product.stock_actual"
+                (input)="onCantidadChange(rowIndex)"
+                class="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 bg-white text-black">
+            </td>
+            <td class="p-3">
+              <input 
+                type="number" 
+                [value]="product.precio_unitario" 
+                min="0"
+                step="0.01"
+                (input)="onPrecioChange(rowIndex)"
+                class="w-full p-2 border border-gray-300 rounded focus:ring-1 focus:ring-blue-500 bg-white text-black">
+            </td>
+            <td class="p-3">
+              <input 
+                type="number" 
+                [value]="product.subtotal" 
+                [disabled]="true"
+                class="w-full p-2 border border-gray-300 rounded bg-gray-100 text-black">
+            </td>
+            <td class="p-3 text-center">
+              <button 
+                (click)="removeProduct(rowIndex)"
+                class="text-red-500 hover:text-red-700 transition-colors font-bold">
+                ✕
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    
+    <div class="flex justify-between items-center mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+      <div class="font-semibold text-black">Total: {{ getTotal() | currency:'BOB ' }}</div>
+      <div class="text-black">{{ productsDetail.length }} producto(s)</div>
+    </div>
+  </div>
+
+  <div *ngIf="productsDetail.length === 0" class="text-center py-12 text-black border-2 border-dashed border-gray-300 rounded-lg">
+    <div class="text-5xl mb-4">🛒</div>
+    <p class="text-lg font-semibold mb-2">No hay productos agregados</p>
+    <p class="text-sm">Selecciona productos para comenzar la venta</p>
+  </div>
+</div>
