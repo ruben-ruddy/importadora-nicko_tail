@@ -28,7 +28,7 @@ export const routes: Routes = [
         path: 'home',
         loadChildren: () => import('./modules/home/home.routes').then(m => m.routes),
         canActivate: [authGuard] ,
-        title: 'home'
+        title: 'Importadora Nicko'
     },
     { path: 'categories', 
       component: HomeCategoriesComponent, 

@@ -34,7 +34,7 @@ export class NavbarComponent implements OnInit {
         { path: 'clients', title: 'Clientes' },
         { path: 'sale', title: 'Ventas' },
         { path: 'parchase', title: 'Compras' },
-        { path: 'style', title: 'Estilos' }
+        { path: 'forecast', title: 'Pronostico' }
       ];
     } else {
       this.navItems = [

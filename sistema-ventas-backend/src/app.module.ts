@@ -16,6 +16,7 @@ import { DmsModule } from './dms/dms.module';
 import { PublicProductsModule } from './public-products/public-products.module';
 import { PublicCategoriesModule } from './public-categories/public-categories.module';
 import { RolesModule } from './roles/roles.module';
+import { ForecastModule } from './forecast/forecast.module';
 
 @Module({
   imports: [
@@ -35,7 +36,8 @@ import { RolesModule } from './roles/roles.module';
     DmsModule,
     PublicProductsModule,
     PublicCategoriesModule,
-    RolesModule, // <-- ¡Añade UsersModule aquí!
+    RolesModule,
+    ForecastModule, // <-- ¡Añade UsersModule aquí!
   ],
   controllers: [AppController],
   providers: [AppService],

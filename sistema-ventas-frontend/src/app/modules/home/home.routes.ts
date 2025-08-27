@@ -7,6 +7,7 @@ import { ClientsComponent } from '../clients/clients.component';
 import { HomeMainComponent } from '../home-main/home-main.component';
 import { UsersComponent } from '../users/users.component';
 import { SalesComponent } from '../sales/sales.component';
+import { ForecastComponent } from '../forecast/forecast.component';
 
 
 
@@ -43,6 +44,9 @@ export const routes: Routes = [
       {
         path: 'sale',
         component: SalesComponent,
+      },{
+        path: 'forecast',
+        component: ForecastComponent,
       },
       // {
       //   path: 'clients',
