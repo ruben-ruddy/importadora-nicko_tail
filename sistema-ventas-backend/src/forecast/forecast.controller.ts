@@ -1,4 +1,4 @@
-// src/forecast/forecast.controller.ts
+  // src/forecast/forecast.controller.ts
 import { Controller, Post, Body, Get, Query, UsePipes, ValidationPipe, Param, BadRequestException } from '@nestjs/common';
 import { ForecastService } from './forecast.service';
 import { ForecastRequestDto } from './dto/forecast-request.dto';
@@ -6,6 +6,7 @@ import { HistoryQueryDto } from './dto/history-query.dto';
 import { ApiTags, ApiOperation, ApiResponse, ApiBody, ApiParam } from '@nestjs/swagger';
 import { TopDatesQueryDto } from './dto/top-dates-query.dto';
 import { TopProductsQueryDto } from './dto/top-products-query.dto';
+import { ForecastResponse } from './interfaces/forecast.interface';
 
 @ApiTags('Pronósticos')
 @Controller('forecast')
@@ -16,10 +17,31 @@ export class ForecastController {
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOperation({ summary: 'Generar pronóstico de ventas' })
   @ApiBody({ type: ForecastRequestDto })
-  @ApiResponse({ status: 201, description: 'Pronóstico generado exitosamente' })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Pronóstico generado exitosamente',
+    schema: { // ← Usar schema en lugar de type para interfaces
+      example: {
+        results: [
+          {
+            fecha: '2024-01-01',
+            ventas_previstas: 10000,
+            intervalo_confianza: { inferior: 8000, superior: 12000 },
+            metrica_precision: 85
+          }
+        ],
+        metrics: {
+          mape: 12.5,
+          mae: 1250,
+          rmse: 1500,
+          accuracy: 87.5
+        }
+      }
+    }
+  })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
   @ApiResponse({ status: 404, description: 'No se encontraron datos históricos' })
-  async createForecast(@Body() forecastRequest: ForecastRequestDto) {
+  async createForecast(@Body() forecastRequest: ForecastRequestDto): Promise<ForecastResponse> {
     return this.forecastService.generateForecast(forecastRequest);
   }
 
@@ -126,4 +148,13 @@ private validateDateFormat(date: string) {
   }
 }
 
+@Post('validate')
+@ApiOperation({ summary: 'Validar precisión del modelo con datos históricos' })
+async validateModel(@Body() forecastRequest: ForecastRequestDto) {
+  try {
+    return await this.forecastService.validateForecastModel(forecastRequest);
+  } catch (error) {
+    throw new BadRequestException(error.message);
+  }
+}
 }

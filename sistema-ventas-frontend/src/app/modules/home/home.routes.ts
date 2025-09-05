@@ -8,6 +8,7 @@ import { HomeMainComponent } from '../home-main/home-main.component';
 import { UsersComponent } from '../users/users.component';
 import { SalesComponent } from '../sales/sales.component';
 import { ForecastComponent } from '../forecast/forecast.component';
+import { PurchaseComponent } from '../purchase/purchase.component';
 
 
 
@@ -18,7 +19,7 @@ export const routes: Routes = [
     children: [
       {
         path: '',
-        redirectTo: 'products',
+        redirectTo: '',
         pathMatch: 'full',
       },     
       {
@@ -44,9 +45,14 @@ export const routes: Routes = [
       {
         path: 'sale',
         component: SalesComponent,
-      },{
+      },
+      {
         path: 'forecast',
         component: ForecastComponent,
+      },
+      {
+        path: 'purchase',
+        component: PurchaseComponent,
       },
       // {
       //   path: 'clients',

@@ -1,5 +1,11 @@
 <!-- sistema-ventas-frontend/src/app/modules/users/modal-user/modal-user.component.html -->
-<div class="p-4">
+<div class="p-4 bg-white">
+    <div class="flex justify-between items-center mb-6">
+    <h2 class="text-2xl font-bold text-gray-800">Usuarios</h2>
+    <button (click)="close()" class="text-gray-500 hover:text-gray-700">
+      <i class="pi pi-times text-xl"></i>
+    </button>
+  </div>
     <div>
         <dynamic-form
             [fields]="UsersFormFields(catalogs)"
@@ -10,11 +16,7 @@
     </div>
     
     <div class="flex justify-end gap-4 mt-4">
-        <button 
-            (click)="close()" 
-            class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors">
-            Cancelar
-        </button>
+        <button (click)="close()" class="bg-blue-500 text-white px-4 py-2 mr-4 hover:bg-blue-600 rounded-lg">Cancelar</button>
         
         <button 
             (click)="save()"

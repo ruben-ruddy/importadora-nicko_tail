@@ -37,9 +37,9 @@ export class UsersComponent {
 
   openAddUserModal() {
     this.ref = this.dialogService.open(ModalUserComponent, {
-      header: 'Nuevo usuario',
-      width: '800px',
-      closable: true,
+      //header: 'Nuevo usuario',
+     width: '800px',
+      //closable: true,
     });
 
     this.ref.onClose.subscribe(() => {
@@ -50,9 +50,9 @@ export class UsersComponent {
   openEditUserModal(users: any) {
     this.ref = this.dialogService.open(ModalUserComponent, {
       data: { data: users },
-      header: 'Actualizar usuario',
+      //header: 'Actualizar usuario',
       width: '800px',
-      closable: true,
+      //closable: true,
     });
 
     this.ref.onClose.subscribe(() => {

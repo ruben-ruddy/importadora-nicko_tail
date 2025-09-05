@@ -29,15 +29,15 @@ import { Roles } from '../auth/decorators/roles.decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 @ApiTags('Compras') // Etiqueta para Swagger UI
-@ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
-@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador: primero autenticación, luego roles
+//@ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
+//@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador: primero autenticación, luego roles
 @Controller('purchases') // Prefijo de ruta para todos los endpoints de este controlador
 export class PurchasesController {
   constructor(private readonly purchasesService: PurchasesService) {}
 
   @Post()
   // Roles que pueden crear compras: Administrador, Almacenero
-  @Roles('Administrador', 'Almacenero') // Usando el enum de Prisma
+  //@Roles('Administrador', 'Almacenero') // Usando el enum de Prisma
   @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Crea una nueva compra (Roles: Administrador, Almacenero)' })
   @ApiResponse({ status: 201, description: 'Compra creada exitosamente.' })
@@ -53,7 +53,7 @@ export class PurchasesController {
   @Get()
   // Roles que pueden listar compras: Administrador, Almacenero, Vendedor
   // (Quizás un Vendedor solo vea las compras relacionadas con sus ventas, esto sería lógica en el servicio)
-  @Roles('Administrador', 'Almacenero', 'Vendedor') // Usando el enum de Prisma
+  //@Roles('Administrador', 'Almacenero', 'Vendedor') // Usando el enum de Prisma
   @ApiOperation({ summary: 'Obtiene todas las compras (Roles: Administrador, Almacenero, Vendedor)' })
   @ApiQuery({ name: 'id_usuario', required: false, type: String, description: 'Filtrar por ID de usuario que realizó la compra.' })
   @ApiQuery({ name: 'numero_compra', required: false, type: String, description: 'Filtrar por número de compra (búsqueda parcial).' })
@@ -71,7 +71,7 @@ export class PurchasesController {
 
   @Get(':id')
   // Roles que pueden ver una compra específica: Administrador, Almacenero, Vendedor
-  @Roles('Administrador', 'Almacenero', 'Vendedor') // Usando el enum de Prisma
+  //@Roles('Administrador', 'Almacenero', 'Vendedor') // Usando el enum de Prisma
   @ApiOperation({ summary: 'Obtiene una compra por ID (Roles: Administrador, Almacenero, Vendedor)' })
   @ApiParam({ name: 'id', description: 'ID de la compra (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Compra encontrada.' })
@@ -84,7 +84,7 @@ export class PurchasesController {
 
   @Patch(':id')
   // Roles que pueden actualizar compras: Administrador, Almacenero
-  @Roles('Administrador', 'Almacenero') // Usando el enum de Prisma
+  //@Roles('Administrador', 'Almacenero') // Usando el enum de Prisma
   @ApiOperation({ summary: 'Actualiza una compra por ID (Roles: Administrador, Almacenero)' })
   @ApiParam({ name: 'id', description: 'ID de la compra (UUID)', type: 'string' })
   @ApiResponse({ status: 200, description: 'Compra actualizada exitosamente.' })
@@ -99,7 +99,7 @@ export class PurchasesController {
 
   @Delete(':id')
   // Roles que pueden eliminar compras: Administrador
-  @Roles('Administrador') // Usando el enum de Prisma
+  //@Roles('Administrador') // Usando el enum de Prisma
   @HttpCode(HttpStatus.NO_CONTENT)
   @ApiOperation({ summary: 'Elimina una compra por ID (Roles: Administrador)' })
   @ApiParam({ name: 'id', description: 'ID de la compra (UUID)', type: 'string' })

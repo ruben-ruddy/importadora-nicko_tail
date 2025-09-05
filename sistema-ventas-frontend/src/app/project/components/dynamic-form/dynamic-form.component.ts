@@ -1,6 +1,7 @@
+// dynamic-form.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators,FormArray } from '@angular/forms';
 import { ImageModule } from 'primeng/image';
 
 @Component({
@@ -9,7 +10,7 @@ import { ImageModule } from 'primeng/image';
   imports: [CommonModule, ReactiveFormsModule, ImageModule],
   templateUrl: './dynamic-form.component.html',
   styleUrl: './dynamic-form.component.scss'
-})
+}) 
 export class DynamicFormComponent implements OnInit {
   fileErrors: Record<string, string> = {};
   previewFiles: Record<string, string | null> = {};
@@ -29,30 +30,12 @@ export class DynamicFormComponent implements OnInit {
     this.buildForm(this.fields);
     
     if (this.initialData) {
-      console.log('asd');
-      
-      this.form.patchValue(this.initialData);
-      //  Solo para el file
-      this.fields.forEach(f => {
-        if(f.columns){
-          f.columns.forEach((s:any) =>{
-             s.fields.forEach((fl:any)=>{
-              if (fl.type === 'file' && this.initialData[fl.key]) {
-                  this.previewFiles[fl.key] = this.initialData[fl.key];
-                   this.form.get(fl.key)?.setValue(this.initialData[fl.key]);
-                }
-             })
-          })
-
-        }
-        
-        if (f.type === 'file' && this.initialData[f.key]) {
-          this.previewFiles[f.key] = this.initialData[f.key];
-           // puede ser una URL
-          this.form.get(f.key)?.setValue(null); // o mantenerlo vacío hasta subir uno nuevo
-        }
-      });
+      this.patchFormWithInitialData();
     }
+
+     setTimeout(() => {
+    this.convertNumericStringValues();
+  }, 100);
 
     // ✅ Llamar a la función askfor si está definida
     if (this.askfor) {
@@ -61,12 +44,62 @@ export class DynamicFormComponent implements OnInit {
 
     this.subscribeToFormChanges();
   }
+
+  private convertNumericStringValues() {
+  Object.keys(this.form.controls).forEach(key => {
+    const control = this.form.get(key);
+    const value = control?.value;
+    
+    // Convertir strings numéricos a números
+    if (typeof value === 'string' && !isNaN(Number(value)) && value !== '') {
+      control?.setValue(Number(value), { emitEvent: false });
+    }
+  });
+}
+
+  private patchFormWithInitialData(): void {
+    // Patch valores normales primero
+    this.form.patchValue(this.initialData);
+
+    // Manejar arrays específicamente
+    this.fields.forEach(field => {
+      if (field.type === 'array' && this.initialData[field.key]) {
+        const formArray = this.form.get(field.key) as FormArray;
+        // Limpiar array existente
+        while (formArray.length !== 0) {
+          formArray.removeAt(0);
+        }
+        // Agregar items del initialData
+        this.initialData[field.key].forEach((item: any) => {
+          formArray.push(this.createArrayItem(field, item));
+        });
+      }
+
+      // Manejar files (tu código existente)
+      if (field.columns) {
+        field.columns.forEach((s: any) => {
+          s.fields.forEach((fl: any) => {
+            if (fl.type === 'file' && this.initialData[fl.key]) {
+              this.previewFiles[fl.key] = this.initialData[fl.key];
+              this.form.get(fl.key)?.setValue(this.initialData[fl.key]);
+            }
+          });
+        });
+      }
+
+      if (field.type === 'file' && this.initialData[field.key]) {
+        this.previewFiles[field.key] = this.initialData[field.key];
+        this.form.get(field.key)?.setValue(null);
+      }
+    });
+  }
+
   private subscribeToFormChanges(): void {
     this.form.valueChanges.subscribe(() => {
       const isComplete = this.checkAllRequiredFieldsFilled();
 
       this.onFormChange.emit({
-        data: this.form.getRawValue(), // obtiene valores incluso de campos deshabilitados
+        data: this.form.getRawValue(),
         valid: this.form.valid,
         touched: this.form.touched,
         dirty: this.form.dirty,
@@ -92,35 +125,122 @@ export class DynamicFormComponent implements OnInit {
         field.columns.forEach((col: any) => {
           col.fields.forEach((f: any) => this.addControl(f));
         });
+      } else if (field.type === 'array') {
+        this.addArrayControl(field);
       } else if (field.key) {
         this.addControl(field);
       }
     });
   }
 
- private addControl(field: any) {
-  if (field.type === 'title') return;
+    private addArrayControl(field: any) {
+    const formArray = this.fb.array([]);
+    this.form.addControl(field.key, formArray);
 
-  const baseValidators = this.mapValidators(field.validators);
-  // Agregar validador de archivo si es tipo file
-  if (field.type === 'file') {
-    baseValidators.push(this.fileValidator(field.validators));
-
+    // Si hay initialData, agregar items
+    if (this.initialData && this.initialData[field.key]) {
+      this.initialData[field.key].forEach((item: any) => {
+        this.addArrayItem(field, item);
+      });
+    } else if (field.minItems > 0) {
+      // Agregar mínimo de items requeridos
+      for (let i = 0; i < field.minItems; i++) {
+        this.addArrayItem(field);
+      }
+    }
   }
 
-  this.form.addControl(field.key, new FormControl({ value: '', disabled: field.readonly }, baseValidators));
+private createArrayItem(field: any, itemData: any = {}): FormGroup {
+  const itemGroup = this.fb.group({});
+  
+  field.itemFields.forEach((itemField: any) => {
+    // Usar valor de itemData, o defaultValue, o vacío
+    const defaultValue = itemData[itemField.key] !== undefined 
+      ? itemData[itemField.key] 
+      : (itemField.defaultValue !== undefined ? itemField.defaultValue : '');
+    
+    const validators = this.mapValidators(itemField.validators);
+    
+    itemGroup.addControl(
+      itemField.key,
+      new FormControl(defaultValue, validators)
+    );
+  });
+
+  return itemGroup;
 }
 
-  private mapValidators(validators: any): any[] {
-    const v: any[] = [];
-    if (!validators) return v;
-    if (validators.required) v.push(Validators.required);
-    if (validators.email) v.push(Validators.email);
-    if (validators.maxLength !== undefined) v.push(Validators.maxLength(validators.maxLength));
-    if (validators.minLength !== undefined) v.push(Validators.minLength(validators.minLength));
-    if (validators.pattern) v.push(Validators.pattern(validators.pattern));
-    return v;
+  addArrayItem(field: any, itemData: any = {}) {
+  const formArray = this.form.get(field.key) as FormArray;
+  const newItem = this.createArrayItem(field, itemData);
+  formArray.push(newItem);
+
+  // Disparar el cálculo de subtotal para el nuevo item
+  setTimeout(() => {
+    this.calculateNewItemSubtotal(field.key, formArray.length - 1);
+  }, 100);
+}
+// Nuevo método para calcular subtotal de nuevo item
+private calculateNewItemSubtotal(arrayKey: string, index: number) {
+  const formArray = this.form.get(arrayKey) as FormArray;
+  const itemGroup = formArray.at(index) as FormGroup;
+  
+  const cantidad = Number(itemGroup.get('cantidad')?.value) || 0;
+  const precio = Number(itemGroup.get('precio_unitario')?.value) || 0;
+  const subtotal = cantidad * precio;
+  
+  itemGroup.get('subtotal')?.setValue(subtotal, { emitEvent: false });
+  
+  // Disparar evento de cambio para que el modal recalcule el total
+  this.form.updateValueAndValidity();
+}
+  removeArrayItem(fieldKey: string, index: number) {
+    const formArray = this.form.get(fieldKey) as FormArray;
+    if (formArray.length > 1) {
+      formArray.removeAt(index);
+    }
   }
+
+  getFormArray(fieldKey: string): FormArray {
+    return this.form.get(fieldKey) as FormArray;
+  }
+
+
+
+ private addControl(field: any) {
+    if (field.type === 'title') return;
+
+    const baseValidators = this.mapValidators(field.validators);
+    if (field.type === 'file') {
+      baseValidators.push(this.fileValidator(field.validators));
+    }
+
+    this.form.addControl(
+      field.key,
+      new FormControl(
+        { value: '', disabled: field.readonly },
+        baseValidators
+      )
+    );
+  }
+
+
+private mapValidators(validators: any): any[] {
+  const v: any[] = [];
+  if (!validators) return v;
+  
+  if (validators.required) v.push(Validators.required);
+  if (validators.email) v.push(Validators.email);
+  if (validators.maxLength !== undefined) v.push(Validators.maxLength(validators.maxLength));
+  if (validators.minLength !== undefined) v.push(Validators.minLength(validators.minLength));
+  if (validators.pattern) v.push(Validators.pattern(validators.pattern));
+  
+  // Validadores numéricos
+  if (validators.min !== undefined) v.push(Validators.min(validators.min));
+  if (validators.max !== undefined) v.push(Validators.max(validators.max));
+  
+  return v;
+}
 
   getControl(key: string) {
     return this.form.get(key);
@@ -231,6 +351,18 @@ export class DynamicFormComponent implements OnInit {
 }
 
 
+convertToNumber(event: Event, arrayKey: string, index: number, fieldKey: string) {
+  const input = event.target as HTMLInputElement;
+  const value = input.value;
+  
+  // Convertir a número si es posible
+  if (value !== '' && !isNaN(Number(value))) {
+    const formArray = this.form.get(arrayKey) as FormArray;
+    const itemGroup = formArray.at(index) as FormGroup;
+    itemGroup.get(fieldKey)?.setValue(Number(value), { emitEvent: true });
+  }
+}
+
   onSubmit() {
     if (this.form.valid) {
       console.log('Form submitted:', this.form.value);
@@ -238,4 +370,28 @@ export class DynamicFormComponent implements OnInit {
       this.form.markAllAsTouched();
     }
   }
+
+  onProductChange(arrayKey: string, index: number, fieldKey: string) {
+  if (fieldKey === 'id_producto') {
+    const formArray = this.form.get(arrayKey) as FormArray;
+    const itemGroup = formArray.at(index) as FormGroup;
+    const productId = itemGroup.get('id_producto')?.value;
+    
+    // Buscar el producto seleccionado y actualizar el precio
+    const fieldConfig = this.fields.find(f => f.key === arrayKey);
+    if (fieldConfig && fieldConfig.itemFields) {
+      const productField = fieldConfig.itemFields.find((f: any) => f.key === 'id_producto');
+      if (productField && productField.onChange) {
+        // Ejecutar la función onChange definida en el schema
+        productField.onChange(
+          { value: productId },
+          this.form,
+          index
+        );
+      }
+    }
+  }
+}
+
+
 }

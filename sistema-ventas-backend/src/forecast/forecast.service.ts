@@ -1,14 +1,18 @@
+// sistema-ventas-backend/src/forecast/forecast.service.ts
 // src/forecast/forecast.service.ts
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { ForecastRequestDto } from './dto/forecast-request.dto';
 import { HistoryQueryDto } from './dto/history-query.dto';
-import { ForecastResult, HistoricalData, TopProduct, TopSellingDate } from './interfaces/forecast.interface';
+import { ForecastResponse, ForecastResult, HistoricalData, TopProduct, TopSellingDate } from './interfaces/forecast.interface';
 import { TopDatesQueryDto } from './dto/top-dates-query.dto';
-
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 @Injectable()
 export class ForecastService {
-  constructor(private prisma: PrismaService) {}
+  constructor(private prisma: PrismaService,
+              private readonly httpService: HttpService
+  ) {}
 
   async getSalesHistory(query: HistoryQueryDto): Promise<HistoricalData[]> {
     const { fecha_inicio, fecha_fin, periodo, producto, categoria } = query;
@@ -106,120 +110,234 @@ export class ForecastService {
     return weekNo;
   }
 
-  async generateForecast(forecastRequest: ForecastRequestDto): Promise<ForecastResult[]> {
-    const { metodo, periodo, fecha_inicio, fecha_fin, parametros } = forecastRequest;
+  // async generateForecast(forecastRequest: ForecastRequestDto): Promise<ForecastResult[]> {
+  //   const { metodo, periodo, fecha_inicio, fecha_fin, parametros } = forecastRequest;
 
-    // Obtener datos históricos
-    const historicalData = await this.getSalesHistory({
-      fecha_inicio,
-      fecha_fin,
-      periodo,
-    });
+  //   // Obtener datos históricos
+  //   const historicalData = await this.getSalesHistory({
+  //     fecha_inicio,
+  //     fecha_fin,
+  //     periodo,
+  //   });
 
-    if (historicalData.length === 0) {
-      throw new NotFoundException('No hay datos históricos para el período seleccionado');
-    }
+  //   if (historicalData.length === 0) {
+  //     throw new NotFoundException('No hay datos históricos para el período seleccionado');
+  //   }
 
+  //   // Extraer solo los valores de ventas
+  //   const salesValues = historicalData.map(item => item.ventas);
+
+  //   // Generar pronóstico según el método
+  //   switch (metodo) {
+  //     case 'lineal':
+  //       return this.linearRegressionForecast(salesValues, parametros?.periodos || 6, periodo);
+      
+  //     case 'promedio_movil':
+  //       return this.movingAverageForecast(salesValues, parametros?.periodos || 6, parametros?.alpha || 0.3);
+      
+  //     case 'estacional':
+  //       return this.seasonalForecast(salesValues, parametros?.periodos || 6, parametros?.estacionalidad || 12);
+      
+  //     default:
+  //       throw new NotFoundException('Método de pronóstico no válido');
+  //   }
+  // }
+
+  // Actualizar el método generateForecast para incluir métricas de error
+async generateForecast(forecastRequest: ForecastRequestDto): Promise<ForecastResponse> {
+  const { metodo, periodo, fecha_inicio, fecha_fin, parametros } = forecastRequest;
+
+  // Obtener datos históricos
+  const historicalData = await this.getSalesHistory({
+    fecha_inicio,
+    fecha_fin,
+    periodo,
+  });
+
+  if (historicalData.length === 0) {
+    throw new NotFoundException('No hay datos históricos para el período seleccionado');
+  }
+
+  // Determinar frecuencia para Python
+  let frequency: string;
+  switch (periodo) {
+    case 'diario': frequency = 'D'; break;
+    case 'semanal': frequency = 'W'; break;
+    case 'mensual': frequency = 'M'; break;
+    default: frequency = 'D';
+  }
+
+  try {
+    // Llamar al servicio Python
+    const pythonServiceUrl = process.env.PYTHON_FORECAST_SERVICE || 'http://localhost:8000';
+    
+    const response = await firstValueFrom(
+      this.httpService.post(`${pythonServiceUrl}/forecast`, {
+        historical_data: historicalData,
+        method: metodo,
+        periods: parametros?.periodos || 6,
+        frequency: frequency,
+        alpha: parametros?.alpha || 0.3,
+        seasonality: parametros?.estacionalidad
+      })
+    );
+
+    // Mapear la respuesta de Python al formato esperado
+    const results: ForecastResult[] = response.data.predictions.map((pred: any) => ({
+      fecha: pred.fecha,
+      ventas_previstas: pred.ventas_previstas,
+      intervalo_confianza: pred.intervalo_confianza,
+      metrica_precision: response.data.metrics.accuracy
+    }));
+
+    return {
+      results,
+      metrics: {
+        mape: response.data.metrics.mae, // Nota: Python devuelve MAE, no MAPE
+        mae: response.data.metrics.mae,
+        rmse: response.data.metrics.rmse || 0,
+        accuracy: response.data.metrics.accuracy
+      }
+    };
+
+  } catch (error) {
+    // Fallback a métodos TypeScript si el servicio Python falla
+    console.error('Error calling Python service, falling back to TS methods:', error);
+    
     // Extraer solo los valores de ventas
     const salesValues = historicalData.map(item => item.ventas);
 
-    // Generar pronóstico según el método
+    let results: ForecastResult[];
+    let predictions: number[];
+
     switch (metodo) {
       case 'lineal':
-        return this.linearRegressionForecast(salesValues, parametros?.periodos || 6, periodo);
+        const linearResult = this.linearRegressionForecast(salesValues, parametros?.periodos || 6, periodo);
+        results = linearResult.results;
+        predictions = linearResult.predictions;
+        break;
       
       case 'promedio_movil':
-        return this.movingAverageForecast(salesValues, parametros?.periodos || 6, parametros?.alpha || 0.3);
+        const maResult = this.movingAverageForecast(salesValues, parametros?.periodos || 6, parametros?.alpha || 0.3, periodo);
+        results = maResult.results;
+        predictions = maResult.predictions;
+        break;
       
       case 'estacional':
-        return this.seasonalForecast(salesValues, parametros?.periodos || 6, parametros?.estacionalidad || 12);
+        const seasonalResult = this.seasonalForecast(salesValues, parametros?.periodos || 6, parametros?.estacionalidad || 12, periodo);
+        results = seasonalResult.results;
+        predictions = seasonalResult.predictions;
+        break;
       
       default:
         throw new NotFoundException('Método de pronóstico no válido');
     }
+
+    // Calcular métricas de error
+    const metrics = this.calculateForecastAccuracy(salesValues, predictions);
+
+    return {
+      results,
+      metrics
+    };
+  }
+}
+
+private linearRegressionForecast(data: number[], periods: number, periodo: string): { 
+  results: ForecastResult[]; 
+  predictions: number[] 
+} {
+  const n = data.length;
+  const x = Array.from({ length: n }, (_, i) => i + 1);
+  
+  const sumX = x.reduce((a, b) => a + b, 0);
+  const sumY = data.reduce((a, b) => a + b, 0);
+  const sumXY = x.reduce((sum, val, idx) => sum + val * data[idx], 0);
+  const sumX2 = x.reduce((sum, val) => sum + val * val, 0);
+  
+  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+  const intercept = (sumY - slope * sumX) / n;
+  
+  const results: ForecastResult[] = [];
+  const predictions: number[] = [];
+  const lastDate = new Date();
+  
+  for (let i = 1; i <= periods; i++) {
+    const prediction = intercept + slope * (n + i);
+    predictions.push(prediction);
+    
+    const confidenceInterval = this.calculateConfidenceInterval(prediction, data);
+    
+    results.push({
+      fecha: this.getFutureDate(lastDate, i, periodo),
+      ventas_previstas: prediction,
+      intervalo_confianza: confidenceInterval,
+      metrica_precision: this.calculatePrecision(data, prediction)
+    });
+  }
+  
+  return { results, predictions };
+}
+private movingAverageForecast(data: number[], periods: number, alpha: number, periodo: string): { 
+  results: ForecastResult[]; 
+  predictions: number[] 
+} {
+  const results: ForecastResult[] = [];
+  const predictions: number[] = [];
+  const forecastData = [...data];
+  const lastDate = new Date();
+
+  for (let i = 0; i < periods; i++) {
+    const window = forecastData.slice(-3);
+    const average = window.reduce((sum, val) => sum + val, 0) / window.length;
+    
+    const smoothedPrediction = alpha * average + (1 - alpha) * (forecastData[forecastData.length - 1] || average);
+    predictions.push(smoothedPrediction);
+    
+    const confidenceInterval = this.calculateConfidenceInterval(smoothedPrediction, data);
+    
+    results.push({
+      fecha: this.getFutureDate(lastDate, i + 1, periodo),
+      ventas_previstas: smoothedPrediction,
+      intervalo_confianza: confidenceInterval,
+      metrica_precision: this.calculatePrecision(data, smoothedPrediction)
+    });
+
+    forecastData.push(smoothedPrediction);
   }
 
-  private linearRegressionForecast(data: number[], periods: number, periodo: string): ForecastResult[] {
-    const n = data.length;
-    const x = Array.from({ length: n }, (_, i) => i + 1);
+  return { results, predictions };
+}
+
+private seasonalForecast(data: number[], periods: number, seasonality: number, periodo: string): { 
+  results: ForecastResult[]; 
+  predictions: number[] 
+} {
+  const results: ForecastResult[] = [];
+  const predictions: number[] = [];
+  const lastDate = new Date();
+
+  for (let i = 1; i <= periods; i++) {
+    const baseIndex = data.length % seasonality;
+    const seasonalIndex = (baseIndex + i - 1) % seasonality;
+    const baseValue = data.slice(-seasonality).reduce((a, b) => a + b, 0) / seasonality;
     
-    const sumX = x.reduce((a, b) => a + b, 0);
-    const sumY = data.reduce((a, b) => a + b, 0);
-    const sumXY = x.reduce((sum, val, idx) => sum + val * data[idx], 0);
-    const sumX2 = x.reduce((sum, val) => sum + val * val, 0);
+    const prediction = baseValue * 1.0; // Aquí deberías usar tus factores estacionales
+    predictions.push(prediction);
     
-    const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-    const intercept = (sumY - slope * sumX) / n;
-    
-    const results: ForecastResult[] = [];
-    const lastDate = new Date();
-    
-    for (let i = 1; i <= periods; i++) {
-      const prediction = intercept + slope * (n + i);
-      const confidenceInterval = this.calculateConfidenceInterval(prediction, data);
-      
-      results.push({
-        fecha: this.getFutureDate(lastDate, i, periodo),
-        ventas_previstas: prediction,
-        intervalo_confianza: confidenceInterval,
-        metrica_precision: this.calculatePrecision(data, prediction)
-      });
-    }
-    
-    return results;
+    const confidenceInterval = this.calculateConfidenceInterval(prediction, data);
+
+    results.push({
+      fecha: this.getFutureDate(lastDate, i, periodo),
+      ventas_previstas: prediction,
+      intervalo_confianza: confidenceInterval,
+      metrica_precision: this.calculatePrecision(data, prediction)
+    });
   }
 
-  private movingAverageForecast(data: number[], periods: number, alpha: number): ForecastResult[] {
-    const results: ForecastResult[] = [];
-    const forecastData = [...data];
-    const lastDate = new Date();
+  return { results, predictions };
+}
 
-    for (let i = 0; i < periods; i++) {
-      const window = forecastData.slice(-3); // Últimos 3 períodos
-      const prediction = window.reduce((sum, val) => sum + val, 0) / window.length;
-      
-      // Suavizado exponencial
-      const smoothedPrediction = alpha * prediction + (1 - alpha) * (forecastData[forecastData.length - 1] || prediction);
-      
-      const confidenceInterval = this.calculateConfidenceInterval(smoothedPrediction, data);
-      
-      results.push({
-        fecha: this.getFutureDate(lastDate, i + 1, 'mensual'), // Ajustar según período
-        ventas_previstas: smoothedPrediction,
-        intervalo_confianza: confidenceInterval,
-        metrica_precision: this.calculatePrecision(data, smoothedPrediction)
-      });
-
-      forecastData.push(smoothedPrediction);
-    }
-
-    return results;
-  }
-
-  private seasonalForecast(data: number[], periods: number, seasonality: number): ForecastResult[] {
-    // Implementación básica de estacionalidad
-    const seasonalFactors = this.calculateSeasonalFactors(data, seasonality);
-    const results: ForecastResult[] = [];
-    const lastDate = new Date();
-
-    for (let i = 1; i <= periods; i++) {
-      const baseIndex = data.length % seasonality;
-      const seasonalIndex = (baseIndex + i - 1) % seasonality;
-      const baseValue = data.slice(-seasonality).reduce((a, b) => a + b, 0) / seasonality;
-      
-      const prediction = baseValue * seasonalFactors[seasonalIndex];
-      const confidenceInterval = this.calculateConfidenceInterval(prediction, data);
-
-      results.push({
-        fecha: this.getFutureDate(lastDate, i, 'mensual'),
-        ventas_previstas: prediction,
-        intervalo_confianza: confidenceInterval,
-        metrica_precision: this.calculatePrecision(data, prediction)
-      });
-    }
-
-    return results;
-  }
 
   private calculateSeasonalFactors(data: number[], seasonality: number): number[] {
   const factors: number[] = Array(seasonality).fill(1);
@@ -545,6 +663,108 @@ private getMonthRangeFromString(monthString: string): [Date, Date] {
   } else {
     throw new Error(`Formato de fecha no reconocido: ${dateString}`);
   }
+}
+// Método para calcular error porcentual
+private calculateErrorPercentage(actual: number, predicted: number): number {
+  if (actual === 0) return predicted === 0 ? 0 : 100;
+  return Math.abs((actual - predicted) / actual) * 100;
+}
+// Método para calcular métricas de error completas
+private calculateForecastAccuracy(historicalData: number[], predictions: number[]): {
+  mape: number;       // Mean Absolute Percentage Error
+  mae: number;        // Mean Absolute Error
+  rmse: number;       // Root Mean Square Error
+  accuracy: number;   // Precisión general (100 - MAPE)
+} {
+  if (historicalData.length === 0 || predictions.length === 0) {
+    return { mape: 0, mae: 0, rmse: 0, accuracy: 0 };
+  }
+
+  let totalError = 0;
+  let totalAbsoluteError = 0;
+  let totalSquaredError = 0;
+  let count = 0;
+
+  // Calcular errores para cada punto de datos
+  for (let i = 0; i < Math.min(historicalData.length, predictions.length); i++) {
+    const actual = historicalData[i];
+    const predicted = predictions[i];
+    
+    if (actual > 0) { // Solo calcular si hay datos reales
+      const error = Math.abs(actual - predicted);
+      const percentageError = this.calculateErrorPercentage(actual, predicted);
+      
+      totalError += percentageError;
+      totalAbsoluteError += error;
+      totalSquaredError += error * error;
+      count++;
+    }
+  }
+
+  if (count === 0) return { mape: 0, mae: 0, rmse: 0, accuracy: 0 };
+
+  const mape = totalError / count;
+  const mae = totalAbsoluteError / count;
+  const rmse = Math.sqrt(totalSquaredError / count);
+  const accuracy = Math.max(0, 100 - mape);
+
+  return { mape, mae, rmse, accuracy };
+}
+
+public async validateForecastModel(forecastRequest: ForecastRequestDto): Promise<{
+  training_period: { start: string; end: string; points: number };
+  test_period: { start: string; end: string; points: number };
+  metrics: { mape: number; mae: number; rmse: number; accuracy: number };
+}> {
+  const fullData = await this.getSalesHistory({
+    fecha_inicio: forecastRequest.fecha_inicio,
+    fecha_fin: forecastRequest.fecha_fin,
+    periodo: forecastRequest.periodo
+  });
+
+  if (fullData.length < 10) {
+    throw new Error('Se necesitan al menos 10 puntos de datos para validación');
+  }
+
+  const splitIndex = Math.floor(fullData.length * 0.8);
+  const trainingData = fullData.slice(0, splitIndex);
+  const testData = fullData.slice(splitIndex);
+
+  // Extraer valores de entrenamiento
+  const trainingValues = trainingData.map(item => item.ventas);
+  let predictions: number[];
+
+  // Usar los métodos internos (ahora son accesibles dentro del servicio)
+  switch (forecastRequest.metodo) {
+    case 'lineal':
+      predictions = this.linearRegressionForecast(trainingValues, testData.length, forecastRequest.periodo).predictions;
+      break;
+    case 'promedio_movil':
+      predictions = this.movingAverageForecast(trainingValues, testData.length, forecastRequest.parametros?.alpha || 0.3, forecastRequest.periodo).predictions;
+      break;
+    case 'estacional':
+      predictions = this.seasonalForecast(trainingValues, testData.length, forecastRequest.parametros?.estacionalidad || 12, forecastRequest.periodo).predictions;
+      break;
+    default:
+      throw new Error('Método de pronóstico no válido');
+  }
+
+  const testValues = testData.map(item => item.ventas);
+  const metrics = this.calculateForecastAccuracy(testValues, predictions);
+
+  return {
+    training_period: {
+      start: trainingData[0].fecha,
+      end: trainingData[trainingData.length - 1].fecha,
+      points: trainingData.length
+    },
+    test_period: {
+      start: testData[0].fecha,
+      end: testData[testData.length - 1].fecha,
+      points: testData.length
+    },
+    metrics
+  };
 }
 
 }

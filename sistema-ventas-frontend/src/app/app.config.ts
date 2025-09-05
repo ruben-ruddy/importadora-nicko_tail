@@ -8,6 +8,7 @@ import { HttpBackend, provideHttpClient, withInterceptors, withFetch } from '@an
 import { TranslateLoader, TranslateModule, TranslateService } from '@ngx-translate/core';
 import { registerLocaleData } from '@angular/common';
 import { provideScReCaptchaSettings } from '@semantic-components/re-captcha';
+import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
 
 import { es } from 'date-fns/locale/es';
@@ -46,7 +47,7 @@ export const appConfig: ApplicationConfig = {
     providePrimeNG({
       theme: {
         preset: Lara
-      }
+      },
     }),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
@@ -82,6 +83,7 @@ export const appConfig: ApplicationConfig = {
     //   } as RecaptchaSettings,
     // },
     
-    TranslateService
+    TranslateService,
+  provideCharts(withDefaultRegisterables())
   ]
 };

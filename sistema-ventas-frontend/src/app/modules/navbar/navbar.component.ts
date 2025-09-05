@@ -33,17 +33,22 @@ export class NavbarComponent implements OnInit {
         { path: 'users', title: 'Usuarios' },
         { path: 'clients', title: 'Clientes' },
         { path: 'sale', title: 'Ventas' },
-        { path: 'parchase', title: 'Compras' },
-        { path: 'forecast', title: 'Pronostico' }
+        { path: 'purchase', title: 'Compras' },
+        { path: 'forecast', title: 'Pronostico' },
+        { path: 'reportes', title: 'Reportes de Ventas'}
       ];
-    } else {
+    } else if (this.user?.role?.nombre_rol == "Almacenero") {
+      
       this.navItems = [
-        { path: 'sale', title: 'Ventas' },
-        { path: 'style', title: 'Estilos' }
+        { path: 'products', title: 'Productos' },
+        { path: 'purchase', title: 'Compras' },
       ];
-    }
+    }else if (this.user?.role?.nombre_rol == "Vendedor") {
+      this.navItems = [
+        { path: 'sale', title: 'Ventas' }
+      ];
   }
-
+}
   closeMenu() {
     this.sidebarToggled.emit(false);
   }

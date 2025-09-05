@@ -7,6 +7,10 @@ export const environment = {
     backend: 'http://localhost:3000/api',
     backend_file: 'http://localhost:3000',
     jwtKey: 'jwtToken',
+    pythonForecastService: 'http://localhost:8000',
+    enablePythonService: true,
+    enableAdvancedMetrics: true,
+    version: '1.0.0'
     // ELIMINA ESTE OBJETO PARA QUE SE USE LA CLAVE DEL DEFAULT.TS
     // recaptcha: {
     //   siteKey: '6Lebp5grAAAAAMS_4bwZ54er5eGPJRIHbIQviKRO',

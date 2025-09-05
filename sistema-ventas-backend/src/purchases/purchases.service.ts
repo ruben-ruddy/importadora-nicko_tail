@@ -11,6 +11,7 @@ import { CreatePurchaseDto, DtoPurchaseState } from './dto/create-purchase.dto';
 import { UpdatePurchaseDto } from './dto/update-purchase.dto';
 import { PurchaseQueryDto } from './dto/purchase-query.dto';
 import { Product } from '@prisma/client'; // Importa el tipo Product de Prisma
+import { PurchaseState, MovementType  } from '@prisma/client';
 
 // Si tus enums de Prisma son así, podrías necesitarlos para tipado estricto
 // import { PurchaseState, MovementType } from '@prisma/client';
@@ -22,7 +23,7 @@ export class PurchasesService {
   async create(createPurchaseDto: CreatePurchaseDto) {
     const {
       id_usuario,
-      numero_compra,
+      //numero_compra,
       detalle_compras,
       observaciones,
       // Los campos total y estado serán recalculados o validados
@@ -37,10 +38,10 @@ export class PurchasesService {
     }
 
     // 2. Verificar que el numero_compra sea único
-    const existingPurchaseByNumber = await this.prisma.purchase.findUnique({ where: { numero_compra } });
-    if (existingPurchaseByNumber) {
-      throw new ConflictException(`El número de compra '${numero_compra}' ya existe.`);
-    }
+    // const existingPurchaseByNumber = await this.prisma.purchase.findUnique({ where: { numero_compra } });
+    // if (existingPurchaseByNumber) {
+    //   throw new ConflictException(`El número de compra '${numero_compra}' ya existe.`);
+    // }
 
     // 3. Pre-procesar los detalles de la compra y calcular el subtotal
     let calculatedTotal = 0;
@@ -69,8 +70,28 @@ export class PurchasesService {
     const finalTotal = total !== undefined ? total : calculatedTotal;
 
     // Convertir el estado del DTO (string) al tipo de enum de Prisma
-    const prismaPurchaseState = estado ? (estado.toUpperCase() as any) : DtoPurchaseState.COMPLETADA.toUpperCase() as any;
+    //const prismaPurchaseState = estado ? (estado.toUpperCase() as any) : DtoPurchaseState.COMPLETADA.toUpperCase() as any;
 
+    const prismaPurchaseState = estado ? 
+  (estado.toLowerCase() as PurchaseState) : PurchaseState.pendiente;
+
+        // 3. Generar número de venta automático
+  const lastPurchase = await this.prisma.purchase.findFirst({
+    orderBy: { fecha_compra: 'desc' },
+    select: { numero_compra: true }
+  });
+
+  let nextPurchaseNumber = 'COMP-0001';
+  if (lastPurchase && lastPurchase.numero_compra) {
+    const match = lastPurchase.numero_compra.match(/COMP-(\d+)/);
+    if (match && match[1]) {
+      const nextNum = parseInt(match[1]) + 1;
+      nextPurchaseNumber = `VEN-${nextNum.toString().padStart(4, '0')}`;
+    }
+  }
+  const existingSale = await this.prisma.purchase.findUnique({
+    where: { numero_compra: nextPurchaseNumber }
+  });
 
     // 4. Iniciar una transacción para asegurar la atomicidad (crear compra y actualizar stock)
     const result = await this.prisma.$transaction(async (prisma) => {
@@ -78,7 +99,7 @@ export class PurchasesService {
       const purchase = await prisma.purchase.create({
         data: {
           id_usuario,
-          numero_compra,
+          numero_compra: nextPurchaseNumber,
           fecha_compra: new Date(), // Usa la fecha del servidor
           total: finalTotal,
           estado: prismaPurchaseState,
@@ -109,8 +130,9 @@ export class PurchasesService {
             data: {
                 id_producto: product.id_producto,
                 id_usuario: id_usuario, // Usuario que registró la compra
-                tipo_movimiento: 'ENTRADA' as any, // Asegúrate que coincida con tu enum de MovementType
+                tipo_movimiento: MovementType.entrada as any, // Asegúrate que coincida con tu enum de MovementType
                 cantidad: quantity,
+                precio_unitario:detalle_compras.find((d: any) => d.id_producto === product.id_producto)?.precio_unitario || null,
                 observaciones: `Entrada por Compra #${purchase.numero_compra} (ID: ${purchase.id_compra})`,
             }
         });
@@ -301,7 +323,7 @@ export class PurchasesService {
               data: {
                   id_producto: detail.id_producto,
                   id_usuario: existingPurchase.id_usuario, // Usuario que hizo la compra (o un usuario de sistema para anulación)
-                  tipo_movimiento: 'SALIDA' as any, // Asegúrate que coincida con tu enum de MovementType
+                  tipo_movimiento: MovementType.salida as any, // Asegúrate que coincida con tu enum de MovementType
                   cantidad: detail.cantidad,
                   observaciones: `Salida por anulación/eliminación de Compra #${existingPurchase.numero_compra} (ID: ${existingPurchase.id_compra})`,
               }

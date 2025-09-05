@@ -37,9 +37,9 @@ export class ProductComponent {
 
   openAddProductModal() {
     this.ref = this.dialogService.open(ModalProductComponent, {
-      header: 'Nuevo Producto',
-      width: '800px',
-      closable: true
+      //header: 'Nuevo Producto',
+      //width: '800px',
+      //closable: true
     });
     this.ref.onClose.subscribe((data: any) => {
       

@@ -34,9 +34,9 @@ export class ClientsComponent {
 
   openAddClientsModal() {
     this.ref = this.dialogService.open(ModalClientsComponent, {
-      header: 'Nuevo Cliente',
+      //header: 'Nuevo Cliente',
       width: '800px',
-      closable: true
+      //closable: true
     });
     this.ref.onClose.subscribe((data: any) => {
       
@@ -49,9 +49,9 @@ export class ClientsComponent {
   openEditClientsModal(clients:any){
     this.ref = this.dialogService.open(ModalClientsComponent, {
       data: { data: clients},
-      header: 'Actualizar Cliente',
+      //header: 'Actualizar Cliente',
       width: '800px',
-      closable: true
+      //closable: true
     });
 
     this.ref.onClose.subscribe((data: any) => {

@@ -51,7 +51,7 @@ export class SalesComponent implements OnInit {
 
 openAddSaleModal() {
   this.ref = this.dialogService.open(ModalSalesComponent, {
-    header: 'Nueva Venta',
+    //header: 'Nueva Venta',
     width: '90%',
     styleClass: 'bg-white rounded-lg shadow-xl', // Clases de Tailwind
     style: { 
@@ -63,7 +63,7 @@ openAddSaleModal() {
     },
     baseZIndex: 10000,
     modal: true,
-    closable: true,
+    //closable: true,
     dismissableMask: true
   });
   
@@ -77,10 +77,10 @@ openAddSaleModal() {
   openEditSaleModal(sale: Sale) {
     this.ref = this.dialogService.open(ModalSalesComponent, {
       data: { data: sale },
-      header: 'Editar Venta',
+      //header: 'Editar Venta',
       width: '90%',
       style: { 'max-width': '1200px' }, // Usa style en lugar de maxWidth
-      closable: true
+      //closable: true
     });
 
     this.ref.onClose.subscribe((data: any) => {

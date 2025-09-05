@@ -54,3 +54,53 @@
     height: 300px;
   }
 }
+.chart-container {
+  position: relative;
+  height: 300px;
+  width: 100%;
+}
+
+@media (max-width: 768px) {
+  .chart-container {
+    height: 250px;
+  }
+}
+
+// Estilos para los tooltips de los gráficos
+.chart-tooltip {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px;
+  border-radius: 4px;
+  font-size: 12px;
+}
+
+// Estilos para las nuevas métricas
+.metric-card {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  }
+}
+
+// Badge para el motor de pronóstico
+.engine-badge {
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 9999px;
+}
+
+// Animación para mostrar/ocultar métricas avanzadas
+.advanced-metrics {
+  transition: max-height 0.3s ease, opacity 0.3s ease;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  
+  &.show {
+    max-height: 200px;
+    opacity: 1;
+  }
+}

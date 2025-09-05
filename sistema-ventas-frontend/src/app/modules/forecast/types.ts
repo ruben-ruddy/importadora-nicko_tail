@@ -18,6 +18,7 @@ export interface ForecastResult {
   fecha: string;
   ventas_previstas: number;
   ventas_reales?: number;
+  error_porcentual?: number;
   intervalo_confianza: {
     inferior: number;
     superior: number;
@@ -33,11 +34,30 @@ export interface HistoricalData {
 }
 
 export interface ForecastMetrics {
-  totalSales: number;
-  averageSales: number;
-  growthRate: number;
-  accuracy: number;
-  periods: number;
+  mape: number;        // Mean Absolute Percentage Error
+  mae: number;         // Mean Absolute Error
+  rmse: number;        // Root Mean Square Error
+  accuracy: number;    // Precisión general (100 - MAPE)
+  r2_score?: number;   // NUEVO: Coeficiente de determinación (de Python)
+  totalSales?: number;
+  averageSales?: number;
+  growthRate?: number;
+  periods?: number;
+}
+
+// En tu archivo types.ts - actualiza la interfaz ModelInfo
+export interface ModelInfo {
+  type: string;
+  coefficient?: number;
+  intercept?: number;
+  alpha?: number;
+  window_size?: number;
+  seasonality?: number;
+  order?: string;
+  aic?: number;
+  r2_score?: number;
+  // AÑADE ESTA NUEVA PROPIEDAD:
+  method?: string; // Para almacenar el método usado (lineal, promedio_movil, estacional)
 }
 
 // Nueva interfaz para el reporte de productos más vendidos
@@ -69,3 +89,17 @@ export interface DateProductAnalysis {
   fecha: string;
   productos: TopProduct[];
 }
+
+export interface ForecastResponse {
+  results: ForecastResult[];
+  metrics: {
+    mape: number;
+    mae: number;
+    rmse: number;
+    accuracy: number;
+    
+  };
+  model_info?: ModelInfo; // AÑADE ESTA PROPIEDAD OPCIONAL
+}
+
+

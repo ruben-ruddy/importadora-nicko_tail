@@ -2,11 +2,34 @@
 export interface ForecastResult {
   fecha: string;
   ventas_previstas: number;
+  ventas_reales?: number;
+  error_porcentual?: number;
   intervalo_confianza: {
     inferior: number;
     superior: number;
   };
   metrica_precision?: number;
+}
+
+export interface ForecastResponse {
+  results: ForecastResult[];
+  metrics: {
+    mape: number;
+    mae: number;
+    rmse: number;
+    accuracy: number;
+  };
+}
+
+export interface ForecastMetrics {
+  mape: number;
+  mae: number;
+  rmse: number;
+  accuracy: number;
+  totalSales?: number;
+  averageSales?: number;
+  growthRate?: number;
+  periods?: number;
 }
 
 export interface HistoricalData {
@@ -16,7 +39,6 @@ export interface HistoricalData {
   categoria?: string;
 }
 
-// Nuevas interfaces para los endpoints
 export interface TopSellingDate {
   fecha: string;
   total_ventas: number;

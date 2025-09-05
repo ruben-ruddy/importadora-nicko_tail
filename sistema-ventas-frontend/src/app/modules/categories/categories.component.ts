@@ -35,9 +35,9 @@ export class CategoriesComponent {
 
   openAddProductModal() {
     this.ref = this.dialogService.open(ModalCategoryComponent, {
-      header: 'Nuevo categoria',
-      width: '800px',
-      closable: true
+      //header: 'Nuevo categoria',
+      //width: '800px',
+      //closable: true
     });
     this.ref.onClose.subscribe((data: any) => {
       
