@@ -1,19 +1,16 @@
 // src/app/modules/home-main/home-main.component.ts
-
-import { Component, OnInit, ViewChild, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, ViewChild, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { CarouselModule, Carousel } from 'primeng/carousel';
 import { ButtonModule } from 'primeng/button';
 import { RippleModule } from 'primeng/ripple';
 import { HttpClientModule } from '@angular/common/http';
 import { ImageService } from '../../project/services/image.service';
 import { ProductCarouselItem } from '../../interfaces/product.interface';
-import { RouterModule } from '@angular/router'; // ¡Importante!
+import { RouterModule } from '@angular/router';
 import { ImageModule } from 'primeng/image';
-
-// ¡ASEGÚRATE DE QUE ESTAS IMPORTACIONES ESTÉN PRESENTES!
 import { HeaderHomeMainComponent } from './header-home-main/header-home-main.component';
-import { FooterHomeMainComponent } from './footer-home-main/footer-home-main.component'; // <--- ¡Esta línea es crucial!
+import { FooterHomeMainComponent } from './footer-home-main/footer-home-main.component';
 
 @Component({
   selector: 'app-home-main',
@@ -24,10 +21,10 @@ import { FooterHomeMainComponent } from './footer-home-main/footer-home-main.com
     ButtonModule,
     RippleModule,
     HttpClientModule,
-    HeaderHomeMainComponent, // Asegúrate de que este también esté
-    FooterHomeMainComponent, // <--- ¡DEBE ESTAR AQUÍ!
+    HeaderHomeMainComponent,
+    FooterHomeMainComponent,
     RouterModule,
-    ImageModule // Asegúrate de que ImageModule esté importado si usas imágenes
+    ImageModule
   ],
   templateUrl: './home-main.component.html',
   styleUrl: './home-main.component.scss'
@@ -36,67 +33,92 @@ export class HomeMainComponent implements OnInit, OnDestroy {
   @ViewChild('carousel') carousel!: Carousel;
 
   products: ProductCarouselItem[] = [];
-  // Opciones responsivas para el carousel
+  isDesktop: boolean = false;
+  showMobileNav: boolean = false; // Control para botones móviles
+
   responsiveOptions = [
     {
-      breakpoint: '1199px',
+      breakpoint: '1400px',
       numVisible: 1,
       numScroll: 1
     },
     {
-      breakpoint: '991px',
+      breakpoint: '1200px',
       numVisible: 1,
       numScroll: 1
     },
     {
-      breakpoint: '767px',
+      breakpoint: '992px',
+      numVisible: 1,
+      numScroll: 1
+    },
+    {
+      breakpoint: '768px',
+      numVisible: 1,
+      numScroll: 1
+    },
+    {
+      breakpoint: '576px',
       numVisible: 1,
       numScroll: 1
     }
   ];
 
   constructor(
-    private imageService: ImageService
+    private imageService: ImageService,
+    @Inject(PLATFORM_ID) private platformId: any
   ) { }
 
+  @HostListener('window:resize', ['$event'])
+  onResize() {
+    if (isPlatformBrowser(this.platformId)) {
+      this.checkScreenSize();
+    }
+  }
+
+  checkScreenSize() {
+    if (isPlatformBrowser(this.platformId)) {
+      const width = window.innerWidth;
+      this.isDesktop = width >= 768;
+      this.showMobileNav = width < 768; // Mostrar botones solo en móvil
+    }
+  }
+
   ngOnInit(): void {
-    console.log('HomeMainComponent: ngOnInit iniciado.');
+    if (isPlatformBrowser(this.platformId)) {
+      const width = window.innerWidth;
+      this.isDesktop = width >= 768;
+      this.showMobileNav = width < 768;
+    } else {
+      this.isDesktop = true;
+      this.showMobileNav = false;
+    }
 
     this.imageService.getLatestProductImages().subscribe({
       next: (data) => {
-        console.log('HomeMainComponent: Datos recibidos en el subscribe:', data);
         if (Array.isArray(data) && data.length > 0) {
           this.products = data;
-          console.log('HomeMainComponent: Array de productos populado:', this.products);
         } else {
-          console.log('HomeMainComponent: Datos no válidos o array vacío:', data);
           this.products = [];
         }
       },
-      error: (e) => console.error('HomeMainComponent: Error en el subscribe:', e),
-      complete: () => console.log('HomeMainComponent: Suscripción a imágenes completada.')
+      error: (e) => console.error('Error loading products:', e)
     });
   }
 
   nextSlide(): void {
-    if (this.carousel) {
+    if (this.carousel && isPlatformBrowser(this.platformId)) {
       this.carousel.navForward({} as MouseEvent);
-      console.log('Navegación siguiente ejecutada.');
-    } else {
-      console.warn('Carousel no está disponible para navegación siguiente.');
     }
   }
 
   prevSlide(): void {
-    if (this.carousel) {
+    if (this.carousel && isPlatformBrowser(this.platformId)) {
       this.carousel.navBackward({} as MouseEvent);
-      console.log('Navegación anterior ejecutada.');
-    } else {
-      console.warn('Carousel no está disponible para navegación anterior.');
     }
   }
 
   ngOnDestroy(): void {
-    // Si HomeMainComponent tiene sus propias suscripciones que no son del header, gestionarlas aquí.
+    // Cleanup
   }
 }

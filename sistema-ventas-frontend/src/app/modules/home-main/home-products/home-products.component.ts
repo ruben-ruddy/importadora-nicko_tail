@@ -125,7 +125,7 @@ export class HomeProductsComponent implements OnInit, OnDestroy { // O el nombre
         product: product
       },
       header: '',
-      width: '50vw',
+      //width: '50vw',
       modal: true,
       closable: false,
       position: 'center' // Opcional: posición del modal

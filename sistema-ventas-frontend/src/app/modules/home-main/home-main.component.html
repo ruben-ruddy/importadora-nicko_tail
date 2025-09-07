@@ -1,95 +1,91 @@
+<!-- //sistemas-ventas-frontend/src/app/modules/home-main/home-main.component.html -->
 <div class="design-container">
     <div class="design3 min-h-screen relative overflow-hidden
                  bg-gradient-to-br from-dark-blue-bg via-medium-blue-bg to-light-blue-bg">
 
         <div class="absolute inset-0 z-0 radial-gradient-overlay"></div>
-        
+
         <app-header-home-main></app-header-home-main>
 
-<section class="hero relative overflow-hidden h-[80vh] flex flex-column justify-content-center p-0
-                        lg:h-[80vh] lg:px-5
-                        md:h-[60vh] md:px-4 md:pt-8">
-            <p-carousel #carousel
-                [value]="products" 
-                [numVisible]="1"
-                [numScroll]="1"
-                [autoplayInterval]="5000"
-                [circular]="true"
-                [showIndicators]="false"
-                [showNavigators]="false"
-                [responsiveOptions]="responsiveOptions"
-                class="w-full h-full flex-grow-1 relative z-1">
-                
+        <section class="hero relative overflow-hidden h-[80vh] flex flex-column justify-content-center p-0
+                lg:h-[80vh] lg:px-5
+                md:h-[60vh] md:px-4 md:pt-8">
+
+            <p-carousel #carousel [value]="products" [numVisible]="1" [numScroll]="1" [autoplayInterval]="5000"
+                [circular]="true" [showIndicators]="false" [showNavigators]="false"
+                [responsiveOptions]="responsiveOptions" class="w-full h-full flex-grow-1 relative z-1">
+
                 <ng-template let-product pTemplate="item">
                     <div class="carousel-item h-full flex flex-row align-items-center px-5 py-0 surface-card border-round
-                                lg:flex-row lg:px-5
-                                md:flex-column md:px-3 md:py-3 md:text-center md:justify-content-center">
-                        
-                        <div class="carousel-content-left flex-1 flex flex-column justify-content-center pr-0 text-900 text-center
-                                        lg:pr-5
-                                        md:w-full md:pr-0 md:mb-3">
-                            <h2 class="text-4xl mb-3 text-primary font-bold line-height-3
-                                             lg:text-3xl 
-                                             md:text-2xl">{{ product.nombre_producto }}</h2>
-                            <p class="text-lg text-700 line-height-3 mb-4
-                                         lg:text-base 
-                                         md:text-sm">{{ product.descripcion }}</p>
-                            <!-- <p-button label="Ver detalles" icon="pi pi-eye" 
-                                [rounded]="true" severity="info" size="small" class="mt-3 w-full md:w-auto"></p-button> -->
+                            lg:flex-row lg:px-5
+                            md:flex-column md:px-3 md:py-3 md:text-center md:justify-content-center">
+
+                        <div class="carousel-content-left flex-1 flex flex-column justify-content-center pr-0 text-white text-center
+                                lg:pr-5
+                                md:w-full md:pr-0 md:mb-3">
+                            <h2 class="text-xl mb-3 text-primary font-bold line-height-3
+                                     lg:text-5xl 
+                                     md:text-2xl">{{ product.nombre_producto }}</h2>
+                            <p class="text-lg text-gray-200 line-height-3 mb-4
+                                 lg:text-base 
+                                 md:text-sm">{{ product.descripcion }}</p>
                         </div>
-                        
+
                         <div class="carousel-image-right flex-1 flex justify-content-center align-items-center overflow-hidden
-                                        lg:min-h-[400px]
-                                        md:min-h-[200px] md:mt-3">
-                            <p-image [src]="product.imagen_url" [alt]="product.nombre_producto" 
-                                width="100%" 
-                                class="block max-w-full max-h-[400px] shadow-4 border-round
-                                       lg:max-h-[350px]
-                                       md:max-h-[200px]"></p-image>
+                                lg:min-h-[400px]
+                                md:min-h-[250px] md:mt-3">
+                            <img [src]="product.imagen_url" [alt]="product.nombre_producto" class="w-auto h-auto max-w-full max-h-[350px] object-contain border-round
+                               lg:max-h-[300px]
+                               md:max-h-[200px]">
                         </div>
                     </div>
                 </ng-template>
             </p-carousel>
 
-            <!-- Botones de navegación responsivos -->
-            <button (click)="prevSlide()" pRipple
-                class="custom-nav-button left absolute top-50% -translate-y-50% bg-primary text-white border-none w-3rem h-3rem border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
-                                lg:left-2
-                                md:left-1 md:w-2.5rem md:h-2.5rem">
+            <!-- Botones de navegación DESKTOP (lados) -->
+            <button *ngIf="isDesktop" (click)="prevSlide()" pRipple class="custom-nav-button left absolute top-50% -translate-y-50% bg-primary text-white border-none w-3rem h-3rem border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
+                        lg:left-2
+                        md:left-1">
                 <i class="pi pi-angle-left text-xl"></i>
             </button>
-            
-            <button (click)="nextSlide()" pRipple
-                class="custom-nav-button right absolute top-50% -translate-y-50% bg-primary text-white border-none w-3rem h-3rem border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
-                                lg:right-2
-                                md:right-1 md:w-2.5rem md:h-2.5rem">
+
+            <button *ngIf="isDesktop" (click)="nextSlide()" pRipple class="custom-nav-button right absolute top-50% -translate-y-50% bg-primary text-white border-none w-3rem h-3rem border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
+                        lg:right-2
+                        md:right-1">
                 <i class="pi pi-angle-right text-xl"></i>
+            </button>
+
+            <!-- Botones de navegación MÓVIL (en los lados) -->
+            <button *ngIf="showMobileNav" (click)="prevSlide()" pRipple class="mobile-nav-button left absolute top-50% -translate-y-50% bg-primary text-white border-none w-10 h-10 border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
+                        md:left-2">
+                <i class="pi pi-angle-left"></i>
+            </button>
+
+            <button *ngIf="showMobileNav" (click)="nextSlide()" pRipple class="mobile-nav-button right absolute top-50% -translate-y-50% bg-primary text-white border-none w-10 h-10 border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
+                        md:right-2">
+                <i class="pi pi-angle-right"></i>
             </button>
 
             <!-- CTA Container responsivo -->
             <div class="cta-container absolute left-50% -translate-x-50% bottom-3 z-3 flex gap-3 py-2 w-full justify-content-center
-                            lg:bottom-3
-                            md:bottom-4 md:flex-wrap">
+                    lg:bottom-3
+                    md:bottom-4 md:flex-wrap">
                 <a routerLink="/products" routerLinkActive="active-link">
-                    <!-- <button pButton type="button" label="PRODUCTOS" icon="pi pi-box" class="p-button-rounded p-button-info"></button> -->
-                    <button pButton type="button" label="PRODUCTOS" icon="pi pi-box" class="p-button-rounded p-button-info" 
-                        styleClass="p-button-raised p-button-rounded uppercase font-bold text-sm
-                                   lg:text-sm lg:py-2
-                                   md:text-xs md:py-1 md:px-2">
+                    <button pButton type="button" label="PRODUCTOS" icon="pi pi-box"
+                        class="p-button-rounded p-button-info" styleClass="p-button-raised p-button-rounded uppercase font-bold text-sm
+                           lg:text-sm lg:py-2
+                           md:text-xs md:py-1 md:px-2">
                     </button>
                 </a>
                 <a routerLink="/categories" routerLinkActive="active-link">
-                    <!-- <button pButton type="button" label="CATEGORÍAS" icon="pi pi-tags" class="p-button-rounded p-button-info"></button> -->
-                    <button pButton type="button" label="CATEGORÍAS" icon="pi pi-tags" class="p-button-rounded p-button-info" 
-                        styleClass="p-button-raised p-button-rounded uppercase font-bold text-sm
-                                   lg:text-sm lg:py-2
-                                   md:text-xs md:py-1 md:px-2"
-                       >
+                    <button pButton type="button" label="CATEGORÍAS" icon="pi pi-tags"
+                        class="p-button-rounded p-button-info" styleClass="p-button-raised p-button-rounded uppercase font-bold text-sm
+                           lg:text-sm lg:py-2
+                           md:text-xs md:py-1 md:px-2">
                     </button>
                 </a>
             </div>
         </section>
-
 
         <section class="services py-20 px-8 bg-white/5 text-white
                         xl:py-16 xl:px-6
@@ -105,24 +101,28 @@
                     <div class="service-icon w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center text-3xl
                                 bg-gradient-to-br from-purple-start to-purple-end">📦</div>
                     <h3 class="text-xl mt-4 mb-2 text-white font-montserrat">Importación</h3>
-                    <p class="text-base leading-relaxed text-white/70 font-inter">Gestión completa de procesos de importación internacional</p>
+                    <p class="text-base leading-relaxed text-white/70 font-inter">Gestión completa de procesos de
+                        importación internacional</p>
                 </div>
                 <div class="service-card text-center p-8 bg-white/5 rounded-xl transition-all duration-300 ease-in-out border border-white/5
                             hover:-translate-y-1 hover:bg-white/15">
                     <div class="service-icon w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center text-3xl
                                 bg-gradient-to-br from-purple-start to-purple-end">🚚</div>
                     <h3 class="text-xl mt-4 mb-2 text-white font-montserrat">Distribución</h3>
-                    <p class="text-base leading-relaxed text-white/70 font-inter">Red de distribución nacional con cobertura total</p>
+                    <p class="text-base leading-relaxed text-white/70 font-inter">Red de distribución nacional con
+                        cobertura total</p>
                 </div>
                 <div class="service-card text-center p-8 bg-white/5 rounded-xl transition-all duration-300 ease-in-out border border-white/5
                             hover:-translate-y-1 hover:bg-white/15">
                     <div class="service-icon w-16 h-16 rounded-full mx-auto mb-5 flex items-center justify-center text-3xl
                                 bg-gradient-to-br from-purple-start to-purple-end">🌐</div>
                     <h3 class="text-xl mt-4 mb-2 text-white font-montserrat">Logística</h3>
-                    <p class="text-base leading-relaxed text-white/70 font-inter">Soluciones logísticas integrales y personalizadas</p>
+                    <p class="text-base leading-relaxed text-white/70 font-inter">Soluciones logísticas integrales y
+                        personalizadas</p>
                 </div>
             </div>
         </section>
+
         <app-footer-home-main></app-footer-home-main>
     </div>
 </div>

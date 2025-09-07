@@ -17,6 +17,7 @@ import { PublicProductsModule } from './public-products/public-products.module';
 import { PublicCategoriesModule } from './public-categories/public-categories.module';
 import { RolesModule } from './roles/roles.module';
 import { ForecastModule } from './forecast/forecast.module';
+import { ReportsModule } from './reports/reports.module';
 
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import { ForecastModule } from './forecast/forecast.module';
     PublicProductsModule,
     PublicCategoriesModule,
     RolesModule,
-    ForecastModule, // <-- ¡Añade UsersModule aquí!
+    ForecastModule,
+    ReportsModule, // <-- ¡Añade UsersModule aquí!
   ],
   controllers: [AppController],
   providers: [AppService],

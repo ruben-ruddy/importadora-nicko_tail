@@ -1,63 +1,84 @@
-        <header class="header relative z-10 bg-dark-blue-bg/95 border-b border-white/10
-                         py-5 px-8
-                         flex flex-wrap justify-between items-center md:flex-row md:px-6">
-            <div class="logo flex items-center gap-4 text-white
-                         mb-0 md:mb-0">
-                <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-purple-start to-pink-end flex items-center justify-center text-white font-bold text-xl">
-                    <a routerLink="/login" routerLinkActive="active-link"  >
-                    <img src="/nicko.png" alt="Logo de IMPORTADORA NICKO" class="max-w-[100%] max-h-[100%] object-contain block"></a>
-                </div>
-                <div>
-                    <div class="company-name text-2xl font-bold font-montserrat
-                                 company-name-gradient md:text-xl">IMPORTADORA NICKO</div>
-                    <p class="mt-0 opacity-70 text-sm text-white md:text-xs">Global Trade Solutions</p>
-                </div>
+        <!-- //sistema-ventas-frontend/src/app/modules/home-main/header-home-main/header-home-main.component.html -->
+<header class="header relative z-50 bg-dark-blue-bg/95 border-b border-white/10
+               py-5 px-8 flex flex-wrap justify-between items-center md:flex-row md:px-6">
+    
+    <!-- Logo -->
+    <div class="logo flex items-center gap-4 text-white mb-0 md:mb-0">
+        <div class="w-14 h-14 rounded-lg bg-gradient-to-br from-purple-start to-pink-end flex items-center justify-center text-white font-bold text-xl">
+            <a routerLink="/login" routerLinkActive="active-link">
+                <img src="/nicko.png" alt="Logo de IMPORTADORA NICKO" class="max-w-[100%] max-h-[100%] object-contain block">
+            </a>
+        </div>
+        <div>
+            <div class="company-name text-2xl font-bold font-montserrat company-name-gradient md:text-xl">
+                IMPORTADORA NICKO
             </div>
+            <p class="mt-0 opacity-70 text-sm text-white md:text-xs">Global Trade Solutions</p>
+        </div>
+    </div>
 
-            <button (click)="toggleMenu()" class="block md:hidden text-white focus:outline-none z-30">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path [class.hidden]="isMenuOpen" class="transition-all duration-300 ease-in-out" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
-                    <path [class.hidden]="!isMenuOpen" class="transition-all duration-300 ease-in-out" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                </svg>
-            </button>
+    <!-- Botón hamburguesa -->
+    <button (click)="toggleMenu()" class="block md:hidden text-white focus:outline-none z-50">
+        <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path [class.hidden]="isMenuOpen" class="transition-all duration-300 ease-in-out" 
+                  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M4 6h16M4 12h16M4 18h16"></path>
+            <path [class.hidden]="!isMenuOpen" class="transition-all duration-300 ease-in-out" 
+                  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                  d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
 
-            <nav class="nav fixed top-0 right-0 h-full w-[280px] bg-dark-blue-bg p-6 flex flex-col gap-4
-                         transform translate-x-full transition-transform duration-300 ease-in-out z-20
-                         md:relative md:h-auto md:w-auto md:bg-transparent md:p-0 md:flex-row md:gap-5 md:transform-none md:z-auto"
+    <!-- Overlay de fondo (SOLO móvil) -->
+    <div *ngIf="isMenuOpen && !isDesktop" 
+         (click)="closeMenu()"
+         class="fixed inset-0 bg-black/70 backdrop-blur-sm z-40 transition-opacity duration-300">
+    </div>
+
+    <!-- Menú de navegación -->
+    <nav class="nav fixed top-0 right-0 h-full w-[280px] bg-dark-blue-bg/95 backdrop-blur-md 
+                border-l border-white/10 p-6 flex flex-col gap-4 shadow-2xl
+                transform translate-x-full transition-transform duration-300 ease-in-out z-50
+                md:relative md:h-auto md:w-auto md:bg-transparent md:backdrop-blur-0 md:border-0 md:p-0 
+                md:flex-row md:gap-5 md:transform-none md:shadow-none"
          [class.translate-x-0]="isMenuOpen && !isDesktop"
          [class.translate-x-full]="!isMenuOpen && !isDesktop">
 
-    <a routerLink="/home-main"                           routerLinkActive="active-link"               class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-              py-3 px-6 rounded-3xl border border-transparent
-              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-              text-left md:w-auto md:px-3">INICIO</a>
+        <!-- Links con cierre automático al hacer clic -->
+        <a routerLink="/home-main" routerLinkActive="active-link" 
+           (click)="closeMenu()"
+           class="text-white/80 no-underline font-medium transition-all duration-300 ease-in-out
+                  py-3 px-6 rounded-3xl border border-transparent
+                  hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+                  text-left md:w-auto md:px-3 md:py-2">INICIO</a>
 
-    <a routerLink="/products"                       routerLinkActive="active-link"               class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-              py-3 px-6 rounded-3xl border border-transparent
-              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-              text-left md:w-auto md:px-3">PRODUCTOS</a>
+        <a routerLink="/products" routerLinkActive="active-link" 
+           (click)="closeMenu()"
+           class="text-white/80 no-underline font-medium transition-all duration-300 ease-in-out
+                  py-3 px-6 rounded-3xl border border-transparent
+                  hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+                  text-left md:w-auto md:px-3 md:py-2">PRODUCTOS</a>
 
-    <a routerLink="/categories"                      routerLinkActive="active-link"
-       class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-              py-3 px-6 rounded-3xl border border-transparent
-              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-              text-left md:w-auto md:px-3">CATEGORÍAS</a>
+        <a routerLink="/categories" routerLinkActive="active-link"
+           (click)="closeMenu()"
+           class="text-white/80 no-underline font-medium transition-all duration-300 ease-in-out
+                  py-3 px-6 rounded-3xl border border-transparent
+                  hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+                  text-left md:w-auto md:px-3 md:py-2">CATEGORÍAS</a>
 
-    <a routerLink="/quienes-somos"                        routerLinkActive="active-link"
-       class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-              py-3 px-6 rounded-3xl border border-transparent
-              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-              text-left md:w-auto md:px-3">QUIENES SOMOS</a>
+        <a routerLink="/quienes-somos" routerLinkActive="active-link"
+           (click)="closeMenu()"
+           class="text-white/80 no-underline font-medium transition-all duration-300 ease-in-out
+                  py-3 px-6 rounded-3xl border border-transparent
+                  hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+                  text-left md:w-auto md:px-3 md:py-2">QUIENES SOMOS</a>
 
-    <a routerLink="/contact"                        routerLinkActive="active-link"
-       class="text-white/80 no-underline font-medium transition-colors duration-300 ease-in-out
-              py-3 px-6 rounded-3xl border border-transparent
-              hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
-              text-left md:w-auto md:px-3">CONTACTO</a>
-</nav>
+        <a routerLink="/contact" routerLinkActive="active-link"
+           (click)="closeMenu()"
+           class="text-white/80 no-underline font-medium transition-all duration-300 ease-in-out
+                  py-3 px-6 rounded-3xl border border-transparent
+                  hover:text-white hover:border-purple-start/50 hover:bg-purple-start/10 hover:-translate-y-0.5
+                  text-left md:w-auto md:px-3 md:py-2">CONTACTO</a>
+    </nav>
 
-            <div *ngIf="isMenuOpen && !isDesktop" (click)="toggleMenu()"
-                 class="fixed inset-0 bg-black/50 z-10 transition-opacity duration-300 ease-in-out opacity-0"
-                 [class.opacity-100]="isMenuOpen"></div>
-
-        </header>
+</header>

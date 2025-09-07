@@ -9,6 +9,7 @@ import { UsersComponent } from '../users/users.component';
 import { SalesComponent } from '../sales/sales.component';
 import { ForecastComponent } from '../forecast/forecast.component';
 import { PurchaseComponent } from '../purchase/purchase.component';
+import { ReportComponent } from '../report/report.component';
 
 
 
@@ -53,6 +54,10 @@ export const routes: Routes = [
       {
         path: 'purchase',
         component: PurchaseComponent,
+      },
+      {
+        path: 'report',
+        component: ReportComponent,
       },
       // {
       //   path: 'clients',

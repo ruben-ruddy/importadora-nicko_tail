@@ -1,0 +1,39 @@
+// report.component.scss
+#report-content {
+  background-color: white;
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    
+    th, td {
+      padding: 0.5rem;
+      border: 1px solid #e5e7eb;
+      text-align: left;
+    }
+    
+    th {
+      background-color: #f9fafb;
+      font-weight: 600;
+    }
+    
+    tr:hover {
+      background-color: #f9fafb;
+    }
+  }
+  
+  .bg-blue-50, .bg-green-50, .bg-red-50, .bg-orange-50, .bg-purple-50 {
+    border: 1px solid #e5e7eb;
+  }
+}
+
+// Mejorar visibilidad para PDF
+@media print {
+  .bg-gray-400 {
+    display: none !important;
+  }
+  
+  button {
+    display: none !important;
+  }
+}

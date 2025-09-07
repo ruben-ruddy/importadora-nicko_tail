@@ -1,11 +1,12 @@
-import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID } from '@angular/core';
-import { isPlatformBrowser, CommonModule } from '@angular/common'; // Asegúrate de importar CommonModule
+//sistema-ventas-frontend/src/app/modules/home-main/header-home-main/header-home-main.component.ts
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, HostListener } from '@angular/core';
+import { isPlatformBrowser, CommonModule } from '@angular/common';
 import { fromEvent, Subject } from 'rxjs';
 import { debounceTime, takeUntil } from 'rxjs/operators';
-import { RouterModule } from '@angular/router'; // ¡Importante!
+import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-header-home-main', // Selector ajustado para este componente específico
+  selector: 'app-header-home-main',
   standalone: true,
   imports: [CommonModule, RouterModule],
   templateUrl: './header-home-main.component.html',
@@ -63,6 +64,28 @@ export class HeaderHomeMainComponent implements OnInit, OnDestroy {
     if (!this.isDesktop) {
       this.isMenuOpen = !this.isMenuOpen;
       console.log('HeaderHomeMain: Menu isMenuOpen:', this.isMenuOpen);
+    }
+  }
+
+  // MÉTODO NUEVO AÑADIDO - Cierra el menú en móvil
+  closeMenu(): void {
+    if (!this.isDesktop) {
+      this.isMenuOpen = false;
+      console.log('HeaderHomeMain: Menú cerrado');
+    }
+  }
+
+  // HostListener para cerrar menú al hacer clic fuera (opcional)
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: Event): void {
+    if (!this.isDesktop && this.isMenuOpen) {
+      const target = event.target as HTMLElement;
+      const menu = document.querySelector('.nav');
+      const button = document.querySelector('button[aria-label="Toggle menu"]');
+      
+      if (menu && !menu.contains(target) && button && !button.contains(target)) {
+        this.closeMenu();
+      }
     }
   }
 }

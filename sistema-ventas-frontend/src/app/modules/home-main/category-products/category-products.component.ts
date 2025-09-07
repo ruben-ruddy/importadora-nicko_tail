@@ -121,7 +121,7 @@ export class CategoryProductsComponent implements OnInit, OnDestroy {
         product: product
       },
       showHeader: false,
-      width: '50vw',
+      //width: '50vw',
       modal: true,
       closable: true,
       position: 'center'

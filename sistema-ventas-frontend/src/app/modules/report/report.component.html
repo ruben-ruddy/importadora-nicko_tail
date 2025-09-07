@@ -1,0 +1,256 @@
+<!-- // sistema-ventas-frontend/src/app/modules/reports/reports.component.html -->
+<div class="container mx-auto px-4 py-6">
+  <h2 class="text-2xl font-bold mb-6 text-gray-800">Reportes de Ventas y Compras</h2>
+
+  <!-- Filtros -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+    <h3 class="text-lg font-semibold mb-4 text-gray-600">Filtros del Reporte</h3>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+      <!-- Tipo de Reporte -->
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-600">Tipo de Reporte</label>
+        <select [(ngModel)]="filters.tipo_reporte" class="w-full p-2 border rounded">
+          <option value="ventas">Ventas</option>
+          <option value="compras">Compras</option>
+          <option value="ambos">Ventas y Compras</option>
+        </select>
+      </div>
+
+      <!-- Fecha Inicio -->
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-600">Fecha Inicio</label>
+        <input type="date" [(ngModel)]="filters.fecha_inicio" 
+               class="w-full p-2 border rounded">
+      </div>
+
+      <!-- Fecha Fin -->
+      <div>
+        <label class="block text-sm font-medium mb-1 text-gray-600">Fecha Fin</label>
+        <input type="date" [(ngModel)]="filters.fecha_fin" 
+               class="w-full p-2 border rounded">
+      </div>
+
+      <!-- Vendedor (solo para reporte de ventas) -->
+      <div *ngIf="filters.tipo_reporte === 'ventas'">
+        <label class="block text-sm font-medium mb-1 text-gray-600">Vendedor (Opcional)</label>
+        <select [(ngModel)]="filters.id_usuario" class="w-full p-2 border rounded">
+          <option value="">Todos los vendedores</option>
+          <option *ngFor="let user of users" [value]="user.id_usuario">
+            {{ user.nombre_completo }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex space-x-4">
+      <button (click)="generateReport()" [disabled]="loading"
+              class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded disabled:bg-gray-400">
+        {{ loading ? 'Generando...' : 'Generar Reporte' }}
+      </button>
+      
+      <button (click)="exportReport('pdf')" 
+              [disabled]="(!salesReport && !purchasesReport) || exportLoading"
+              class="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded disabled:bg-gray-400">
+        {{ exportLoading ? 'Exportando...' : 'Exportar PDF' }}
+      </button>
+      
+      <button (click)="exportReport('excel')" 
+              [disabled]="(!salesReport && !purchasesReport) || exportLoading"
+              class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded disabled:bg-gray-400">
+        {{ exportLoading ? 'Exportando...' : 'Exportar Excel' }}
+      </button>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="error" class="mt-4 bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Loading para generación de reporte -->
+  <div *ngIf="loading" class="flex justify-center items-center h-64">
+    <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
+    <span class="ml-3 text-gray-600">Generando reporte...</span>
+  </div>
+
+  <!-- Loading para exportación -->
+  <div *ngIf="exportLoading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="bg-white p-6 rounded-lg text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500 mx-auto mb-4"></div>
+      <p class="text-gray-700">Exportando reporte...</p>
+    </div>
+  </div>
+
+  <!-- Contenido del reporte para exportación -->
+  <div id="report-content">
+    <!-- Resultados -->
+    <div *ngIf="!loading && (salesReport || purchasesReport)" class="space-y-6">
+      
+      <!-- Resumen General -->
+      <div *ngIf="filters.tipo_reporte === 'ambos'" class="bg-white rounded-lg shadow-md p-6">
+        <h3 class="text-lg font-semibold mb-4 text-gray-600">Resumen General</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="text-center p-4 bg-green-50 rounded-lg">
+            <p class="text-2xl font-bold text-green-600">{{ totalIngresosEgresos.ingresos | currency }}</p>
+            <p class="text-sm text-green-800">Total Ingresos</p>
+          </div>
+          <div class="text-center p-4 bg-red-50 rounded-lg">
+            <p class="text-2xl font-bold text-red-600">{{ totalIngresosEgresos.egresos | currency }}</p>
+            <p class="text-sm text-red-800">Total Egresos</p>
+          </div>
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <p class="text-2xl font-bold" 
+              [class.text-green-600]="totalIngresosEgresos.balance >= 0"
+              [class.text-red-600]="totalIngresosEgresos.balance < 0">
+              {{ totalIngresosEgresos.balance | currency }}
+            </p>
+            <p class="text-sm text-blue-800">Balance Neto</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reporte de Ventas -->
+      <div *ngIf="salesReport" class="bg-white rounded-lg shadow-md p-6 text-gray-600">
+        <h3 class="text-lg font-semibold mb-4 text-gray-600">
+          Reporte de Ventas del {{ filters.fecha_inicio }} al {{ filters.fecha_fin }}
+        </h3>
+        
+        <!-- Resumen Ventas -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="text-center p-4 bg-blue-50 rounded-lg">
+            <p class="text-2xl font-bold text-blue-600">{{ salesReport.total_ingresos | currency }}</p>
+            <p class="text-sm text-blue-800">Total Ventas</p>
+          </div>
+          <div class="text-center p-4 bg-green-50 rounded-lg">
+            <p class="text-2xl font-bold text-green-600">{{ salesReport.cantidad_ventas }}</p>
+            <p class="text-sm text-green-800">N° de Ventas</p>
+          </div>
+          <div class="text-center p-4 bg-purple-50 rounded-lg">
+            <p class="text-2xl font-bold text-purple-600">
+              {{ salesReport.cantidad_ventas > 0 ? (salesReport.total_ingresos / salesReport.cantidad_ventas | currency) : (0 | currency) }}
+            </p>
+            <p class="text-sm text-purple-800">Promedio por Venta</p>
+          </div>
+        </div>
+
+        <!-- Ventas por Vendedor -->
+        <h4 class="font-semibold mb-3">Ventas por Vendedor</h4>
+        <div class="overflow-x-auto">
+          <table class="min-w-full table-auto">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-4 py-2 text-left">Vendedor</th>
+                <th class="px-4 py-2 text-left">Ventas</th>
+                <th class="px-4 py-2 text-left">Total</th>
+                <th class="px-4 py-2 text-left">Porcentaje</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let vendedor of salesReport.ventas_por_vendedor" class="border-b hover:bg-gray-50">
+                <td class="px-4 py-3">{{ vendedor.nombre_completo }}</td>
+                <td class="px-4 py-3">{{ vendedor.cantidad_ventas }}</td>
+                <td class="px-4 py-3 font-medium">{{ vendedor.total_ventas | currency }}</td>
+                <td class="px-4 py-3">{{ vendedor.porcentaje | number:'1.2-2' }}%</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Productos Más Vendidos -->
+        <h4 class="font-semibold mb-3 mt-6">Productos Más Vendidos</h4>
+        <div class="overflow-x-auto">
+          <table class="min-w-full table-auto">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-4 py-2 text-left">Producto</th>
+                <th class="px-4 py-2 text-left">Cantidad Vendida</th>
+                <th class="px-4 py-2 text-left">Total Vendido</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let producto of salesReport.productos_mas_vendidos" class="border-b hover:bg-gray-50">
+                <td class="px-4 py-3">{{ producto.nombre_producto }}</td>
+                <td class="px-4 py-3">{{ producto.cantidad_vendida }}</td>
+                <td class="px-4 py-3 font-medium">{{ producto.total_ventas | currency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Ventas por Día -->
+        <h4 class="font-semibold mb-3 mt-6">Ventas por Día</h4>
+        <div class="overflow-x-auto">
+          <table class="min-w-full table-auto">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-4 py-2 text-left">Fecha</th>
+                <th class="px-4 py-2 text-left">N° de Ventas</th>
+                <th class="px-4 py-2 text-left">Total del Día</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let dia of salesReport.ventas_por_dia" class="border-b hover:bg-gray-50">
+                <td class="px-4 py-3">{{ dia.fecha }}</td>
+                <td class="px-4 py-3">{{ dia.cantidad_ventas }}</td>
+                <td class="px-4 py-3 font-medium">{{ dia.total_ventas | currency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Reporte de Compras -->
+      <div *ngIf="purchasesReport" class="bg-white rounded-lg shadow-md p-6 text-gray-600">
+        <h3 class="text-lg font-semibold mb-4">
+          Reporte de Compras del {{ filters.fecha_inicio }} al {{ filters.fecha_fin }}
+        </h3>
+        
+        <!-- Resumen Compras -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <div class="text-center p-4 bg-red-50 rounded-lg">
+            <p class="text-2xl font-bold text-red-600">{{ purchasesReport.total_egresos | currency }}</p>
+            <p class="text-sm text-red-800">Total Compras</p>
+          </div>
+          <div class="text-center p-4 bg-orange-50 rounded-lg">
+            <p class="text-2xl font-bold text-orange-600">{{ purchasesReport.cantidad_compras }}</p>
+            <p class="text-sm text-orange-800">N° de Compras</p>
+          </div>
+          <div class="text-center p-4 bg-purple-50 rounded-lg">
+            <p class="text-2xl font-bold text-purple-600">
+              {{ purchasesReport.cantidad_compras > 0 ? (purchasesReport.total_egresos / purchasesReport.cantidad_compras | currency) : (0 | currency) }}
+            </p>
+            <p class="text-sm text-purple-800">Promedio por Compra</p>
+          </div>
+        </div>
+
+        <!-- Productos Más Comprados -->
+        <h4 class="font-semibold mb-3">Productos Más Comprados</h4>
+        <div class="overflow-x-auto">
+          <table class="min-w-full table-auto">
+            <thead>
+              <tr class="bg-gray-50">
+                <th class="px-4 py-2 text-left">Producto</th>
+                <th class="px-4 py-2 text-left">Cantidad Comprada</th>
+                <th class="px-4 py-2 text-left">Total Comprado</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let producto of purchasesReport.productos_mas_comprados" class="border-b hover:bg-gray-50">
+                <td class="px-4 py-3">{{ producto.nombre_producto }}</td>
+                <td class="px-4 py-3">{{ producto.cantidad_comprada }}</td>
+                <td class="px-4 py-3 font-medium">{{ producto.total_compras | currency }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sin resultados -->
+    <div *ngIf="!loading && !salesReport && !purchasesReport && !error" class="bg-white rounded-lg shadow-md p-6 text-center">
+      <p class="text-gray-500">Seleccione fechas y haga clic en "Generar Reporte" para ver los datos</p>
+    </div>
+  </div>
+</div>

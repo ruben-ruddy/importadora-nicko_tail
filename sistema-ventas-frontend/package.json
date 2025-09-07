@@ -43,6 +43,7 @@
     "rxjs": "~7.8.2",
     "tailwindcss-primeui": "^0.6.1",
     "tslib": "^2.8.1",
+    "xlsx": "^0.18.5",
     "zone.js": "~0.15.1"
   },
   "devDependencies": {
@@ -64,6 +65,7 @@
     "@types/range-parser": "^1.2.7",
     "@types/send": "^0.17.5",
     "@types/serve-static": "^1.15.8",
+    "@types/xlsx": "^0.0.35",
     "autoprefixer": "^10.4.16",
     "jasmine-core": "~5.9.0",
     "json-server": "^1.0.0-beta.3",

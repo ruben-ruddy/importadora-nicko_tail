@@ -35,7 +35,7 @@ export class NavbarComponent implements OnInit {
         { path: 'sale', title: 'Ventas' },
         { path: 'purchase', title: 'Compras' },
         { path: 'forecast', title: 'Pronostico' },
-        { path: 'reportes', title: 'Reportes de Ventas'}
+        { path: 'report', title: 'Reportes de Ventas'}
       ];
     } else if (this.user?.role?.nombre_rol == "Almacenero") {
       
