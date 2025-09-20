@@ -163,7 +163,7 @@ export class SalesService {
 
   // ... (el resto de tus métodos findAll, findOne, update, remove) ...
   async findAll(query: SaleQueryDto) {
-    const { id_cliente, id_usuario, numero_venta, estado, startDate, endDate, page = 1, limit = 10 } = query;
+    const { id_cliente, id_usuario, numero_venta, estado, startDate, endDate, page = 1, limit = 1000 } = query;
     const skip = (page - 1) * limit;
 
     const where: any = {};

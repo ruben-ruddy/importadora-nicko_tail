@@ -59,7 +59,7 @@ export class UpdateSaleDto extends PartialType(
   @IsNumber()
   @Min(0)
   @Type(() => Number)
-  @IsDecimal({ decimal_digits: '1,2' })
+  //@IsDecimal({ decimal_digits: '1,2' })
   subtotal?: number;
 
   @ApiProperty({ description: 'Descuento total aplicado a la venta', required: false, type: Number, format: 'float', default: 0 })
@@ -67,7 +67,7 @@ export class UpdateSaleDto extends PartialType(
   @IsNumber()
   @Min(0)
   @Type(() => Number)
-  @IsDecimal({ decimal_digits: '1,2' })
+  //@IsDecimal({ decimal_digits: '1,2' })
   descuento?: number;
 
   @ApiProperty({ description: 'Impuesto total aplicado a la venta', required: false, type: Number, format: 'float', default: 0 })
@@ -75,7 +75,7 @@ export class UpdateSaleDto extends PartialType(
   @IsNumber()
   @Min(0)
   @Type(() => Number)
-  @IsDecimal({ decimal_digits: '1,2' })
+  //@IsDecimal({ decimal_digits: '1,2' })
   impuesto?: number;
 
   @ApiProperty({ description: 'Total final de la venta', type: Number, format: 'float', example: 100.00, required: false })
@@ -83,6 +83,6 @@ export class UpdateSaleDto extends PartialType(
   @IsNumber()
   @Min(0)
   @Type(() => Number)
-  @IsDecimal({ decimal_digits: '1,2' })
+  //@IsDecimal({ decimal_digits: '1,2' })
   total?: number;
 }

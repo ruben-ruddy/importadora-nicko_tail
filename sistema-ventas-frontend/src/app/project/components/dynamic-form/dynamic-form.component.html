@@ -23,7 +23,7 @@
                   <!-- Input -->
                   @if (['text', 'number'].includes(f.type)) {
                     <input [type]="f.type" [formControlName]="f.key" [readonly]="f.readonly"
-                      class="input input-bordered w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black" />
+                      class="input input-bordered w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 text-black bg-white" />
                   }
 
                   <!-- Select -->
@@ -87,7 +87,7 @@
                       }
 
                       @if(f.key){
-                        <div class="text-center">
+                        <div class="text-center text-white">
                           <img [src]="initialData[f.key]" alt="Imagen cargada" class="w-64 h-64 object-cover mx-auto">
                           {{initialData[f.key]}}
                         </div>

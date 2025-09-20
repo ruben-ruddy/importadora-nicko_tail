@@ -3,13 +3,15 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { FormsModule } from '@angular/forms'; // ← Añadir si necesitas ngModel
+import { FormsModule } from '@angular/forms';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { SalesService } from '../sales.service';
 import { ToasterService } from '../../../project/services/toaster.service';
-import { Client, User, Product } from '../types';
+import { Client, User, Product, Sale } from '../types';
 import { SaleDetailComponent } from '../sale-detail/sale-detail.component';
 import { GeneralService } from '../../../core/gerneral.service';
+import { SaleTicketComponent } from '../sale-ticket/sale-ticket.component';
+import { DialogService } from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-modal-sales',
@@ -17,7 +19,7 @@ import { GeneralService } from '../../../core/gerneral.service';
   imports: [
     CommonModule, 
     ReactiveFormsModule, 
-    FormsModule, // ← Añadir si necesitas ngModel
+    FormsModule,
     SaleDetailComponent,
   ],
   templateUrl: './modal-sales.component.html',
@@ -37,7 +39,8 @@ export class ModalSalesComponent implements OnInit {
     public ref: DynamicDialogRef,
     private salesService: SalesService,
     private toaster: ToasterService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private dialogService: DialogService 
   ) {
     this.createForm();
   }
@@ -46,8 +49,6 @@ export class ModalSalesComponent implements OnInit {
     this.form = this.fb.group({
       id_usuario: [{ value: '', disabled: false }, Validators.required],
       id_cliente: [''],
-      //numero_venta: ['', Validators.required],
-      //fecha_venta: [new Date().toISOString().substring(0, 10)],
       subtotal: [0, [Validators.required, Validators.min(0)]],
       descuento: [0, [Validators.min(0)]],
       impuesto: [0, [Validators.min(0)]],
@@ -63,16 +64,12 @@ export class ModalSalesComponent implements OnInit {
   }
 
   async ngOnInit() {
-    // Obtener el usuario logueado al iniciar el componente
     this.user = this.generalService.getUser();
     
-    // Si hay un usuario, preseleccionar su id en el formulario
-    // Esto asegura que el campo 'Vendedor' esté prellenado
     if (this.user && this.user.id_usuario) {
       this.form.patchValue({
         id_usuario: this.user.id_usuario
       });
-      // Deshabilitar el control para evitar que el usuario lo cambie
       this.form.get('id_usuario')?.disable();
     }
 
@@ -95,7 +92,6 @@ export class ModalSalesComponent implements OnInit {
 
       this.catalogs.products = products;
 
-      // Cargar datos iniciales si es edición
       if (this.initiaData) {
         this.loadInitialData();
       }
@@ -119,7 +115,6 @@ export class ModalSalesComponent implements OnInit {
         new Date().toISOString().substring(0, 10)
     });
 
-    // Cargar detalle de ventas si existe
     if (this.initiaData.detalle_ventas) {
       this.initiaData.detalle_ventas.forEach((detalle: any) => {
         const product = this.catalogs.products.find((p: Product) => p.id_producto === detalle.id_producto);
@@ -149,82 +144,132 @@ export class ModalSalesComponent implements OnInit {
     this.totalVenta = totalFinal;
   }
 
-  async save() {
-    if (this.form.valid && this.detalleVentas.length > 0) {
-      try {
-        const formData = this.form.getRawValue();
-        
-        // Preparar datos en el formato correcto (sin fecha_venta y numero de venta)
-        const saleData = {
-          id_usuario: formData.id_usuario,
-          id_cliente: formData.id_cliente || null,
-          //numero_venta: formData.numero_venta,
-          subtotal: parseFloat(formData.subtotal),
-          descuento: parseFloat(formData.descuento),
-          impuesto: parseFloat(formData.impuesto),
-          total: parseFloat(formData.total),
-          estado: formData.estado,
-          observaciones: formData.observaciones || null,
-          detalle_ventas: formData.detalle_ventas.map((item: any) => ({
-            id_producto: item.id_producto,
-            cantidad: parseInt(item.cantidad),
-            precio_unitario: parseFloat(item.precio_unitario)
-            // subtotal - se calcula automáticamente en el backend
-          }))
-        };
+async save() {
+  if (this.form.valid && this.detalleVentas.length > 0) {
+    try {
+      const formData = this.form.getRawValue();
+      
+      const saleData = {
+        id_usuario: formData.id_usuario,
+        id_cliente: formData.id_cliente || null,
+        subtotal: parseFloat(formData.subtotal),
+        descuento: parseFloat(formData.descuento),
+        impuesto: parseFloat(formData.impuesto),
+        total: parseFloat(formData.total),
+        estado: formData.estado,
+        observaciones: formData.observaciones || null,
+        detalle_ventas: formData.detalle_ventas.map((item: any) => ({
+          id_producto: item.id_producto,
+          cantidad: parseInt(item.cantidad),
+          precio_unitario: parseFloat(item.precio_unitario)
+        }))
+      };
 
-        console.log('Datos a enviar:', saleData);
+      console.log('Datos a enviar:', saleData);
 
-        if (this.initiaData?.id_venta) {
-          const result = await this.salesService.updateSale(this.initiaData.id_venta, saleData);
-          this.toaster.showToast({
-            severity: 'success',
-            summary: 'Actualizado',
-            detail: 'Venta actualizada correctamente'
-          });
-          this.ref.close(result);
-        } else {
-          const result = await this.salesService.createSale(saleData);
-          this.toaster.showToast({
-            severity: 'success',
-            summary: 'Creado',
-            detail: 'Venta creada correctamente'
-          });
-          this.ref.close(result);
-        }
-      } catch (error: unknown) {
-        console.error('Error saving sale:', error);
-        
-        let errorMessage = 'Error al guardar la venta';
-        
-        if (typeof error === 'object' && error !== null) {
-          const errorObj = error as { error?: { message?: string }; message?: string };
-          
-          if (errorObj.error?.message) {
-            errorMessage = errorObj.error.message;
-          } else if (errorObj.message) {
-            errorMessage = errorObj.message;
-          }
-        } else if (typeof error === 'string') {
-          errorMessage = error;
-        }
-        
+      let result: Sale;
+
+      if (this.initiaData?.id_venta) {
+        result = await this.salesService.updateSale(this.initiaData.id_venta, saleData);
         this.toaster.showToast({
-          severity: 'error',
-          summary: 'Error',
-          detail: errorMessage
+          severity: 'success',
+          summary: 'Actualizado',
+          detail: 'Venta actualizada correctamente'
+        });
+      } else {
+        result = await this.salesService.createSale(saleData);
+        this.toaster.showToast({
+          severity: 'success',
+          summary: 'Creado',
+          detail: 'Venta creada correctamente'
         });
       }
-    } else {
+
+      // Construir los datos completos para el ticket usando la información local
+      const ticketData = this.buildTicketData(result, formData);
+
+      // Mostrar ticket después de guardar
+      this.dialogService.open(SaleTicketComponent, {
+        data: { saleData: ticketData },
+        header: 'Ticket de Venta',
+        width: '500px',
+        style: { 'max-width': '90vw' },
+        closable: true
+      });
+
+      this.ref.close(result);
+      
+    } catch (error: unknown) {
+      console.error('Error saving sale:', error);
+      
+      let errorMessage = 'Error al guardar la venta';
+      
+      if (typeof error === 'object' && error !== null) {
+        const errorObj = error as { error?: { message?: string }; message?: string };
+        
+        if (errorObj.error?.message) {
+          errorMessage = errorObj.error.message;
+        } else if (errorObj.message) {
+          errorMessage = errorObj.message;
+        }
+      } else if (typeof error === 'string') {
+        errorMessage = error;
+      }
+      
       this.toaster.showToast({
-        severity: 'warning',
-        summary: 'Validación',
-        detail: 'Complete todos los campos requeridos y agregue al menos un producto'
+        severity: 'error',
+        summary: 'Error',
+        detail: errorMessage
       });
     }
   }
+}
+
 
   close() {
     this.ref.close();
   }
+
+  // Nuevo método para construir los datos del ticket
+private buildTicketData(result: Sale, formData: any): any {
+  // Obtener información del cliente seleccionado
+  const selectedClient = formData.id_cliente ? 
+    this.catalogs.clients.find((c: Client) => c.value === formData.id_cliente) : 
+    null;
+
+  // Obtener información del vendedor seleccionado
+  const selectedUser = this.catalogs.users.find((u: User) => u.value === formData.id_usuario);
+
+  // Construir el detalle de ventas con información completa de productos
+  const detalleVentas = formData.detalle_ventas.map((item: any) => {
+    const product = this.catalogs.products.find((p: Product) => p.id_producto === item.id_producto);
+    return {
+      ...item,
+      producto: product ? {
+        nombre_producto: product.nombre_producto,
+        codigo_producto: product.codigo_producto
+      } : undefined,
+      subtotal: item.cantidad * item.precio_unitario
+    };
+  });
+
+  return {
+    ...result,
+    numero_venta: result.numero_venta || `VENTA-${new Date().getTime()}`,
+    fecha_venta: result.fecha_venta || new Date().toISOString(),
+    client: selectedClient ? {
+      nombre_completo: selectedClient.label
+    } : undefined,
+    user: selectedUser ? {
+      nombre_usuario: selectedUser.label
+    } : undefined,
+    detalle_ventas: detalleVentas,
+    subtotal: formData.subtotal,
+    descuento: formData.descuento,
+    impuesto: formData.impuesto,
+    total: formData.total,
+    observaciones: formData.observaciones
+  };
+}
+
 }

@@ -18,7 +18,7 @@ export class LinearRegressionModel {
       predictions.push(intercept + slope * (n + i));
     }
 
-    // Cálculo de R-cuadrado (R-squared) para la precisión
+    // Cálculo de R²
     const yMean = sumY / n;
     const ssTot = data.reduce((sum, val) => sum + Math.pow(val - yMean, 2), 0);
     const ssRes = data.reduce((sum, val, idx) => sum + Math.pow(val - (intercept + slope * x[idx]), 2), 0);
@@ -27,13 +27,10 @@ export class LinearRegressionModel {
     return { predictions, rSquared };
   }
 
-  static calculateConfidenceInterval(predictions: number[], actuals: number[]): { inferior: number; superior: number }[] {
-    // Implementación de un intervalo de confianza simple.
-    // Para una implementación más robusta, se usarían fórmulas estadísticas más complejas.
-    const confidenceIntervals = predictions.map(pred => ({
+  static calculateConfidenceInterval(predictions: number[], salesValues: number[]): { inferior: number; superior: number }[] {
+    return predictions.map(pred => ({
       inferior: pred * 0.9,
       superior: pred * 1.1,
     }));
-    return confidenceIntervals;
   }
 }

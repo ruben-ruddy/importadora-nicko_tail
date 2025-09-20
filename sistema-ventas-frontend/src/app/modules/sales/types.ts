@@ -9,6 +9,9 @@ export interface Client {
   documento_identidad?: string;
   fecha_registro: string;
   activo: boolean;
+   // Para uso en selectores
+  value?: string;
+  label?: string;
 }
 
 export interface User {
@@ -20,6 +23,9 @@ export interface User {
   activo: boolean;
   fecha_creacion: string;
   ultimo_acceso?: string;
+   // Para uso en selectores
+  value?: string;
+  label?: string;
 }
 
 export interface Product {
@@ -66,4 +72,8 @@ export interface SaleDetail {
   precio_unitario: number;
   subtotal: number;
   producto?: Product;
+  // Agregar estas propiedades opcionales
+  nombre_producto?: string;
+  codigo_producto?: string;
+  stock_actual?: number;
 }

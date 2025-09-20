@@ -1,4 +1,4 @@
-// src/forecast/interfaces/forecast.interface.ts
+//sistema-ventas-backend/src/forecast/interfaces/forecast.interface.ts
 export interface ForecastResult {
   fecha: string;
   ventas_previstas: number;
@@ -19,6 +19,7 @@ export interface ForecastResponse {
     rmse: number;
     accuracy: number;
   };
+  model_info?: any;
 }
 
 export interface ForecastMetrics {

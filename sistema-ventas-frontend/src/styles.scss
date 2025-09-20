@@ -7,3 +7,36 @@
 }
 @tailwind components;
 @tailwind utilities;
+
+
+.ticket-dialog .p-dialog {
+  max-width: 340px !important;
+  margin: 1rem auto !important;
+}
+
+.ticket-dialog .p-dialog-content {
+  padding: 0 !important;
+  overflow-y: auto !important;
+  max-height: 70vh !important;
+}
+
+.ticket-dialog .p-dialog-header {
+  padding: 12px 16px !important;
+  background: #3b82f6 !important;
+  color: white !important;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+/* Permitir scroll en el dialog */
+.p-dialog-mask {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Asegurar que el contenido sea scrollable */
+.p-dialog-content {
+  overflow-y: auto !important;
+}

@@ -105,5 +105,20 @@ export class SalesService {
     }
   }
 
+  async getSaleWithDetails(id: string): Promise<Sale> {
+  try {
+    const response: any = await firstValueFrom(
+      this.http.get(`${this.apiUrl}/sales/${id}/details`)
+    );
+    return response as Sale;
+  } catch (error: unknown) {
+    // Si el endpoint de detalles no existe, intenta con el endpoint normal
+    try {
+      return await this.getSale(id);
+    } catch {
+      return this.handleError(error);
+    }
+  }
+}
   
 }

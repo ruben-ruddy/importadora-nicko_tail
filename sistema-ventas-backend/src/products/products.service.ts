@@ -59,7 +59,7 @@ export class ProductsService {
   }
 
   async findAll(query: ProductQueryDto): Promise<{ products: PrismaProduct[]; total: number; page: number; limit: number }> {
-    const { search, categoryId, active, page = '1', limit = '1000' } = query;
+    const { search, categoryId, active, page = '1', limit = '5000' } = query;
 
     const take = parseInt(limit, 10);
     const skip = (parseInt(page, 10) - 1) * take;

@@ -13,37 +13,43 @@ import { ForecastResponse } from './interfaces/forecast.interface';
 export class ForecastController {
   constructor(private readonly forecastService: ForecastService) {}
 
-  @Post()
-  @UsePipes(new ValidationPipe({ transform: true }))
-  @ApiOperation({ summary: 'Generar pronóstico de ventas' })
-  @ApiBody({ type: ForecastRequestDto })
-  @ApiResponse({ 
-    status: 201, 
-    description: 'Pronóstico generado exitosamente',
-    schema: { // ← Usar schema en lugar de type para interfaces
-      example: {
-        results: [
-          {
-            fecha: '2024-01-01',
-            ventas_previstas: 10000,
-            intervalo_confianza: { inferior: 8000, superior: 12000 },
-            metrica_precision: 85
-          }
-        ],
-        metrics: {
-          mape: 12.5,
-          mae: 1250,
-          rmse: 1500,
-          accuracy: 87.5
+@Post()
+@UsePipes(new ValidationPipe({ transform: true }))
+@ApiOperation({ summary: 'Generar pronóstico de ventas con promedio móvil' })
+@ApiBody({ type: ForecastRequestDto })
+@ApiResponse({ 
+  status: 201, 
+  description: 'Pronóstico generado exitosamente',
+  schema: {
+    example: {
+      results: [
+        {
+          fecha: '2024-01-01',
+          ventas_previstas: 10000,
+          intervalo_confianza: { inferior: 8000, superior: 12000 },
+          metrica_precision: 85
         }
+      ],
+      metrics: {
+        mape: 12.5,
+        mae: 1250,
+        rmse: 1500,
+        accuracy: 87.5
+      },
+      model_info: {
+        type: 'moving_average',
+        window_size: 3,
+        alpha: 0.3,
+        periods: 6
       }
     }
-  })
-  @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
-  @ApiResponse({ status: 404, description: 'No se encontraron datos históricos' })
-  async createForecast(@Body() forecastRequest: ForecastRequestDto): Promise<ForecastResponse> {
-    return this.forecastService.generateForecast(forecastRequest);
   }
+})
+@ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
+@ApiResponse({ status: 404, description: 'No se encontraron datos históricos' })
+async createForecast(@Body() forecastRequest: ForecastRequestDto): Promise<ForecastResponse> {
+  return this.forecastService.generateForecast(forecastRequest);
+}
 
   @Get('history')
   @UsePipes(new ValidationPipe({ transform: true }))

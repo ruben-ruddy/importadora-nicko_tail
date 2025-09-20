@@ -30,7 +30,7 @@ export class ProductComponent {
 
   async loadProducts() {
     this.products = await this.productService.getProducts()
-    console.log(this.products);
+    //console.log(this.products);
     
     //this.generalService.hide(); // option
   }

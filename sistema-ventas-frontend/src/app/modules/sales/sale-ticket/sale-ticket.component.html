@@ -1,0 +1,120 @@
+<!-- sistema-ventas-frontend/src/app/modules/sales/sale-ticket/sale-ticket.component.html -->
+<div *ngIf="saleData; else loading" class="ticket-container">
+  <!-- Encabezado con logo -->
+  <div class="text-center mb-3">
+        <!-- Logo directo en HTML -->
+    <div class="logo-container mb-2">
+      <img 
+        src="/nicko.png" 
+        [alt]="companyName" 
+        class="logo-img"
+        onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+      
+      <!-- Placeholder que se muestra si el logo falla -->
+      <div class="logo-placeholder" style="display: none;">
+        {{ companyName }}<br>
+        <small>LOGO</small>
+      </div>
+    </div>
+    <h1 class="text-sm font-bold uppercase">{{ companyName }}</h1>
+    <p class="text-xs">{{ companyAddress }}</p>
+    <p class="text-xs">Tel: {{ companyPhone }}</p>
+    <p class="text-xs">NIT: {{ companyTaxId }}</p>
+  </div>
+
+  <!-- Línea separadora -->
+  <div class="border-t border-dashed border-gray-400 my-2"></div>
+
+  <!-- Información de la venta -->
+  <div class="mb-3">
+    <div class="flex justify-between text-xs mb-1">
+      <span class="font-medium">Nro. Venta:</span>
+      <span>{{ saleData.numero_venta || 'N/A' }}</span>
+    </div>
+    <div class="flex justify-between text-xs mb-1">
+      <span class="font-medium">Fecha:</span>
+      <span>{{ currentDate }} {{ currentTime }}</span>
+    </div>
+    <div class="flex justify-between text-xs mb-1">
+      <span class="font-medium">Cliente:</span>
+      <span class="text-right">{{ saleData.client?.nombre_completo || saleData.client?.label || 'Cliente general' }}</span>
+    </div>
+  </div>
+
+  <!-- Línea separadora -->
+  <div class="border-t border-dashed border-gray-400 my-2"></div>
+
+  <!-- Detalles de productos -->
+  <div class="mb-3">
+    <h2 class="text-xs font-bold uppercase text-center mb-2">PRODUCTOS</h2>
+    
+    <div *ngFor="let item of saleData.detalle_ventas || []" class="text-xs mb-2 border-b border-gray-200 pb-1">
+      <div class="font-medium">{{ item.producto?.nombre_producto || item.nombre_producto || 'Producto' }}</div>
+      <div class="flex justify-between">
+        <span>{{ item.cantidad }} x {{ item.precio_unitario | currency:'BOB ' }}</span>
+        <span class="font-medium">{{ (item.cantidad * item.precio_unitario) | currency:'BOB ' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Línea separadora -->
+  <div class="border-t border-dashed border-gray-400 my-2"></div>
+
+  <!-- Totales -->
+  <div class="mb-3">
+    <div class="flex justify-between text-xs mb-1">
+      <span class="font-medium">Subtotal:</span>
+      <span>{{ saleData.subtotal | currency:'BOB ' }}</span>
+    </div>
+    
+    <div *ngIf="saleData.descuento > 0" class="flex justify-between text-xs mb-1">
+      <span class="font-medium">Descuento:</span>
+      <span class="text-red-600">-{{ saleData.descuento | currency:'BOB ' }}</span>
+    </div>
+    
+    <div *ngIf="saleData.impuesto > 0" class="flex justify-between text-xs mb-1">
+      <span class="font-medium">Impuesto:</span>
+      <span>{{ saleData.impuesto | currency:'BOB ' }}</span>
+    </div>
+    
+    <div class="flex justify-between text-sm font-bold border-t border-gray-400 pt-1 mt-2">
+      <span>TOTAL:</span>
+      <span>{{ saleData.total | currency:'BOB ' }}</span>
+    </div>
+  </div>
+
+  <!-- Observaciones -->
+  <div *ngIf="saleData.observaciones" class="mb-3 text-xs">
+    <p class="font-medium">Observaciones:</p>
+    <p class="break-words">{{ saleData.observaciones }}</p>
+  </div>
+
+  <!-- Pie de página -->
+  <div class="text-center text-xs border-t border-dashed border-gray-400 pt-2">
+    <p>¡Gracias por su compra!</p>
+    <p>{{ currentDate }} {{ currentTime }}</p>
+  </div>
+
+  <!-- Botones FIJOS en la parte inferior -->
+  <div class="button-container screen-only" *ngIf="showPrintButton">
+    <div class="flex justify-center gap-2">
+      <button 
+        (click)="printTicket()"
+        class="ticket-button">
+        🖨️ Imprimir
+      </button>
+      <button 
+        (click)="closeDialog()"
+        class="ticket-button close">
+        ✕ Cerrar
+      </button>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading>
+  <div class="ticket-container text-center py-8">
+    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+    <p class="text-xs text-gray-600">Cargando ticket...</p>
+  </div>
+</ng-template>

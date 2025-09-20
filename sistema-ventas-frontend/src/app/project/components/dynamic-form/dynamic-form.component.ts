@@ -306,7 +306,7 @@ private mapValidators(validators: any): any[] {
 }
 
   isImage(fileData: string | null): boolean {
-    console.log(fileData);
+    //console.log(fileData);
     
     return typeof fileData === 'string' && fileData.startsWith('data:image/');
   }

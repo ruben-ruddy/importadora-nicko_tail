@@ -1,3 +1,4 @@
+<!-- //sistema-ventas-frontend/src/app/modules/sales/sales.component.html -->
 <div class="container mx-auto px-4 py-6 bg-white">
   <h2 class="text-2xl font-bold mb-6 text-gray-800">Administración de Ventas</h2>
   
@@ -55,12 +56,15 @@
                 {{ formatCurrency(sale.total) }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                <button 
+                <!-- <button 
                   pButton 
                   icon="pi pi-pencil" 
                   class="p-button-text p-button-primary mr-2"
                   (click)="openEditSaleModal(sale); $event.stopPropagation()">_Editar
-                </button>
+                </button> -->
+                  <button pButton icon="pi pi-print" class="p-button-text p-button-info"
+                    (click)="openPrintTicketModal(sale); $event.stopPropagation()">Imprimir
+                  </button>
 
               </td>
             </tr>

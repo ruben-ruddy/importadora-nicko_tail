@@ -1,24 +1,28 @@
-// src/forecast/dto/forecast-request.dto.ts
-import { IsString, IsOptional, IsNumber, IsArray, IsIn, ValidateNested, IsObject } from 'class-validator';
+import { IsString, IsOptional, IsNumber, ValidateNested, IsIn, Min, Max } from 'class-validator';
 import { Type } from 'class-transformer';
 
 class ForecastParameters {
   @IsOptional()
   @IsNumber()
-  periodos?: number;
-
+  @Min(1)
+  periodos?: number = 6;
+  
   @IsOptional()
   @IsNumber()
-  alpha?: number;
-
+  @Min(2)
+  @Max(12)
+  ventana?: number = 3;
+  
   @IsOptional()
   @IsNumber()
-  estacionalidad?: number;
+  @Min(0.1)
+  @Max(1.0)
+  alpha?: number = 0.3;
 }
 
 export class ForecastRequestDto {
   @IsString()
-  @IsIn(['lineal', 'promedio_movil', 'estacional'])
+  @IsIn(['promedio_movil']) // Solo permitimos promedio móvil
   metodo: string;
 
   @IsString()
@@ -30,14 +34,6 @@ export class ForecastRequestDto {
 
   @IsString()
   fecha_fin: string;
-
-  @IsOptional()
-  @IsArray()
-  productos?: string[];
-
-  @IsOptional()
-  @IsArray()
-  categorias?: string[];
 
   @IsOptional()
   @ValidateNested()

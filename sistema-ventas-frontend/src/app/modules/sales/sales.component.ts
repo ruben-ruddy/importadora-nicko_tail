@@ -9,7 +9,7 @@ import { DynamicDialogModule } from 'primeng/dynamicdialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { Sale } from './types';
-
+import { SaleTicketComponent } from './sale-ticket/sale-ticket.component'; // Importar el nuevo componente
 @Component({
   selector: 'app-sales',
   standalone: true,
@@ -17,7 +17,8 @@ import { Sale } from './types';
     CommonModule, 
     DynamicDialogModule, 
     ButtonModule, 
-    InputTextModule
+    InputTextModule,
+    //SaleTicketComponent
   ],
   templateUrl: './sales.component.html',
   styleUrl: './sales.component.scss',
@@ -89,6 +90,30 @@ openAddSaleModal() {
       }
     });
   }
+
+openPrintTicketModal(sale: Sale) {
+  this.ref = this.dialogService.open(SaleTicketComponent, {
+    data: { 
+      saleData: sale,
+      showPrintButton: true
+    },
+    header: 'Ticket de Venta',
+    width: '340px', // Un poco más ancho
+    styleClass: 'ticket-dialog',
+    contentStyle: { 
+      'padding': '0',
+      'margin': '0',
+      'border-radius': '8px',
+      'overflow-y': 'auto', // ← Permitir scroll vertical
+      'max-height': '80vh', // ← Altura máxima
+      'max-width': '95vw'
+    },
+    baseZIndex: 10000,
+    modal: true,
+    closable: true,
+    dismissableMask: true
+  });
+}
 
   formatCurrency(amount: number) {
     return new Intl.NumberFormat('es-CO', {

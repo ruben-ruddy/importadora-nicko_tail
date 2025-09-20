@@ -1,0 +1,118 @@
+/* sistema-ventas-frontend/src/app/modules/sales/sale-ticket/sale-ticket.component.css */
+  .ticket-container {
+    width: 300px;
+    min-height: auto;
+    padding: 16px;
+    margin: 0 auto;
+    background: white;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #000;
+  }
+
+  /* Estilos para pantalla */
+  @media screen {
+    .ticket-container {
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+    }
+    
+    .screen-only {
+      display: block !important;
+    }
+  }
+
+  /* Estilos para impresión */
+  @media print {
+    .screen-only {
+      display: none !important;
+    }
+    
+    body, html {
+      margin: 0 !important;
+      padding: 0 !important;
+      background: white !important;
+    }
+    
+    .ticket-container {
+      width: 80mm !important;
+      padding: 2mm !important;
+      margin: 0 !important;
+      box-shadow: none !important;
+      border: none !important;
+    }
+  }
+
+  /* Botones estilo ticket */
+  .ticket-button {
+    padding: 8px 16px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    margin: 4px;
+  }
+
+  .ticket-button:hover {
+    background: #1d4ed8;
+  }
+
+  .ticket-button.close {
+    background: #6b7280;
+  }
+
+  .ticket-button.close:hover {
+    background: #4b5563;
+  }
+
+  /* Contenedor de botones fijo en la parte inferior */
+  .button-container {
+    position: sticky;
+    bottom: 0;
+    background: white;
+    padding: 12px 0;
+    border-top: 1px dashed #e5e7eb;
+    margin-top: 16px;
+  }
+
+  .ticket-container {
+    width: 300px;
+    min-height: auto;
+    padding: 16px;
+    margin: 0 auto;
+    background: white;
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    color: #000;
+  }
+
+  .logo-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 12px;
+    min-height: 60px;
+  }
+
+  .logo-img {
+    max-height: 50px;
+    max-width: 150px;
+    object-fit: contain;
+  }
+
+  .logo-placeholder {
+    height: 50px;
+    width: 150px;
+    background: #f3f4f6;
+    border: 1px dashed #d1d5db;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    font-size: 10px;
+    text-align: center;
+    flex-direction: column;
+  }

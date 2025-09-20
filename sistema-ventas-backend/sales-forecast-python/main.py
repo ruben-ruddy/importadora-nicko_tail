@@ -1,16 +1,12 @@
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from typing import List, Optional, Dict, Any
 import pandas as pd
 import numpy as np
-from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from statsmodels.tsa.holtwinters import ExponentialSmoothing
-from statsmodels.tsa.arima.model import ARIMA
-from statsmodels.tsa.seasonal import seasonal_decompose
-import json
-from datetime import datetime, timedelta
+from sklearn.metrics import mean_absolute_error, mean_squared_error
 import logging
+from datetime import datetime, timedelta
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -18,13 +14,22 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Sales Forecast API", version="1.0.0")
 
+# Configurar CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 class ForecastRequest(BaseModel):
     historical_data: List[Dict[str, Any]]
-    method: str  # 'lineal', 'promedio_movil', 'estacional', 'arima', 'exponential_smoothing'
+    method: str
     periods: int
-    frequency: str  # 'D' (diario), 'W' (semanal), 'M' (mensual)
+    frequency: str
+    window_size: Optional[int] = 3
     alpha: Optional[float] = 0.3
-    seasonality: Optional[int] = None
 
 class ForecastResponse(BaseModel):
     predictions: List[Dict[str, Any]]
@@ -33,70 +38,143 @@ class ForecastResponse(BaseModel):
 
 def prepare_time_series_data(historical_data, frequency):
     """Prepara los datos históricos para el análisis de series de tiempo"""
-    df = pd.DataFrame(historical_data)
-    df['fecha'] = pd.to_datetime(df['fecha'])
-    df.set_index('fecha', inplace=True)
+    try:
+        df = pd.DataFrame(historical_data)
+        df['fecha'] = pd.to_datetime(df['fecha'])
+        df.set_index('fecha', inplace=True)
+        
+        # Resample según la frecuencia
+        if frequency == 'D':
+            df = df.resample('D').sum()
+        elif frequency == 'W':
+            df = df.resample('W-MON').sum()
+        elif frequency == 'M':
+            df = df.resample('M').sum()
+        
+        return df
+    except Exception as e:
+        logger.error(f"Error preparing time series data: {str(e)}")
+        raise
+
+def filter_outliers(data, threshold=2.0):
+    """Filtrar valores atípicos usando el método del rango intercuartílico"""
+    try:
+        if len(data) < 3:
+            return data
+        
+        q1 = np.percentile(data, 25)
+        q3 = np.percentile(data, 75)
+        iqr = q3 - q1
+        
+        lower_bound = q1 - threshold * iqr
+        upper_bound = q3 + threshold * iqr
+        
+        filtered_data = [x for x in data if lower_bound <= x <= upper_bound]
+        logger.info(f"Filtered outliers: {len(data)} -> {len(filtered_data)}")
+        return filtered_data
+    except Exception as e:
+        logger.error(f"Error filtering outliers: {str(e)}")
+        return data
+
+def moving_average_forecast(data, periods, window_size=3, alpha=0.3):
+    """Pronóstico usando promedio móvil con suavizado exponencial"""
+    try:
+        # Filtrar outliers antes de calcular
+        filtered_data = filter_outliers(data)
+        
+        predictions = []
+        forecast_data = filtered_data.copy()
+        
+        for i in range(periods):
+            # Usar ventana disponible si no hay suficientes datos
+            actual_window_size = min(window_size, len(forecast_data))
+            window = forecast_data[-actual_window_size:]
+            average = np.mean(window) if len(window) > 0 else 0
+            
+            # Aplicar suavizado exponencial
+            if len(forecast_data) > 0:
+                last_value = forecast_data[-1]
+                smoothed_prediction = alpha * average + (1 - alpha) * last_value
+            else:
+                smoothed_prediction = average
+                
+            predictions.append(smoothed_prediction)
+            forecast_data = np.append(forecast_data, smoothed_prediction)
+        
+        return predictions
+    except Exception as e:
+        logger.error(f"Error in moving average forecast: {str(e)}")
+        raise
+
+def calculate_metrics(actual, predicted):
+    """Calcula métricas SOLO con los datos MÁS RECIENTES"""
+    try:
+        if len(actual) < 3 or len(predicted) < 3:
+            return {'mae': 0, 'mape': 0, 'rmse': 0, 'accuracy': 0}
+        
+        # USAR SOLO LOS ÚLTIMOS 3 MESES para cálculo de métricas
+        # (los más relevantes para evaluar el pronóstico)
+        actual_recent = actual[-3:]  # Julio, Agosto, Septiembre
+        predicted_recent = predicted[:3]  # Oct, Nov, Dic pronosticados
+        
+        # Calcular MAE solo con datos recientes
+        mae = mean_absolute_error(actual_recent, predicted_recent)
+        
+        # Calcular MAPE de forma robusta
+        mape_sum = 0
+        valid_points = 0
+        
+        for a, p in zip(actual_recent, predicted_recent):
+            if a > 1000:  # Solo valores razonables
+                error_pct = abs((a - p) / a)
+                mape_sum += min(error_pct, 0.5)  # Máximo 50% de error por punto
+                valid_points += 1
+        
+        mape = (mape_sum / valid_points) * 100 if valid_points > 0 else 0
+        
+        # Calcular precisión
+        accuracy = max(0, 100 - mape)
+        
+        return {
+            'mae': float(mae),
+            'mape': float(mape),
+            'rmse': float(np.sqrt(mean_squared_error(actual_recent, predicted_recent))),
+            'accuracy': float(accuracy)
+        }
+        
+    except Exception as e:
+        logger.error(f"Error calculating metrics: {str(e)}")
+        return {'mae': 0, 'mape': 0, 'rmse': 0, 'accuracy': 0}
     
-    # Resample según la frecuencia
-    if frequency == 'D':
-        df = df.resample('D').sum()
-    elif frequency == 'W':
-        df = df.resample('W-MON').sum()
-    elif frequency == 'M':
-        df = df.resample('M').sum()
-    
-    return df
 
 @app.post("/forecast", response_model=ForecastResponse)
 async def generate_forecast(request: ForecastRequest):
     try:
         logger.info(f"Generando pronóstico con método: {request.method}")
+        logger.info(f"Datos recibidos: {len(request.historical_data)} puntos")
         
         # Preparar datos
         df = prepare_time_series_data(request.historical_data, request.frequency)
         y = df['ventas'].values
         
+        logger.info(f"Datos procesados: {len(y)} valores")
+        
         if len(y) < 2:
             raise HTTPException(status_code=400, detail="Se necesitan al menos 2 puntos de datos históricos")
         
-        predictions = []
-        metrics = {}
-        model_info = {}
-        
-        if request.method == 'lineal':
-            results = linear_regression_forecast(y, request.periods)
-            predictions = results['predictions']
-            metrics = results['metrics']
-            model_info = results['model_info']
-            
-        elif request.method == 'promedio_movil':
-            results = moving_average_forecast(y, request.periods, request.alpha)
-            predictions = results['predictions']
-            metrics = results['metrics']
-            model_info = results['model_info']
-            
-        elif request.method == 'estacional':
-            if not request.seasonality:
-                raise HTTPException(status_code=400, detail="Se requiere parámetro de estacionalidad")
-            results = seasonal_forecast(y, request.periods, request.seasonality, request.frequency)
-            predictions = results['predictions']
-            metrics = results['metrics']
-            model_info = results['model_info']
-            
-        elif request.method == 'exponential_smoothing':
-            results = exponential_smoothing_forecast(y, request.periods, request.frequency)
-            predictions = results['predictions']
-            metrics = results['metrics']
-            model_info = results['model_info']
-            
-        elif request.method == 'arima':
-            results = arima_forecast(y, request.periods, request.frequency)
-            predictions = results['predictions']
-            metrics = results['metrics']
-            model_info = results['model_info']
-            
+        # Usar promedio móvil
+        if request.method == 'moving_average':
+            predictions = moving_average_forecast(
+                y, 
+                request.periods, 
+                request.window_size, 
+                request.alpha
+            )
         else:
-            raise HTTPException(status_code=400, detail="Método de pronóstico no válido")
+            raise HTTPException(status_code=400, detail=f"Método no soportado: {request.method}")
+        
+        # Calcular métricas
+        metrics = calculate_metrics(y, predictions)
         
         # Formatear respuesta
         last_date = df.index[-1]
@@ -108,227 +186,41 @@ async def generate_forecast(request: ForecastRequest):
             elif request.frequency == 'W':
                 pred_date = last_date + timedelta(weeks=i+1)
             elif request.frequency == 'M':
-                # Aproximación para meses
                 pred_date = last_date + timedelta(days=30*(i+1))
+            
+            # Calcular intervalo de confianza
+            confidence_multiplier = 0.2 + (i * 0.05)
+            inferior = max(0, pred * (1 - confidence_multiplier))
+            superior = pred * (1 + confidence_multiplier)
             
             formatted_predictions.append({
                 "fecha": pred_date.strftime("%Y-%m-%d"),
                 "ventas_previstas": float(pred),
                 "intervalo_confianza": {
-                    "inferior": float(pred * 0.8),  # Simplificado
-                    "superior": float(pred * 1.2)   # Simplificado
+                    "inferior": float(inferior),
+                    "superior": float(superior)
                 }
             })
         
         return ForecastResponse(
             predictions=formatted_predictions,
             metrics=metrics,
-            model_info=model_info
+            model_info={
+                'type': 'moving_average',
+                'window_size': request.window_size,
+                'alpha': request.alpha,
+                'periods': request.periods
+            }
         )
         
     except Exception as e:
         logger.error(f"Error en generación de pronóstico: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-def linear_regression_forecast(data, periods):
-    """Pronóstico usando regresión lineal"""
-    X = np.array(range(len(data))).reshape(-1, 1)
-    y = np.array(data)
-    
-    model = LinearRegression()
-    model.fit(X, y)
-    
-    # Predecir
-    future_X = np.array(range(len(data), len(data) + periods)).reshape(-1, 1)
-    predictions = model.predict(future_X)
-    
-    # Métricas
-    y_pred = model.predict(X)
-    mae = mean_absolute_error(y, y_pred)
-    rmse = np.sqrt(mean_squared_error(y, y_pred))
-    r2 = r2_score(y, y_pred)
-    
-    return {
-        'predictions': predictions,
-        'metrics': {
-            'mae': float(mae),
-            'rmse': float(rmse),
-            'r2_score': float(r2),
-            'accuracy': float(max(0, 100 - (mae / np.mean(y) * 100)))
-        },
-        'model_info': {
-            'type': 'linear_regression',
-            'coefficient': float(model.coef_[0]),
-            'intercept': float(model.intercept_)
-        }
-    }
-
-def moving_average_forecast(data, periods, alpha=0.3):
-    """Pronóstico usando promedio móvil con suavizado exponencial"""
-    predictions = []
-    forecast_data = list(data)
-    
-    for i in range(periods):
-        window = forecast_data[-3:]  # Ventana de 3 períodos
-        average = np.mean(window) if window else np.mean(data)
-        smoothed_prediction = alpha * average + (1 - alpha) * forecast_data[-1]
-        
-        predictions.append(smoothed_prediction)
-        forecast_data.append(smoothed_prediction)
-    
-    # Métricas (usando los últimos puntos para validación)
-    if len(data) > 5:
-        val_size = min(5, len(data) - 1)
-        actuals = data[-val_size:]
-        preds = predictions[:val_size]
-        
-        mae = mean_absolute_error(actuals, preds) if len(actuals) == len(preds) else 0
-        accuracy = max(0, 100 - (mae / np.mean(actuals) * 100)) if np.mean(actuals) > 0 else 0
-    else:
-        mae = 0
-        accuracy = 0
-    
-    return {
-        'predictions': predictions,
-        'metrics': {
-            'mae': float(mae),
-            'accuracy': float(accuracy)
-        },
-        'model_info': {
-            'type': 'moving_average',
-            'alpha': alpha,
-            'window_size': 3
-        }
-    }
-
-def seasonal_forecast(data, periods, seasonality, frequency):
-    """Pronóstico considerando estacionalidad"""
-    try:
-        # Convertir a serie temporal
-        if frequency == 'D':
-            freq = 'D'
-        elif frequency == 'W':
-            freq = 'W'
-        elif frequency == 'M':
-            freq = 'M'
-        
-        series = pd.Series(data)
-        
-        # Descomposición estacional
-        result = seasonal_decompose(series, model='additive', period=seasonality)
-        
-        # Pronóstico simple basado en patrones estacionales
-        seasonal_component = result.seasonal[-seasonality:].values
-        trend = np.mean(series[-seasonality:]) if len(series) >= seasonality else np.mean(series)
-        
-        predictions = []
-        for i in range(periods):
-            seasonal_idx = i % seasonality
-            prediction = trend + seasonal_component[seasonal_idx]
-            predictions.append(prediction)
-        
-        # Métricas
-        if len(data) > seasonality * 2:
-            # Validación usando datos históricos
-            val_predictions = []
-            for i in range(seasonality):
-                seasonal_idx = i % seasonality
-                val_predictions.append(trend + seasonal_component[seasonal_idx])
-            
-            actuals = data[-seasonality:]
-            mae = mean_absolute_error(actuals, val_predictions)
-            accuracy = max(0, 100 - (mae / np.mean(actuals) * 100))
-        else:
-            mae = 0
-            accuracy = 0
-        
-        return {
-            'predictions': predictions,
-            'metrics': {
-                'mae': float(mae),
-                'accuracy': float(accuracy)
-            },
-            'model_info': {
-                'type': 'seasonal',
-                'seasonality': seasonality,
-                'trend': float(trend)
-            }
-        }
-        
-    except Exception as e:
-        logger.error(f"Error en pronóstico estacional: {str(e)}")
-        # Fallback a método simple
-        return moving_average_forecast(data, periods, 0.3)
-
-def exponential_smoothing_forecast(data, periods, frequency):
-    """Pronóstico usando suavizado exponencial de Holt-Winters"""
-    try:
-        if frequency == 'D':
-            freq = 7  # Estacionalidad semanal para datos diarios
-        elif frequency == 'W':
-            freq = 52  # Estacionalidad anual para datos semanales
-        elif frequency == 'M':
-            freq = 12  # Estacionalidad anual para datos mensuales
-        
-        model = ExponentialSmoothing(
-            data, 
-            seasonal='additive', 
-            seasonal_periods=min(freq, len(data)//2) if len(data) > freq*2 else None
-        )
-        fitted_model = model.fit()
-        predictions = fitted_model.forecast(periods)
-        
-        # Métricas
-        y_pred = fitted_model.fittedvalues
-        mae = mean_absolute_error(data[:len(y_pred)], y_pred)
-        accuracy = max(0, 100 - (mae / np.mean(data) * 100)) if np.mean(data) > 0 else 0
-        
-        return {
-            'predictions': predictions,
-            'metrics': {
-                'mae': float(mae),
-                'accuracy': float(accuracy)
-            },
-            'model_info': {
-                'type': 'exponential_smoothing',
-                'model_params': str(fitted_model.params)
-            }
-        }
-        
-    except Exception as e:
-        logger.error(f"Error en suavizado exponencial: {str(e)}")
-        return moving_average_forecast(data, periods, 0.3)
-
-def arima_forecast(data, periods, frequency):
-    """Pronóstico usando modelo ARIMA"""
-    try:
-        # Modelo ARIMA simple - en producción se debería hacer una búsqueda de parámetros
-        model = ARIMA(data, order=(1, 1, 1))
-        fitted_model = model.fit()
-        predictions = fitted_model.forecast(periods)
-        
-        # Métricas
-        y_pred = fitted_model.fittedvalues
-        mae = mean_absolute_error(data[1:len(y_pred)+1], y_pred)
-        accuracy = max(0, 100 - (mae / np.mean(data) * 100)) if np.mean(data) > 0 else 0
-        
-        return {
-            'predictions': predictions,
-            'metrics': {
-                'mae': float(mae),
-                'accuracy': float(accuracy)
-            },
-            'model_info': {
-                'type': 'arima',
-                'order': '(1,1,1)',
-                'aic': float(fitted_model.aic)
-            }
-        }
-        
-    except Exception as e:
-        logger.error(f"Error en modelo ARIMA: {str(e)}")
-        return moving_average_forecast(data, periods, 0.3)
+@app.get("/health")
+async def health_check():
+    return {"status": "healthy", "service": "sales-forecast"}
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)

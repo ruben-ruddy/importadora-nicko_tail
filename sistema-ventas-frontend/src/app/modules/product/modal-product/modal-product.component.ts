@@ -50,7 +50,7 @@ export class ModalProductComponent implements OnInit {
       label: res.nombre_categoria,
       value: res.id_categoria,
     }));
-    console.log("catalogs", this.catalogs );
+   // console.log("catalogs", this.catalogs );
     
     this.view = true
   }
