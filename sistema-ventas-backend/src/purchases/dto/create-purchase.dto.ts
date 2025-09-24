@@ -32,43 +32,34 @@ export class CreatePurchaseDetailDto {
   id_producto: string;
 
   @ApiProperty({ description: 'Cantidad del producto comprado', example: 10 })
-  @IsNumber()
+  @IsNumber({}, { message: 'La cantidad debe ser un número válido' })
   @Min(1)
   cantidad: number;
 
-  @ApiProperty({ description: 'Precio unitario al que se compró el producto', type: Number, format: 'float', example: 5.75 })
-  @IsNumber()
-  @Min(0)
-  @Type(() => Number) // Convertir a número si viene como string
-  //@IsDecimal({ decimal_digits: '1,2' })
-  precio_unitario: number;
-
-  @ApiProperty({ description: 'Subtotal del detalle de la compra (cantidad * precio_unitario)', type: Number, format: 'float', example: 57.50 })
-  @IsNumber()
+  @ApiProperty({ description: 'Precio unitario', type: Number, example: 5.75 })
+  @IsNumber({}, { message: 'El precio unitario debe ser un número válido' })
   @Min(0)
   @Type(() => Number)
-  //@IsDecimal({ decimal_digits: '1,2' })
-  subtotal: number; // Este subtotal del detalle puede ser calculado en el backend
+  precio_unitario: number;
+
+  @ApiProperty({ description: 'Subtotal', type: Number, example: 57.50 })
+  @IsNumber({}, { message: 'El subtotal debe ser un número válido' })
+  @Min(0)
+  @Type(() => Number)
+  subtotal: number;
 }
 
 export class CreatePurchaseDto {
-  @ApiProperty({ description: 'ID del usuario que registra la compra', format: 'uuid' })
+  @ApiProperty({ description: 'ID del usuario', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
   id_usuario: string;
 
-  // @ApiProperty({ description: 'Número único de la compra', example: 'COMPRA-2024-0001' })
-  // @IsString()
-  // @IsNotEmpty()
-  // @Max(50) // Limite de varchar
-  // numero_compra: string;
-
-  @ApiProperty({ description: 'Total final de la compra', type: Number, format: 'float', example: 500.00 })
-  @IsNumber()
+  @ApiProperty({ description: 'Total final', type: Number, example: 500.00 })
+  @IsNumber({}, { message: 'El total debe ser un número válido' })
   @Min(0)
   @Type(() => Number)
-  //@IsDecimal({ decimal_digits: '1,2' })
-  total: number; // Este total será recalculado en el backend
+  total: number;
 
   @ApiProperty({ description: 'Estado actual de la compra', enum: DtoPurchaseState, default: DtoPurchaseState.PENDIENTE })
   @IsOptional()
@@ -85,5 +76,5 @@ export class CreatePurchaseDto {
   @ArrayMinSize(1)
   @ValidateNested({ each: true })
   @Type(() => CreatePurchaseDetailDto)
-  detalle_compras: CreatePurchaseDetailDto[]; // Coincide con schema.prisma (relación)
+  detalle_compras: CreatePurchaseDetailDto[];
 }

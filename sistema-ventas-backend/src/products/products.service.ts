@@ -59,7 +59,7 @@ export class ProductsService {
   }
 
   async findAll(query: ProductQueryDto): Promise<{ products: PrismaProduct[]; total: number; page: number; limit: number }> {
-    const { search, categoryId, active, page = '1', limit = '5000' } = query;
+    const { search, categoryId, active, page = '1', limit = '10' } = query;
 
     const take = parseInt(limit, 10);
     const skip = (parseInt(page, 10) - 1) * take;
@@ -107,64 +107,65 @@ export class ProductsService {
     return product;
   }
 
-  async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<PrismaProduct> {
-    if (updateProductDto.id_categoria) {
-      const category = await this.prisma.category.findUnique({
-        where: { id_categoria: updateProductDto.id_categoria },
-      });
-      if (!category) {
-        throw new NotFoundException(`La categoría con ID "${updateProductDto.id_categoria}" no existe.`);
+async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<PrismaProduct> {
+  if (updateProductDto.id_categoria) {
+    const category = await this.prisma.category.findUnique({
+      where: { id_categoria: updateProductDto.id_categoria },
+    });
+    if (!category) {
+      throw new NotFoundException(`La categoría con ID "${updateProductDto.id_categoria}" no existe.`);
+    }
+  }
+
+  if (updateProductDto.nombre_producto || updateProductDto.codigo_producto) {
+    const existingProduct = await this.prisma.product.findFirst({
+      where: {
+        AND: [
+          { id_producto: { not: id_producto } },
+          {
+            OR: [
+              ...(updateProductDto.nombre_producto ? [{ nombre_producto: updateProductDto.nombre_producto }] : []),
+              ...(updateProductDto.codigo_producto ? [{ codigo_producto: updateProductDto.codigo_producto }] : [])
+            ]
+          }
+        ]
       }
-    }
-
-    if (updateProductDto.nombre_producto || updateProductDto.codigo_producto) {
-      const existingProduct = await this.prisma.product.findFirst({
-        where: {
-          AND: [
-            { id_producto: { not: id_producto } },
-            {
-              OR: [
-                ...(updateProductDto.nombre_producto ? [{ nombre_producto: updateProductDto.nombre_producto }] : []),
-                ...(updateProductDto.codigo_producto ? [{ codigo_producto: updateProductDto.codigo_producto }] : [])
-              ]
-            }
-          ]
-        }
-      });
-
-      if (existingProduct) {
-        if (updateProductDto.nombre_producto && existingProduct.nombre_producto === updateProductDto.nombre_producto) {
-          throw new ConflictException(`El producto con nombre "${updateProductDto.nombre_producto}" ya existe.`);
-        }
-        if (updateProductDto.codigo_producto && existingProduct.codigo_producto === updateProductDto.codigo_producto) {
-          throw new ConflictException(`El producto con código "${updateProductDto.codigo_producto}" ya existe.`);
-        }
-      }
-    }
-
-    const dataToUpdate: any = {};
-    if (updateProductDto.id_categoria !== undefined) dataToUpdate.id_categoria = updateProductDto.id_categoria;
-    if (updateProductDto.nombre_producto !== undefined) dataToUpdate.nombre_producto = updateProductDto.nombre_producto;
-    if (updateProductDto.codigo_producto !== undefined) {
-      dataToUpdate.codigo_producto = updateProductDto.codigo_producto || '';
-    }
-    if (updateProductDto.descripcion !== undefined) dataToUpdate.descripcion = updateProductDto.descripcion;
-    if (updateProductDto.precio_venta !== undefined) dataToUpdate.precio_venta = updateProductDto.precio_venta;
-    if (updateProductDto.precio_compra !== undefined) dataToUpdate.precio_compra = updateProductDto.precio_compra;
-    if (updateProductDto.stock_actual !== undefined) dataToUpdate.stock_actual = updateProductDto.stock_actual;
-    if (updateProductDto.imagen_url !== undefined) dataToUpdate.imagen_url = updateProductDto.imagen_url;
-    if (updateProductDto.activo !== undefined) dataToUpdate.activo = updateProductDto.activo;
-
-    const product = await this.prisma.product.update({
-      where: { id_producto },
-      data: dataToUpdate,
     });
 
-    if (!product) {
-      throw new NotFoundException(`Producto con ID "${id_producto}" no encontrado para actualizar.`);
+    if (existingProduct) {
+      if (updateProductDto.nombre_producto && existingProduct.nombre_producto === updateProductDto.nombre_producto) {
+        throw new ConflictException(`El producto con nombre "${updateProductDto.nombre_producto}" ya existe.`);
+      }
+      if (updateProductDto.codigo_producto && existingProduct.codigo_producto === updateProductDto.codigo_producto) {
+        throw new ConflictException(`El producto con código "${updateProductDto.codigo_producto}" ya existe.`);
+      }
     }
-    return product;
   }
+
+  const dataToUpdate: any = {};
+  if (updateProductDto.id_categoria !== undefined) dataToUpdate.id_categoria = updateProductDto.id_categoria;
+  if (updateProductDto.nombre_producto !== undefined) dataToUpdate.nombre_producto = updateProductDto.nombre_producto;
+  if (updateProductDto.codigo_producto !== undefined) {
+    dataToUpdate.codigo_producto = updateProductDto.codigo_producto || '';
+  }
+  if (updateProductDto.descripcion !== undefined) dataToUpdate.descripcion = updateProductDto.descripcion;
+  if (updateProductDto.precio_venta !== undefined) dataToUpdate.precio_venta = updateProductDto.precio_venta;
+  if (updateProductDto.precio_compra !== undefined) dataToUpdate.precio_compra = updateProductDto.precio_compra;
+  if (updateProductDto.stock_actual !== undefined) dataToUpdate.stock_actual = updateProductDto.stock_actual;
+  if (updateProductDto.stock_minimo !== undefined) dataToUpdate.stock_minimo = updateProductDto.stock_minimo; // Añadido stock_minimo
+  if (updateProductDto.imagen_url !== undefined) dataToUpdate.imagen_url = updateProductDto.imagen_url;
+  if (updateProductDto.activo !== undefined) dataToUpdate.activo = updateProductDto.activo; // Añadido activo
+
+  const product = await this.prisma.product.update({
+    where: { id_producto },
+    data: dataToUpdate,
+  });
+
+  if (!product) {
+    throw new NotFoundException(`Producto con ID "${id_producto}" no encontrado para actualizar.`);
+  }
+  return product;
+}
 
   async remove(id_producto: string): Promise<PrismaProduct> {
     const product = await this.prisma.product.delete({

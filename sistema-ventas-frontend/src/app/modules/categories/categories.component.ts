@@ -35,8 +35,8 @@ export class CategoriesComponent {
 
   openAddProductModal() {
     this.ref = this.dialogService.open(ModalCategoryComponent, {
-      //header: 'Nuevo categoria',
-      //width: '800px',
+      header: 'Nuevo categoria',
+      width: '800px',
       //closable: true
     });
     this.ref.onClose.subscribe((data: any) => {
@@ -50,9 +50,9 @@ export class CategoriesComponent {
   openEditProductModal(product:any){
     this.ref = this.dialogService.open(ModalCategoryComponent, {
       data: { data: product},
-      header: 'actualizar categoria',
+      header: 'Actualizar Categoría',
       width: '800px',
-      closable: true
+      //closable: true
     });
 
     this.ref.onClose.subscribe((data: any) => {

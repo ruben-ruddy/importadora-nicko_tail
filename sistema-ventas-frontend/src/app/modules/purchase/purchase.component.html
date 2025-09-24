@@ -1,70 +1,187 @@
-<!-- purchase.component.html -->
-<div class="container mx-auto px-4 py-2">
-    <h2 class="text-2xl font-bold mb-6 text-gray-800">Lista de Compras</h2> 
-    
-    <button (click)="openAddPurchaseModal()" class="bg-green-500 text-white px-4 py-2 rounded mb-4">
+<!-- // sistema-ventas-frontend/src/app/modules/purchase/purchase.component.html -->
+<div class="container mx-auto px-4 py-2 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200">
+    <h2 class="text-2xl font-bold mb-6">Lista de Compras</h2> 
+
+    <div class="mb-4 flex flex-col sm:flex-row gap-4 items-center">
+      <button 
+        (click)="openAddPurchaseModal()" 
+        class="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-4 py-2 rounded transition-colors duration-200"
+      >
         Nueva Compra
-    </button>
-
-    <!-- Estado de carga -->
-    @if (loading) {
-    <div class="flex justify-center items-center h-64">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
-        <span class="ml-3 text-gray-600">Cargando compras...</span>
+      </button>
+        <input 
+          type="text" 
+          placeholder="Buscar compras..." 
+          [value]="searchTerm"
+          (input)="onSearchChange($event)"
+          class="border border-gray-300 dark:border-gray-600 rounded px-3 py-2 w-full sm:w-64 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+        >
+      
     </div>
-    }
 
-    <!-- Estado de error -->
-    @if (error && !loading) {
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-        {{ error }}
+    <!-- Mensaje informativo -->
+    <div class="mb-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 text-blue-700 dark:text-blue-300 px-4 py-3 rounded">
+      <div class="flex items-center">
+        <i class="pi pi-info-circle mr-2"></i>
+        <span class="text-sm">
+          <strong>Nota:</strong> Solo las compras en estado "Pendiente" pueden ser editadas. 
+          En la edición solo se permite modificar observaciones y estado.
+        </span>
+      </div>
     </div>
-    }
 
-    <!-- Tabla de compras -->
-    @if (!loading && !error) {
-    <div class="overflow-x-auto">
-        <table class="min-w-full bg-white rounded-lg overflow-hidden">
-            <thead class="bg-gray-100">
-                <tr>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Comprador</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
-                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-gray-200">
-                @for (purchase of purchases; track purchase.id_compra) {
-                <tr class="hover:bg-gray-100 transition-colors">
-                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ purchase.numero_compra }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ purchase.fecha_compra | date:'short' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ purchase.user?.nombre_usuario || 'N/A' }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-black">{{ purchase.total | currency }}</td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm">
-                        <span [class]="getStatusClass(purchase.estado)">
-                            {{ purchase.estado }}
-                        </span>
-                    </td>
-                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        <button (click)="openEditPurchaseModal(purchase)" class="text-blue-500 hover:text-blue-700 mr-2">
-                            Editar
-                        </button>
-                        <button (click)="viewPurchaseDetails(purchase)" class="text-green-500 hover:text-green-700">
-                            Ver Detalles
-                        </button>
-                    </td>
-                </tr>
-                } @empty {
-                <tr>
-                    <td colspan="6" class="px-6 py-4 text-center text-sm text-gray-500">
-                        No hay compras registradas
-                    </td>
-                </tr>
+    <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+      <table class="min-w-full bg-white dark:bg-gray-800">
+        <thead class="bg-gray-50 dark:bg-gray-700">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Número</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Fecha</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Usuario</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Estado</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Total</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider dark:text-gray-300">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+          @for (purchase of purchases; track purchase.id_compra) {
+          <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
+            <td 
+              class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white cursor-pointer"
+              (click)="viewPurchaseDetails(purchase)"
+            >
+              {{ purchase.numero_compra }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+              {{ purchase.fecha_compra | date:'short' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-600 dark:text-gray-400">
+              {{ purchase.user?.nombre_completo || purchase.user?.nombre_usuario || 'N/A' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span [ngClass]="{
+                  'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300': purchase.estado.toLowerCase() === 'pendiente',
+                  'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300': purchase.estado.toLowerCase() === 'completada',
+                  'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300': purchase.estado.toLowerCase() === 'cancelada',
+                  'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300': !purchase.estado
+                }" 
+                class="px-3 py-1 text-xs font-medium rounded-full capitalize">
+                {{ purchase.estado }}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-gray-900 dark:text-white">
+              {{ purchase.total | currency:'BOB':'symbol':'1.2-2' }}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm space-x-2">
+              <button 
+                (click)="openEditPurchaseModal(purchase, $event)" 
+                [disabled]="purchase.estado.toLowerCase() !== 'pendiente'"
+                [class]="purchase.estado.toLowerCase() === 'pendiente' 
+                  ? 'bg-blue-500 hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700 text-white' 
+                  : 'bg-gray-300 dark:bg-gray-700 text-gray-500 dark:text-gray-400 cursor-not-allowed'"
+                class="px-3 py-1 rounded text-xs font-medium transition-colors duration-200"
+                [title]="purchase.estado.toLowerCase() !== 'pendiente' 
+                  ? 'Solo se pueden editar compras en estado Pendiente' 
+                  : 'Editar compra'"
+              >
+                Editar
+              </button>
+              <button 
+                (click)="viewPurchaseDetails(purchase, $event)" 
+                class="bg-green-500 hover:bg-green-600 dark:bg-green-600 dark:hover:bg-green-700 text-white px-3 py-1 rounded text-xs font-medium transition-colors duration-200"
+              >
+                Ver Detalles
+              </button>
+            </td>
+          </tr>
+          }
+          
+          @if (loading) {
+          <tr>
+            <td colspan="6" class="px-6 py-8 text-center">
+              <div class="flex justify-center items-center space-x-3">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 dark:border-blue-400"></div>
+                <span class="text-gray-600 dark:text-gray-400">Cargando compras...</span>
+              </div>
+            </td>
+          </tr>
+          }
+          
+          @if (!loading && purchases.length === 0) {
+          <tr>
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500 dark:text-gray-400">
+              <div class="flex flex-col items-center space-y-2">
+                <i class="pi pi-inbox text-4xl text-gray-300 dark:text-gray-600"></i>
+                <span>No hay compras registradas</span>
+                @if (searchTerm || estadoFilter) {
+                <span class="text-sm">Intenta ajustar los filtros de búsqueda</span>
                 }
-            </tbody>
-        </table>
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    @if (totalRecords > 0 && !loading) {
+    <div class="mt-6 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="text-sm text-gray-600 dark:text-gray-400">
+        Mostrando <span class="font-medium">{{ (page - 1) * limit + 1 }}</span> a 
+        <span class="font-medium">{{ Math.min(page * limit, totalRecords) }}</span> de 
+        <span class="font-medium">{{ totalRecords }}</span> compras
+      </div>
+      
+      <div class="flex flex-col sm:flex-row items-center gap-4">
+        <div class="flex items-center space-x-2">
+          <span class="text-sm text-gray-600 dark:text-gray-400">Mostrar:</span>
+          <select 
+            [value]="limit" 
+            (change)="onLimitChange($any($event.target).value)"
+            class="border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+          >
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="50">50</option>
+          </select>
+          <span class="text-sm text-gray-600 dark:text-gray-400">por página</span>
+        </div>
+        
+        <div class="flex items-center space-x-1">
+          <button 
+            (click)="onPageChange(page - 1)" 
+            [disabled]="page === 1"
+            class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+          >
+            ⮜
+          </button>
+          
+          <div class="flex space-x-1 mx-2">
+            @for (pageNum of getPages(); track pageNum) {
+              @if (pageNum === '...') {
+              <span class="px-3 py-1 text-gray-500 dark:text-gray-400">...</span>
+              } @else if (typeof pageNum === 'number') {
+              <button 
+                (click)="onPageChange(pageNum)" 
+                [class]="pageNum === page 
+                  ? 'bg-blue-500 text-white border-blue-500' 
+                  : 'border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700'"
+                class="px-3 py-1 border rounded text-sm font-medium transition-colors duration-200 min-w-[2.5rem]"
+              >
+                {{ pageNum }}
+              </button>
+              }
+            }
+          </div>
+          <button 
+            (click)="onPageChange(page + 1)" 
+            [disabled]="page === lastPage"
+            class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded disabled:opacity-50 disabled:cursor-not-allowed text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200"
+          >
+            ➤
+          </button>
+        </div>
+      </div>
     </div>
     }
 </div>

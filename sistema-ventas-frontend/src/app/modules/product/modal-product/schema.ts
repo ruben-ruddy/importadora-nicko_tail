@@ -79,6 +79,17 @@ export const productFormFields=(catalogs: any)=> {
                   },
 
                 },
+                {
+                  key: 'activo', // CAMBIADO A SELECT
+                  label: 'Estado',
+                  type: 'select',
+                  options: [
+                    { label: 'Activo', value: true },
+                    { label: 'Inactivo', value: false }
+                  ],
+                  validators: { required: true },
+                  defaultValue: true
+                }
               ]
             }
             

@@ -1,0 +1,21 @@
+// sistema-ventas-frontend/src/app/modules/sales/sales.component.scss
+// Estilos mínimos para la paginación y modo oscuro
+:host {
+  display: block;
+}
+
+// Asegurar que los botones de paginación se vean bien en modo oscuro
+button[disabled] {
+  cursor: not-allowed;
+}
+
+// Mejorar la visualización de los estados
+span {
+  &.bg-yellow-100, &.bg-green-100, &.bg-red-100 {
+    border: 1px solid currentColor;
+  }
+  
+  &.dark\:bg-yellow-900, &.dark\:bg-green-900, &.dark\:bg-red-900 {
+    border: 1px solid currentColor;
+  }
+}

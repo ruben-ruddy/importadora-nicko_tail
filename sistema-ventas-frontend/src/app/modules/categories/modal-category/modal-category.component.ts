@@ -25,7 +25,8 @@ export class ModalCategoryComponent implements OnInit {
   };
   initiaData = this.dynamicDialogConfig.data?.data;
   catalogs: any = {};
-  public view = false
+  public view = false;
+  
   constructor(
     public ref: DynamicDialogRef,
     private categoriesService: CategoriesService,
@@ -36,12 +37,13 @@ export class ModalCategoryComponent implements OnInit {
   async ngOnInit() {
     this.catalogs.CRISTAL = [];
     this.view = true;
-    this.initiaData.icono_url = `${environment.backend_file}${this.initiaData.icono_url}`;
-    // Si es edición, asegurar que icono_url sea string
+    
+    // Preparar datos iniciales para el campo activo
     if (this.initiaData) {
       this.initiaData = {
         ...this.initiaData,
-        icono_url: this.initiaData.icono_url || ''
+        activo: String(this.initiaData.activo), // Convertir a string para el select
+        icono_url: this.initiaData.icono_url ? `${environment.backend_file}${this.initiaData.icono_url}` : ''
       };
     }
   }
@@ -65,18 +67,21 @@ export class ModalCategoryComponent implements OnInit {
       try {
         const formData = {...this.formData.data};
         
-        /// Si icono_url es un File (nuevo archivo), lo subimos
+        // Convertir activo de string a booleano para el backend
+        if (typeof formData.activo === 'string') {
+          formData.activo = formData.activo === 'true';
+        }
+        
+        // El resto del código igual que antes para el icono
         if (formData.icono_url instanceof File) {
           const uploadFormData = new FormData();
           uploadFormData.append('file', formData.icono_url);
-          // Usamos el postDms del ApiService existente
           const uploadResponse: any = await this.apiService.postDms(uploadFormData);
-          // Asignamos la URL devuelta por el backend
           formData.icono_url = uploadResponse.url || uploadResponse.path || '';
         } else if (this.initiaData?.icono_url) {
-          // Mantiene el icono original si no se subió uno nuevo
           formData.icono_url = this.initiaData.icono_url.replace(environment.backend_file, '');
         }
+        
         if (this.initiaData?.id_categoria) {
           await this.categoriesService.updateCategory(
             this.initiaData.id_categoria,

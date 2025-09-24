@@ -73,18 +73,17 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
-  @Delete(':id')
-  // Definimos los roles directamente como strings
-  //@Roles('Administrador')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @ApiOperation({ summary: 'Elimina un usuario por ID (Roles: Administrador)' })
-  @ApiParam({ name: 'id', description: 'ID del usuario (UUID)', type: 'string' })
-  @ApiResponse({ status: 204, description: 'Usuario eliminado exitosamente.' })
-  @ApiResponse({ status: 401, description: 'No autorizado.' })
-  @ApiResponse({ status: 403, description: 'Prohibido.' })
-  @ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
-  @ApiResponse({ status: 409, description: 'Conflicto de integridad referencial.' })
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(id);
-  }
+@Delete(':id')
+//@Roles('Administrador')
+@HttpCode(HttpStatus.NO_CONTENT)
+@ApiOperation({ summary: 'Elimina un usuario por ID (Roles: Administrador)' })
+@ApiParam({ name: 'id', description: 'ID del usuario (UUID)', type: 'string' })
+@ApiResponse({ status: 204, description: 'Usuario eliminado exitosamente.' })
+@ApiResponse({ status: 401, description: 'No autorizado.' })
+@ApiResponse({ status: 403, description: 'Prohibido.' })
+@ApiResponse({ status: 404, description: 'Usuario no encontrado.' })
+@ApiResponse({ status: 409, description: 'Conflicto de integridad referencial.' })
+async remove(@Param('id') id: string) {
+  await this.usersService.remove(id);
+}
 }

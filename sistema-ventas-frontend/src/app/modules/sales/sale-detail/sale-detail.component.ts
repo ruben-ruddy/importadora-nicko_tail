@@ -21,6 +21,7 @@ import { Subscription } from 'rxjs'; // Importar Subscription para gestionar la 
 export class SaleDetailComponent implements OnInit, OnDestroy {
   @Input() products: Product[] = [];
   @Input() formArray!: FormArray;
+  @Input() isEditMode: boolean = false;
   @Output() totalUpdated = new EventEmitter<number>();
 
   selectedProduct: any = null;
@@ -50,6 +51,11 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
   }
 
   addProduct() {
+    if (this.isEditMode) {
+      alert('No se pueden agregar productos en modo edición');
+      return;
+    }
+
     if (!this.selectedProduct) {
       alert('Seleccione un producto');
       return;
@@ -83,16 +89,17 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
 
     this.formArray.push(productGroup);
     
-    // El método updateProductsDetail se llama automáticamente por la suscripción
-    
     // Resetear formulario de adición
     this.selectedProduct = null;
     this.cantidad = 1;
   }
 
   removeProduct(index: number) {
+    if (this.isEditMode) {
+      alert('No se pueden eliminar productos en modo edición');
+      return;
+    }
     this.formArray.removeAt(index);
-    // El método updateProductsDetail se llama automáticamente por la suscripción
   }
 
   updateProductsDetail() {
@@ -118,26 +125,36 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
   }
 
   onCantidadChange(index: number) {
+    if (this.isEditMode) {
+      alert('No se puede modificar la cantidad en modo edición');
+      return;
+    }
+    
     const control = this.formArray.at(index) as FormGroup;
     const cantidad = control.get('cantidad')?.value || 0;
     const precio = control.get('precio_unitario')?.value || 0;
     const subtotal = cantidad * precio;
     
-    // Actualizar solo el subtotal en el FormGroup, no el componente completo
     control.patchValue({ subtotal }, { emitEvent: false });
     this.updateProductsDetail();
   }
 
+
   onPrecioChange(index: number) {
+    if (this.isEditMode) {
+      alert('No se puede modificar el precio en modo edición');
+      return;
+    }
+    
     const control = this.formArray.at(index) as FormGroup;
     const cantidad = control.get('cantidad')?.value || 0;
     const precio = control.get('precio_unitario')?.value || 0;
     const subtotal = cantidad * precio;
     
-    // Actualizar solo el subtotal en el FormGroup, no el componente completo
     control.patchValue({ subtotal }, { emitEvent: false });
     this.updateProductsDetail();
   }
+
 
   getProductOptions() {
     return this.products.map(product => ({

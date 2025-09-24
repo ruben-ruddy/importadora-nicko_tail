@@ -32,13 +32,11 @@ export class PurchaseQueryDto {
 
   @ApiProperty({ description: 'Número de página', required: false, default: 1, type: Number })
   @IsOptional()
-  @Type(() => Number)
   @IsNumberString()
-  page?: number;
+  page?: string;
 
   @ApiProperty({ description: 'Límite de elementos por página', required: false, default: 10, type: Number })
   @IsOptional()
-  @Type(() => Number)
   @IsNumberString()
-  limit?: number;
+  limit?: string;
 }

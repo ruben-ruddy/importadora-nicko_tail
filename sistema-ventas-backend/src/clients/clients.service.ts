@@ -1,5 +1,5 @@
 // src/clients/clients.service.ts
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateClientDto } from './dto/create-client.dto';
 import { UpdateClientDto } from './dto/update-client.dto';
@@ -10,31 +10,40 @@ import { Client as PrismaClient } from '@prisma/client';
 export class ClientsService {
   constructor(private prisma: PrismaService) {}
 
-  async create(createClientDto: CreateClientDto): Promise<PrismaClient> {
-    // Opcional: Verificar si el cliente ya existe por documento de identidad o email si son únicos para tu negocio
-    if (createClientDto.documento_identidad) {
-      const existingClientByDoc = await this.prisma.client.findFirst({
-        where: { documento_identidad: createClientDto.documento_identidad },
-      });
-      if (existingClientByDoc) {
-        throw new ConflictException(`Ya existe un cliente con el documento de identidad "${createClientDto.documento_identidad}".`);
-      }
-    }
-    if (createClientDto.email) {
-        const existingClientByEmail = await this.prisma.client.findFirst({
-            where: { email: createClientDto.email },
-        });
-        if (existingClientByEmail) {
-            throw new ConflictException(`Ya existe un cliente con el email "${createClientDto.email}".`);
-        }
-    }
-
-    return this.prisma.client.create({
-      data: createClientDto,
+async create(createClientDto: CreateClientDto): Promise<PrismaClient> {
+  // Verificar si el cliente ya existe por documento de identidad
+  if (createClientDto.documento_identidad) {
+    const existingClientByDoc = await this.prisma.client.findFirst({
+      where: { documento_identidad: createClientDto.documento_identidad },
     });
+    if (existingClientByDoc) {
+      throw new ConflictException(`Ya existe un cliente con el documento de identidad "${createClientDto.documento_identidad}".`);
+    }
   }
+  
+  // ✅ SOLO verificar email si se proporcionó y no está vacío
+if (createClientDto.email && createClientDto.email.trim() !== '') {
+  // Validar formato de email manualmente
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(createClientDto.email)) {
+    throw new BadRequestException('El email debe ser una dirección de correo válida.');
+  }
+  
+  // Validar unicidad
+  const existingClientByEmail = await this.prisma.client.findFirst({
+    where: { email: createClientDto.email },
+  });
+  if (existingClientByEmail) {
+    throw new ConflictException(`Ya existe un cliente con el email "${createClientDto.email}".`);
+  }
+}
 
-  async findAll(query: ClientQueryDto): Promise<{ clients: PrismaClient[]; total: number; page: number; limit: number }> {
+  return this.prisma.client.create({
+    data: createClientDto,
+  });
+}
+
+  async findAll(query: ClientQueryDto): Promise<{ clients: PrismaClient[]; total: number; page: number; limit: number; totalPages: number }> {
     const { search, active, page = '1', limit = '10' } = query;
 
     const take = parseInt(limit, 10);
@@ -65,7 +74,15 @@ export class ClientsService {
       this.prisma.client.count({ where }),
     ]);
 
-    return { clients, total, page: parseInt(page, 10), limit: take };
+    const totalPages = Math.ceil(total / take);
+
+    return { 
+      clients, 
+      total, 
+      page: parseInt(page, 10), 
+      limit: take,
+      totalPages 
+    };
   }
 
   async findOne(id_cliente: string): Promise<PrismaClient> {
@@ -88,17 +105,18 @@ export class ClientsService {
     }
 
     // Verificar si el nuevo email o documento de identidad ya existen en otro cliente
-    if (updateClientDto.email) {
-      const existingClientByEmail = await this.prisma.client.findFirst({
-        where: {
-          email: updateClientDto.email,
-          id_cliente: { not: id_cliente },
-        },
-      });
-      if (existingClientByEmail) {
-        throw new ConflictException(`Ya existe un cliente con el email "${updateClientDto.email}".`);
-      }
+  // ✅ SOLO verificar email si se proporcionó y no está vacío
+  if (updateClientDto.email && updateClientDto.email.trim() !== '') {
+    const existingClientByEmail = await this.prisma.client.findFirst({
+      where: {
+        email: updateClientDto.email,
+        id_cliente: { not: id_cliente },
+      },
+    });
+    if (existingClientByEmail) {
+      throw new ConflictException(`Ya existe un cliente con el email "${updateClientDto.email}".`);
     }
+  }
     if (updateClientDto.documento_identidad) {
         const existingClientByDoc = await this.prisma.client.findFirst({
             where: {

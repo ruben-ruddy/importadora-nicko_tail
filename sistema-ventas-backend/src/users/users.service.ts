@@ -57,7 +57,7 @@ export class UsersService {
   }
 
   async findAll(query: UserQueryDto): Promise<{ users: Omit<PrismaUser, 'password_hash'>[]; total: number; page: number; limit: number }> {
-    const { search, id_rol, active, page = '1', limit = '10' } = query;
+    const { search, id_rol, active, page = '1', limit = '50' } = query;
 
     const take = parseInt(limit, 10);
     const skip = (parseInt(page, 10) - 1) * take;
@@ -208,38 +208,40 @@ export class UsersService {
     }
   }
 
-  async remove(id_usuario: string): Promise<Omit<PrismaUser, 'password_hash'>> {
+async remove(id_usuario: string): Promise<void> {
+  try {
     const existingUser = await this.prisma.user.findUnique({
       where: { id_usuario },
     });
+    
     if (!existingUser) {
       throw new NotFoundException(`Usuario con ID "${id_usuario}" no encontrado para eliminar.`);
     }
 
-    // Opcional: Verificar si el usuario tiene ventas, compras o movimientos de inventario asociados
-    const userSalesCount = await this.prisma.sale.count({ where: { id_usuario } });
-    const userPurchasesCount = await this.prisma.purchase.count({ where: { id_usuario } });
-    const userMovementsCount = await this.prisma.inventoryMovement.count({ where: { id_usuario } });
+    // Verificar si el usuario tiene registros asociados
+    const [userSalesCount, userPurchasesCount, userMovementsCount] = await Promise.all([
+      this.prisma.sale.count({ where: { id_usuario } }),
+      this.prisma.purchase.count({ where: { id_usuario } }),
+      this.prisma.inventoryMovement.count({ where: { id_usuario } })
+    ]);
 
     if (userSalesCount > 0 || userPurchasesCount > 0 || userMovementsCount > 0) {
-        throw new ConflictException(`No se puede eliminar el usuario con ID "${id_usuario}" porque tiene registros asociados (ventas, compras o movimientos de inventario).`);
+      throw new ConflictException(
+        `No se puede eliminar el usuario porque tiene ${userSalesCount} ventas, ${userPurchasesCount} compras y ${userMovementsCount} movimientos de inventario asociados.`
+      );
     }
 
-    const deletedUser = await this.prisma.user.delete({
+    await this.prisma.user.delete({
       where: { id_usuario },
-      select: { // Excluir el password_hash de la respuesta
-        id_usuario: true,
-        id_rol: true,
-        nombre_usuario: true,
-        email: true,
-        nombre_completo: true,
-        telefono: true,
-        activo: true,
-        fecha_creacion: true,
-        ultimo_acceso: true,
-        role: true,
-      }
     });
-    return deletedUser;
+    
+  } catch (error) {
+    if (error instanceof NotFoundException || error instanceof ConflictException) {
+      throw error;
+    }
+    
+    // Error de base de datos u otro error inesperado
+    throw new BadRequestException('Error al eliminar el usuario. Por favor, intente nuevamente.');
   }
+}
 }

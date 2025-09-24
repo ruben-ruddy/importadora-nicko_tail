@@ -41,11 +41,12 @@ export class NavbarComponent implements OnInit {
       
       this.navItems = [
         { path: 'products', title: 'Productos' },
-        { path: 'purchase', title: 'Compras' },
+        { path: 'purchase', title: 'Compras' }
       ];
     }else if (this.user?.role?.nombre_rol == "Vendedor") {
       this.navItems = [
-        { path: 'sale', title: 'Ventas' }
+        { path: 'sale', title: 'Ventas' },
+        { path: 'clients', title: 'Clientes' }
       ];
   }
 }

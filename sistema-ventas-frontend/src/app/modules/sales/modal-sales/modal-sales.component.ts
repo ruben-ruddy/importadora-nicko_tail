@@ -149,21 +149,35 @@ async save() {
     try {
       const formData = this.form.getRawValue();
       
-      const saleData = {
+      // Preparar datos para enviar al backend
+      const saleData: any = {
         id_usuario: formData.id_usuario,
-        id_cliente: formData.id_cliente || null,
-        subtotal: parseFloat(formData.subtotal),
-        descuento: parseFloat(formData.descuento),
-        impuesto: parseFloat(formData.impuesto),
-        total: parseFloat(formData.total),
         estado: formData.estado,
-        observaciones: formData.observaciones || null,
-        detalle_ventas: formData.detalle_ventas.map((item: any) => ({
+        observaciones: formData.observaciones || null
+      };
+
+      // Solo incluir campos permitidos para actualización
+      if (this.initiaData?.id_venta) {
+        // Para edición, solo enviar campos permitidos
+        saleData.id_cliente = formData.id_cliente || null;
+        saleData.descuento = parseFloat(formData.descuento) || 0;
+        saleData.impuesto = parseFloat(formData.impuesto) || 0;
+        
+        // Nota: No enviamos detalle_ventas, subtotal ni total para edición
+        // ya que el backend no permite modificar estos campos
+      } else {
+        // Para creación, enviar todos los campos
+        saleData.id_cliente = formData.id_cliente || null;
+        saleData.subtotal = parseFloat(formData.subtotal);
+        saleData.descuento = parseFloat(formData.descuento) || 0;
+        saleData.impuesto = parseFloat(formData.impuesto) || 0;
+        saleData.total = parseFloat(formData.total);
+        saleData.detalle_ventas = formData.detalle_ventas.map((item: any) => ({
           id_producto: item.id_producto,
           cantidad: parseInt(item.cantidad),
           precio_unitario: parseFloat(item.precio_unitario)
-        }))
-      };
+        }));
+      }
 
       console.log('Datos a enviar:', saleData);
 
@@ -188,14 +202,16 @@ async save() {
       // Construir los datos completos para el ticket usando la información local
       const ticketData = this.buildTicketData(result, formData);
 
-      // Mostrar ticket después de guardar
-      this.dialogService.open(SaleTicketComponent, {
-        data: { saleData: ticketData },
-        header: 'Ticket de Venta',
-        width: '500px',
-        style: { 'max-width': '90vw' },
-        closable: true
-      });
+      // Mostrar ticket después de guardar (solo para nuevas ventas)
+      if (!this.initiaData?.id_venta) {
+        this.dialogService.open(SaleTicketComponent, {
+          data: { saleData: ticketData },
+          header: 'Ticket de Venta',
+          width: '500px',
+          style: { 'max-width': '90vw' },
+          closable: true
+        });
+      }
 
       this.ref.close(result);
       

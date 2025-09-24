@@ -1,6 +1,7 @@
-// schema.ts (corregido)
-// schema.ts (sin campo fecha_compra)
-export const purchaseFormFields = (catalogs: any) => {
+// schema.ts (actualizado para usuario automático)
+export const purchaseFormFields = (catalogs: any, currentUser: any = null) => {
+  const isCurrentUserSet = currentUser && currentUser.id_usuario;
+  
   return [
     {
       type: 'column',
@@ -13,14 +14,11 @@ export const purchaseFormFields = (catalogs: any) => {
               type: 'select',
               options: catalogs['users'] || [],
               validators: { required: true },
+              readonly: isCurrentUserSet,
+              disabled: isCurrentUserSet,
+              defaultValue: isCurrentUserSet ? currentUser.id_usuario : null,
+              description: isCurrentUserSet ? 'Usuario actualmente logeado' : 'Seleccione un usuario'
             },
-            // {
-            //   key: 'numero_compra',
-            //   label: 'Número de Compra',
-            //   type: 'text',
-            //   validators: { required: true, maxLength: 50 },
-            // },
-            
             {
               key: 'estado',
               label: 'Estado',
@@ -41,6 +39,7 @@ export const purchaseFormFields = (catalogs: any) => {
               label: 'Observaciones',
               type: 'text',
               validators: { maxLength: 500 },
+              rows: 3
             }
           ]
         }

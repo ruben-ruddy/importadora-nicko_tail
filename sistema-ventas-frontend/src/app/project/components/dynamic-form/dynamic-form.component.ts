@@ -1,4 +1,4 @@
-// dynamic-form.component.ts
+// sistema-ventas-frontend/src/app/project/components/dynamic-form/dynamic-form.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators,FormArray } from '@angular/forms';
@@ -45,10 +45,16 @@ export class DynamicFormComponent implements OnInit {
     this.subscribeToFormChanges();
   }
 
-  private convertNumericStringValues() {
+private convertNumericStringValues() {
   Object.keys(this.form.controls).forEach(key => {
     const control = this.form.get(key);
     const value = control?.value;
+    const field = this.findFieldByKey(key);
+    
+    // No convertir checkboxes (deben permanecer como booleanos)
+    if (field && field.type === 'checkbox') {
+      return;
+    }
     
     // Convertir strings numéricos a números
     if (typeof value === 'string' && !isNaN(Number(value)) && value !== '') {
@@ -59,6 +65,19 @@ export class DynamicFormComponent implements OnInit {
 
   private patchFormWithInitialData(): void {
     // Patch valores normales primero
+      const patchData: any = {};
+  
+  Object.keys(this.initialData).forEach(key => {
+    const field = this.findFieldByKey(key);
+    if (field && field.type === 'checkbox') {
+      // Asegurar que los checkboxes sean booleanos
+      patchData[key] = Boolean(this.initialData[key]);
+    } else {
+      patchData[key] = this.initialData[key];
+    }
+  });
+  
+  this.form.patchValue(patchData);
     this.form.patchValue(this.initialData);
 
     // Manejar arrays específicamente
@@ -93,6 +112,20 @@ export class DynamicFormComponent implements OnInit {
       }
     });
   }
+
+  private findFieldByKey(key: string): any {
+  for (const field of this.fields) {
+    if (field.type === 'column' && field.columns) {
+      for (const col of field.columns) {
+        const found = col.fields.find((f: any) => f.key === key);
+        if (found) return found;
+      }
+    } else if (field.key === key) {
+      return field;
+    }
+  }
+  return null;
+}
 
   private subscribeToFormChanges(): void {
     this.form.valueChanges.subscribe(() => {
@@ -154,20 +187,45 @@ private createArrayItem(field: any, itemData: any = {}): FormGroup {
   const itemGroup = this.fb.group({});
   
   field.itemFields.forEach((itemField: any) => {
-    // Usar valor de itemData, o defaultValue, o vacío
-    const defaultValue = itemData[itemField.key] !== undefined 
-      ? itemData[itemField.key] 
-      : (itemField.defaultValue !== undefined ? itemField.defaultValue : '');
+    // Obtener el valor inicial para cada campo del item
+    const initialValue = this.getArrayItemInitialValue(itemField, itemData);
     
     const validators = this.mapValidators(itemField.validators);
     
     itemGroup.addControl(
       itemField.key,
-      new FormControl(defaultValue, validators)
+      new FormControl(initialValue, validators)
     );
   });
 
   return itemGroup;
+}
+
+// Nuevo método para obtener valores iniciales de campos en arrays
+private getArrayItemInitialValue(itemField: any, itemData: any): any {
+  // Si hay datos del item y el campo existe, usar ese valor
+  if (itemData && itemData[itemField.key] !== undefined) {
+    // Para checkboxes, asegurar que sea booleano
+    if (itemField.type === 'checkbox') {
+      return Boolean(itemData[itemField.key]);
+    }
+    return itemData[itemField.key];
+  }
+  
+  // Si no hay datos del item, usar el defaultValue del campo
+  if (itemField.defaultValue !== undefined) {
+    return itemField.defaultValue;
+  }
+  
+  // Valores por defecto según el tipo de campo
+  switch (itemField.type) {
+    case 'checkbox':
+      return false;
+    case 'number':
+      return null;
+    default:
+      return '';
+  }
 }
 
   addArrayItem(field: any, itemData: any = {}) {
@@ -207,22 +265,54 @@ private calculateNewItemSubtotal(arrayKey: string, index: number) {
 
 
 
- private addControl(field: any) {
-    if (field.type === 'title') return;
+private addControl(field: any) {
+  if (field.type === 'title') return;
 
-    const baseValidators = this.mapValidators(field.validators);
-    if (field.type === 'file') {
-      baseValidators.push(this.fileValidator(field.validators));
-    }
-
-    this.form.addControl(
-      field.key,
-      new FormControl(
-        { value: '', disabled: field.readonly },
-        baseValidators
-      )
-    );
+  // Obtener el valor inicial
+  const initialValue = this.getInitialValue(field);
+  
+  const baseValidators = this.mapValidators(field.validators);
+  if (field.type === 'file') {
+    baseValidators.push(this.fileValidator(field.validators));
   }
+
+  this.form.addControl(
+    field.key,
+    new FormControl(
+      { value: initialValue, disabled: field.readonly },
+      baseValidators
+    )
+  );
+}
+
+// Nuevo método para obtener el valor inicial
+private getInitialValue(field: any): any {
+  // Si hay datos iniciales y el campo existe, usar ese valor
+  if (this.initialData && this.initialData[field.key] !== undefined) {
+    // Para checkboxes, asegurar que sea booleano
+    if (field.type === 'checkbox') {
+      return Boolean(this.initialData[field.key]);
+    }
+    return this.initialData[field.key];
+  }
+  
+  // Si no hay datos iniciales, usar el defaultValue del campo
+  if (field.defaultValue !== undefined) {
+    return field.defaultValue;
+  }
+  
+  // Valores por defecto según el tipo de campo
+  switch (field.type) {
+    case 'checkbox':
+      return false;
+    case 'number':
+      return null; // O 0 si prefieres
+    case 'file':
+      return null;
+    default:
+      return '';
+  }
+}
 
 
 private mapValidators(validators: any): any[] {

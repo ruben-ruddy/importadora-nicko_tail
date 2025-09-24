@@ -1,6 +1,5 @@
 // sistema-ventas-frontend/src/app/modules/sales/sales.service.ts
-
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../../environments/environment';
@@ -21,24 +20,35 @@ export class SalesService {
 
   async getSales(queryParams?: any): Promise<any> {
     try {
-      const params = queryParams ? { params: queryParams } : {};
-      const response: any = await firstValueFrom(this.http.get(`${this.apiUrl}/sales`, params));
-      return response.sales || response;
+      let params = new HttpParams();
+      
+      if (queryParams) {
+        Object.keys(queryParams).forEach(key => {
+          if (queryParams[key] !== undefined && queryParams[key] !== null) {
+            params = params.set(key, queryParams[key]);
+          }
+        });
+      }
+      
+      const response: any = await firstValueFrom(
+        this.http.get(`${this.apiUrl}/sales`, { params })
+      );
+      return response;
     } catch (error) {
       return this.handleError(error);
     }
   }
 
   async getSale(id: string): Promise<Sale> {
-  try {
-    const response: any = await firstValueFrom(
-      this.http.get(`${this.apiUrl}/sales/${id}`)
-    );
-    return response as Sale;
-  } catch (error: unknown) {
-    return this.handleError(error);
+    try {
+      const response: any = await firstValueFrom(
+        this.http.get(`${this.apiUrl}/sales/${id}`)
+      );
+      return response as Sale;
+    } catch (error: unknown) {
+      return this.handleError(error);
+    }
   }
-}
 
   async createSale(data: any): Promise<Sale> {
     try {
@@ -93,7 +103,6 @@ export class SalesService {
     }
   }
 
-  // Verificar stock disponible
   async checkStock(productId: string, quantity: number): Promise<boolean> {
     try {
       const products = await this.getProducts();
@@ -106,19 +115,17 @@ export class SalesService {
   }
 
   async getSaleWithDetails(id: string): Promise<Sale> {
-  try {
-    const response: any = await firstValueFrom(
-      this.http.get(`${this.apiUrl}/sales/${id}/details`)
-    );
-    return response as Sale;
-  } catch (error: unknown) {
-    // Si el endpoint de detalles no existe, intenta con el endpoint normal
     try {
-      return await this.getSale(id);
-    } catch {
-      return this.handleError(error);
+      const response: any = await firstValueFrom(
+        this.http.get(`${this.apiUrl}/sales/${id}/details`)
+      );
+      return response as Sale;
+    } catch (error: unknown) {
+      try {
+        return await this.getSale(id);
+      } catch {
+        return this.handleError(error);
+      }
     }
   }
-}
-  
 }

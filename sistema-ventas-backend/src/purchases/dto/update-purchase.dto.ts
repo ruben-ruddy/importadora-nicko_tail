@@ -60,7 +60,7 @@ export class UpdatePurchaseDto extends PartialType(
   @IsNumber()
   @Min(0)
   @Type(() => Number)
-  @IsDecimal({ decimal_digits: '1,2' })
+  //@IsDecimal({ decimal_digits: '1,2' })
   total?: number;
 
   @ApiProperty({ description: 'Estado actual de la compra', enum: DtoPurchaseState, required: false })

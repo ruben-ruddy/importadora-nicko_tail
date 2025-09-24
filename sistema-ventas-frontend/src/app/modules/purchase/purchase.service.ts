@@ -1,10 +1,26 @@
-// purchase.service.ts
-import { HttpClient } from '@angular/common/http';
+// sistema-ventas-frontend/src/app/modules/purchase/purchase.service.ts
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environments/environment';
 import { firstValueFrom } from 'rxjs';
 import { Purchase } from '../../interfaces/purchase.interface';
-import { ApiResponse, UsersResponse, ProductsResponse, PurchasesResponse } from '../../interfaces/api-response.interface';
+
+export interface PurchaseResponse {
+  data: Purchase[];
+  total: number;
+  page: number;
+  limit: number;
+  lastPage: number;
+}
+
+export interface PurchaseQuery {
+  page?: number;
+  limit?: number;
+  search?: string;
+  estado?: string;
+  startDate?: string;
+  endDate?: string;
+}
 
 @Injectable({
   providedIn: 'root'
@@ -13,44 +29,61 @@ export class PurchaseService {
 
   constructor(private http: HttpClient) { }
 
-private extractArrayData(response: any): any[] {
-  // Siempre devolver un array, nunca undefined
-  if (Array.isArray(response)) {
-    return response;
-  }
-  
-  if (response && Array.isArray(response.data)) {
-    return response.data;
-  }
-  
-  if (response && Array.isArray(response.users)) {
-    return response.users;
-  }
-  
-  if (response && Array.isArray(response.products)) {
-    return response.products;
-  }
-  
-  if (response && Array.isArray(response.purchases)) {
-    return response.purchases;
-  }
-  
-  // Si no coincide con ninguna estructura conocida, devolver array vacío
-  return [];
-}
-
-  async getPurchases(): Promise<Purchase[]> {
-    try {
-      const response: any = await firstValueFrom(
-        this.http.get<PurchasesResponse | Purchase[]>(`${environment.backend}/purchases`)
-      );
-      return this.extractArrayData(response);
-    } catch (error) {
-      console.error('Error fetching purchases:', error);
-      return [];
+  private extractArrayData(response: any): any[] {
+    if (Array.isArray(response)) {
+      return response;
     }
+    
+    if (response && Array.isArray(response.data)) {
+      return response.data;
+    }
+    
+    if (response && Array.isArray(response.users)) {
+      return response.users;
+    }
+    
+    if (response && Array.isArray(response.products)) {
+      return response.products;
+    }
+    
+    if (response && Array.isArray(response.purchases)) {
+      return response.purchases;
+    }
+    
+    return [];
   }
 
+async getPurchases(query: PurchaseQuery = {}): Promise<PurchaseResponse> {
+  try {
+    let params = new HttpParams();
+    
+    // Asegurarse de que los números se envíen como strings
+    if (query.page) params = params.set('page', query.page.toString());
+    if (query.limit) params = params.set('limit', query.limit.toString());
+    
+    // CORREGIR: Usar 'numero_compra' en lugar de 'search'
+    if (query.search) params = params.set('numero_compra', query.search);
+    
+    if (query.estado) params = params.set('estado', query.estado);
+    if (query.startDate) params = params.set('startDate', query.startDate);
+    if (query.endDate) params = params.set('endDate', query.endDate);
+
+    console.log('Parámetros enviados al backend:', {
+      page: query.page?.toString(),
+      limit: query.limit?.toString(),
+      numero_compra: query.search, // ← Ahora se envía como 'numero_compra'
+      estado: query.estado
+    });
+
+    const response = await firstValueFrom(
+      this.http.get<PurchaseResponse>(`${environment.backend}/purchases`, { params })
+    );
+    return response;
+  } catch (error) {
+    console.error('Error fetching purchases:', error);
+    return { data: [], total: 0, page: 1, limit: 10, lastPage: 1 };
+  }
+}
   async getPurchaseById(id: string): Promise<Purchase> {
     try {
       const response = await firstValueFrom(
@@ -66,7 +99,7 @@ private extractArrayData(response: any): any[] {
   async getUsers(): Promise<any[]> {
     try {
       const response = await firstValueFrom(
-        this.http.get<UsersResponse | any[]>(`${environment.backend}/users`)
+        this.http.get<any[]>(`${environment.backend}/users`)
       );
       return this.extractArrayData(response);
     } catch (error) {
@@ -78,7 +111,7 @@ private extractArrayData(response: any): any[] {
   async getProducts(): Promise<any[]> {
     try {
       const response = await firstValueFrom(
-        this.http.get<ProductsResponse | any[]>(`${environment.backend}/products`)
+        this.http.get<any[]>(`${environment.backend}/products`)
       );
       return this.extractArrayData(response);
     } catch (error) {
@@ -87,21 +120,21 @@ private extractArrayData(response: any): any[] {
     }
   }
 
-async createPurchase(data: Purchase): Promise<Purchase> {
-  // Asegurarse de que no se envíe fecha_compra
-  const { fecha_compra, ...purchaseData } = data;
-  return firstValueFrom(
-    this.http.post<Purchase>(`${environment.backend}/purchases`, purchaseData)
-  );
-}
+  async createPurchase(data: Purchase): Promise<Purchase> {
+    // Asegurarse de que no se envíe fecha_compra
+    const { fecha_compra, ...purchaseData } = data;
+    return firstValueFrom(
+      this.http.post<Purchase>(`${environment.backend}/purchases`, purchaseData)
+    );
+  }
 
-async updatePurchase(id: string, data: Purchase): Promise<Purchase> {
-  // Asegurarse de que no se envíe fecha_compra en updates
-  const { fecha_compra, ...purchaseData } = data;
-  return firstValueFrom(
-    this.http.patch<Purchase>(`${environment.backend}/purchases/${id}`, purchaseData)
-  );
-}
+  async updatePurchase(id: string, data: Purchase): Promise<Purchase> {
+    // Asegurarse de que no se envíe fecha_compra en updates
+    const { fecha_compra, id_compra, ...purchaseData } = data;
+    return firstValueFrom(
+      this.http.patch<Purchase>(`${environment.backend}/purchases/${id}`, purchaseData)
+    );
+  }
 
   deletePurchase(id: string): Promise<void> {
     return firstValueFrom(
