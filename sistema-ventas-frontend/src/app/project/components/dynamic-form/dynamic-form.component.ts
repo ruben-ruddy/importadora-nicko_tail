@@ -395,11 +395,14 @@ private mapValidators(validators: any): any[] {
   reader.readAsDataURL(file);
 }
 
-  isImage(fileData: string | null): boolean {
-    //console.log(fileData);
-    
-    return typeof fileData === 'string' && fileData.startsWith('data:image/');
+  isImage(fileData: string | null | undefined): boolean {
+  if (!fileData || typeof fileData !== 'string') {
+    return false;
   }
+  return fileData.startsWith('data:image/') || 
+         fileData.startsWith('http') || 
+         fileData.includes('image/');
+}
 
  
 

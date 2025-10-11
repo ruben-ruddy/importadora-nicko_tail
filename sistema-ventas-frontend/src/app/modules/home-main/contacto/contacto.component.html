@@ -1,0 +1,69 @@
+<app-header-home-main></app-header-home-main>
+
+<div class="design3 min-h-screen relative overflow-hidden
+             bg-gradient-to-br from-dark-blue-bg via-medium-blue-bg to-light-blue-bg">
+    <div class="max-w-6xl mx-auto p-4 md:p-4">
+        
+        <div class="text-center mb-10">
+            <h2 class="p-4 text-3xl font-bold text-center text-white">CONTÁCTANOS</h2>
+            <p class="text-gray-400 text-lg">Estamos listos para ayudarte. Envíanos un mensaje o encuéntranos.</p>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto text-center">
+            
+            <div class="bg-white rounded-2xl shadow p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4 border-b pb-2">Nuestra Ubicación</h2>
+                <div class="space-y-4">
+                    <div class="flex items-start">
+                        <i class="pi pi-map-marker text-red-500 text-2xl mr-3 mt-1"></i>
+                        <p class="text-gray-600">Av. Buenos Aires 464 Local 3-SS, La Paz, Bolivia</p>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="pi pi-phone text-blue-500 text-2xl mr-3 mt-1"></i>
+                        <p class="text-gray-600">+591 74057107</p>
+                    </div>
+                    <div class="flex items-start">
+                        <i class="pi pi-envelope text-yellow-500 text-2xl mr-3 mt-1"></i>
+                        <p class="text-gray-600">info@importadora.com</p>
+                    </div>
+                </div>
+
+                <h2 class="text-xl font-semibold text-gray-800 mt-6 mb-4 border-b pb-2">Horario de Atención</h2>
+                <p class="text-gray-600">Lunes a Viernes: 8:00 a.m. - 6:00 p.m.</p>
+                <p class="text-gray-600">Sábados: 9:00 a.m. - 1:00 p.m.</p>
+            </div>
+            
+            <div class="bg-white rounded-2xl shadow p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-4">Envíanos un Mensaje</h2>
+                <form class="space-y-4">
+                    <input type="text" placeholder="Tu Nombre" 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <input type="email" placeholder="Tu Email" 
+                           class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500">
+                    <textarea placeholder="Tu Mensaje" rows="4"
+                              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"></textarea>
+                    
+                    <button type="submit"
+                            class="w-full py-3 px-6 bg-green-600 text-white font-bold rounded-lg 
+                                   hover:bg-green-700 transition duration-300 shadow-md">
+                        Enviar Mensaje
+                    </button>
+                </form>
+            </div>
+
+        </div>
+
+        <div class="mt-12 text-center p-4">
+            <a href="https://api.whatsapp.com/send?phone=59174057107&text" target="_blank">
+                <button type="button" 
+                        class="bg-green-500 hover:bg-green-600 text-white font-bold py-3 px-6 rounded-full 
+                               shadow-lg transition duration-300 flex items-center justify-center mx-auto">
+                    <i class="pi pi-whatsapp mr-2"></i> Contáctanos por WhatsApp
+                </button>
+            </a>
+        </div>
+        
+    </div>
+</div>
+
+<app-footer-home-main></app-footer-home-main>

@@ -113,9 +113,8 @@ def calculate_metrics(actual, predicted):
             return {'mae': 0, 'mape': 0, 'rmse': 0, 'accuracy': 0}
         
         # USAR SOLO LOS ÚLTIMOS 3 MESES para cálculo de métricas
-        # (los más relevantes para evaluar el pronóstico)
-        actual_recent = actual[-3:]  # Julio, Agosto, Septiembre
-        predicted_recent = predicted[:3]  # Oct, Nov, Dic pronosticados
+        actual_recent = actual[-3:]  # Últimos 3 meses reales
+        predicted_recent = predicted[:3]  # Primeras 3 predicciones
         
         # Calcular MAE solo con datos recientes
         mae = mean_absolute_error(actual_recent, predicted_recent)
@@ -145,7 +144,25 @@ def calculate_metrics(actual, predicted):
     except Exception as e:
         logger.error(f"Error calculating metrics: {str(e)}")
         return {'mae': 0, 'mape': 0, 'rmse': 0, 'accuracy': 0}
-    
+
+def calculate_monthly_precision(base_accuracy, month_index, decay_rate=0.03):
+    """
+    Calcula precisión decreciente para cada mes futuro
+    base_accuracy: Precisión base del modelo (ej: 87.3%)
+    month_index: Índice del mes (0 = primer mes, 1 = segundo mes, etc.)
+    decay_rate: Tasa de decaimiento mensual (3% por defecto)
+    """
+    try:
+        # Fórmula: Precisión disminuye exponencialmente
+        precision = base_accuracy * ((1 - decay_rate) ** month_index)
+        
+        # Límites: Mínimo 30%, máximo la precisión base
+        precision = max(min(precision, base_accuracy), 30)
+        
+        return round(precision, 1)
+    except Exception as e:
+        logger.error(f"Error calculating monthly precision: {str(e)}")
+        return base_accuracy
 
 @app.post("/forecast", response_model=ForecastResponse)
 async def generate_forecast(request: ForecastRequest):
@@ -173,14 +190,19 @@ async def generate_forecast(request: ForecastRequest):
         else:
             raise HTTPException(status_code=400, detail=f"Método no soportado: {request.method}")
         
-        # Calcular métricas
+        # Calcular métricas generales
         metrics = calculate_metrics(y, predictions)
+        
+        # Obtener precisión base del modelo
+        base_accuracy = metrics['accuracy']
+        logger.info(f"Precisión base del modelo: {base_accuracy}%")
         
         # Formatear respuesta
         last_date = df.index[-1]
         formatted_predictions = []
         
         for i, pred in enumerate(predictions):
+            # Calcular fecha futura
             if request.frequency == 'D':
                 pred_date = last_date + timedelta(days=i+1)
             elif request.frequency == 'W':
@@ -193,14 +215,20 @@ async def generate_forecast(request: ForecastRequest):
             inferior = max(0, pred * (1 - confidence_multiplier))
             superior = pred * (1 + confidence_multiplier)
             
+            # ✅✅✅ CORRECCIÓN CLAVE: Calcular precisión individual para cada mes
+            monthly_precision = calculate_monthly_precision(base_accuracy, i)
+            
             formatted_predictions.append({
                 "fecha": pred_date.strftime("%Y-%m-%d"),
                 "ventas_previstas": float(pred),
                 "intervalo_confianza": {
                     "inferior": float(inferior),
                     "superior": float(superior)
-                }
+                },
+                "metrica_precision": float(monthly_precision)  # ✅ AHORA SÍ se envía por mes
             })
+            
+            logger.info(f"Mes {i+1}: Precisión = {monthly_precision}%")
         
         return ForecastResponse(
             predictions=formatted_predictions,
@@ -209,7 +237,9 @@ async def generate_forecast(request: ForecastRequest):
                 'type': 'moving_average',
                 'window_size': request.window_size,
                 'alpha': request.alpha,
-                'periods': request.periods
+                'periods': request.periods,
+                'base_accuracy': base_accuracy,
+                'decay_rate': 0.03
             }
         )
         
@@ -220,6 +250,25 @@ async def generate_forecast(request: ForecastRequest):
 @app.get("/health")
 async def health_check():
     return {"status": "healthy", "service": "sales-forecast"}
+
+@app.get("/test-precision")
+async def test_precision():
+    """Endpoint para probar el cálculo de precisión por mes"""
+    base_accuracy = 87.3
+    results = []
+    
+    for i in range(12):
+        precision = calculate_monthly_precision(base_accuracy, i)
+        results.append({
+            'mes': i + 1,
+            'precision': precision
+        })
+    
+    return {
+        'base_accuracy': base_accuracy,
+        'monthly_precision': results,
+        'explanation': 'La precisión disminuye 3% cada mes futuro'
+    }
 
 if __name__ == "__main__":
     import uvicorn

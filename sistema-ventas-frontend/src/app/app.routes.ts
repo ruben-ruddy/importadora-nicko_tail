@@ -5,6 +5,7 @@ import { HomeProductsComponent } from './modules/home-main/home-products/home-pr
 import { HomeCategoriesComponent } from './modules/home-main/home-categories/home-categories.component';
 import { CategoryProductsComponent } from './modules/home-main/category-products/category-products.component';
 import { QuienesSomosComponent } from './modules/home-main/quienes-somos/quienes-somos.component';
+import { ContactoComponent } from './modules/home-main/contacto/contacto.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: 'home-main', pathMatch: 'full' },
@@ -43,6 +44,11 @@ export const routes: Routes = [
     { path: 'quienes-somos', 
       component: QuienesSomosComponent,
       title: 'Quiénes Somos'
+    },
+    { path: 'contacto', 
+      component: ContactoComponent,
+      title: 'Contácto'
     }
+
 
 ];

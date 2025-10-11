@@ -17,18 +17,3 @@ export class PublicCategoriesController {
   }
   
 }
-
-// import { Controller, Get, UseInterceptors } from '@nestjs/common';
-// import { CacheInterceptor } from '@nestjs/cache-manager';
-
-// @Controller('api/public/categories')
-// @UseInterceptors(CacheInterceptor) // Cache automático
-// export class PublicCategoriesController {
-//   constructor(private readonly categoriesService: CategoriesService) {}
-
-//   @Get()
-//   @CacheTTL(60 * 5) // 5 minutos de caché
-//   async getActiveCategories() {
-//     return this.categoriesService.findActiveCategories();
-//   }
-// }

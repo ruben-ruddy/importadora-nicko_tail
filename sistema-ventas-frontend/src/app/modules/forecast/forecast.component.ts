@@ -1,5 +1,5 @@
 // sistema-ventas-frontend/src/app/modules/forecast/forecast.component.ts
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ForecastService } from './forecast.service';
@@ -213,7 +213,7 @@ export class ForecastComponent implements OnInit, OnDestroy {
     }
   };
 
-  constructor(private forecastService: ForecastService) { }
+  constructor(private forecastService: ForecastService, private ngZone: NgZone) { }
 
   async ngOnInit() {
     await this.loadHistoricalData();
@@ -244,32 +244,36 @@ export class ForecastComponent implements OnInit, OnDestroy {
     }
   }
 
-  async generateForecast() {
-    this.loading = true;
-    this.error = null;
-    this.success = null;
+async generateForecast() {
+  this.loading = true;
+  this.error = null;
+  this.success = null;
 
-    try {
-      const response = await this.forecastService.generateForecast(this.forecastRequest);
+  try {
+    const response = await this.forecastService.generateForecast(this.forecastRequest);
+    console.log('Forecast response:', response);
+    // Crea una copia profunda del objeto response para forzar la detección de cambios
+    const clonedResponse = JSON.parse(JSON.stringify(response));
 
-      this.forecastResults = response.results;
-      this.forecastMetrics = response.metrics;
-      this.modelInfo = response.model_info || null;
+    this.forecastResults = clonedResponse.results;
+    this.forecastMetrics = clonedResponse.metrics;
+    this.modelInfo = clonedResponse.model_info || null;
 
-      this.activeTab = 'results';
-      this.success = 'Pronóstico generado correctamente';
+    this.activeTab = 'results';
+    this.success = 'Pronóstico generado correctamente';
 
-      setTimeout(() => {
-        this.updateCharts();
-      }, 100);
+    // Ahora puedes actualizar los gráficos, ya que los datos son estables
+    setTimeout(() => {
+      this.updateCharts();
+    }, 100);
 
-    } catch (error: any) {
-      this.error = error.message || 'Error al generar el pronóstico';
-      console.error('Error generating forecast:', error);
-    } finally {
-      this.loading = false;
-    }
+  } catch (error: any) {
+    this.error = error.message || 'Error al generar el pronóstico';
+    console.error('Error generating forecast:', error);
+  } finally {
+    this.loading = false;
   }
+}
 
   private updateCharts() {
     this.updateSalesChart();
@@ -371,13 +375,13 @@ export class ForecastComponent implements OnInit, OnDestroy {
     }
   }
 
-  getErrorClass(error: number | undefined): string {
-    if (error === undefined) return 'text-gray-500 bg-gray-100';
-    if (error <= 10) return 'text-green-600 bg-green-50';
-    if (error <= 20) return 'text-yellow-600 bg-yellow-50';
-    if (error <= 30) return 'text-orange-600 bg-orange-50';
-    return 'text-red-600 bg-red-50';
-  }
+getErrorClass(error: number | undefined): string {
+  if (error === undefined || error === null) return 'text-gray-500 bg-gray-100'; // Agregué null para mayor seguridad
+  if (error <= 10) return 'text-green-600 bg-green-50';
+  if (error <= 20) return 'text-yellow-600 bg-yellow-50';
+  if (error <= 30) return 'text-orange-600 bg-orange-50';
+  return 'text-red-600 bg-red-50';
+}
 
   getPrecisionClass(precision: number | undefined): string {
     if (precision === undefined) return 'text-gray-500';
