@@ -7,13 +7,21 @@ import { ProductQueryDto } from './dto/product-query.dto';
 import { Product as PrismaProduct } from '@prisma/client';
 import { LatestProductImageDto } from './dto/latest-product-image.dto';
 
+import { ConfigService } from '@nestjs/config';
+
 @Injectable()
 export class ProductsService {
   // Define la URL base de tu backend aquí
   // Es CRUCIAL que esta URL coincida con la URL donde tu backend está sirviendo los archivos estáticos.
-  private readonly baseUrl: string = 'http://localhost:3000'; // <--- ¡AÑADE ESTA LÍNEA!
+  //private readonly baseUrl: string = 'http://localhost:3000'; // <--- ¡AÑADE ESTA LÍNEA!
 
-  constructor(private prisma: PrismaService) {}
+  private readonly baseUrl: string;
+
+  constructor(private prisma: PrismaService,
+    private configService: ConfigService
+  ) {
+    this.baseUrl = this.configService.get('BASE_URL') || 'http://localhost:3000';
+  }
 
   // --- Métodos CRUD Existentes ---
   async create(createProductDto: CreateProductDto): Promise<PrismaProduct> {

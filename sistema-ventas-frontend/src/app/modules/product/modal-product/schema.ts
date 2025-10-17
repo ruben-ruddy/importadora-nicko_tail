@@ -32,7 +32,7 @@ export const productFormFields=(catalogs: any)=> {
                   key: 'descripcion',
                   label: 'Descripción',
                   type: 'text',
-                  validators: { required: true, maxLength: 50, minLength: 0 },
+                  validators: { required: true, maxLength: 300, minLength: 0 },
                 },
                 {
                   key: 'precio_venta',

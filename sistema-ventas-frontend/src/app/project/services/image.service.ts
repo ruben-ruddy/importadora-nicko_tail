@@ -1,29 +1,32 @@
 // src/app/project/services/image.service.ts
-
-import { Injectable } from '@angular/core';
+import { Injectable, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
-import { ProductCarouselItem } from '../../interfaces/product.interface'; // Para el carrusel
-// Si vas a usar interfaces para la ventana de productos, importarlas aquí
-// import { ProductListItem, ProductDetail } from '../../interfaces/product.interface'; // Ejemplo
+import { ProductCarouselItem } from '../../interfaces/product.interface';
 
 @Injectable({
   providedIn: 'root'
 })
-export class ImageService { // Considera renombrar a 'PublicProductsService' si maneja todos los productos
+export class ImageService {
+  private apiBaseUrl = 'http://localhost:3000/api';
+  private serverBaseUrl = 'http://localhost:3000';
 
-  // URLs hardcodeadas (ya que no quieres modificar environment.ts)
-  // URL base para los endpoints de la API (con '/api')
-  private apiBaseUrl = 'http://localhost:3000/api'; // Corresponde a environment.backend
-  // URL base para servir archivos estáticos (sin '/api')
-  private serverBaseUrl = 'http://localhost:3000'; // Corresponde a la baseUrl de tu ProductsService en el backend
+  constructor(
+    private http: HttpClient,
+    @Inject(PLATFORM_ID) private platformId: Object
+  ) { }
 
-  constructor(private http: HttpClient) { }
+  private isClient(): boolean {
+    return isPlatformBrowser(this.platformId);
+  }
 
-  // 1. Método para el Carrusel (ya lo tienes, ajustado para usar apiBaseUrl)
-  // Endpoint: http://localhost:3000/api/public/products/latest-images
   getLatestProductImages(): Observable<ProductCarouselItem[]> {
+    if (!this.isClient()) {
+      return of([]);
+    }
+
     const carouselApiUrl = `${this.apiBaseUrl}/public/products/latest-images`;
     console.log('ImageService (Carousel): Realizando petición a:', carouselApiUrl);
 
@@ -32,7 +35,6 @@ export class ImageService { // Considera renombrar a 'PublicProductsService' si 
       map(data => {
         const fullImageUrls = data.map(product => ({
           ...product,
-          // Prefija con serverBaseUrl, ya que el backend envía la ruta relativa para el carrusel
           imagen_url: `${this.serverBaseUrl}${product.imagen_url}`
         }));
         console.log('ImageService (Carousel): Objetos de producto con URLs de imagen completas:', fullImageUrls);
@@ -45,13 +47,15 @@ export class ImageService { // Considera renombrar a 'PublicProductsService' si 
     );
   }
 
-  // 2. Método para la Ventana de Productos (todos los productos)
-  // Endpoint: http://localhost:3000/api/public/products/all
-  getAllPublicProducts(): Observable<ProductCarouselItem[]> { // Tipado a ProductCarouselItem[] si esa es la interfaz que esperas
+  getAllPublicProducts(): Observable<ProductCarouselItem[]> {
+    if (!this.isClient()) {
+      return of([]);
+    }
+
     const allProductsApiUrl = `${this.apiBaseUrl}/public/products/all`;
     console.log('ImageService (All Products): Realizando petición a:', allProductsApiUrl);
 
-    return this.http.get<ProductCarouselItem[]>(allProductsApiUrl).pipe( // El backend ya debe enviar la URL de imagen completa
+    return this.http.get<ProductCarouselItem[]>(allProductsApiUrl).pipe(
       tap(data => console.log('ImageService (All Products): Datos recibidos:', data)),
       catchError(error => {
         console.error('ImageService (All Products): Error al obtener todos los productos:', error);
@@ -60,28 +64,28 @@ export class ImageService { // Considera renombrar a 'PublicProductsService' si 
     );
   }
 
-  // 3. Método para el Pop-up (detalle de un producto por ID)
-  // Endpoint: http://localhost:3000/api/public/products/:id
-  getPublicProductDetails(id: string): Observable<ProductCarouselItem | null> { // Tipado
+  getPublicProductDetails(id: string): Observable<ProductCarouselItem | null> {
+    if (!this.isClient()) {
+      return of(null);
+    }
+
     const productDetailApiUrl = `${this.apiBaseUrl}/public/products/${id}`;
     console.log('ImageService (Product Detail): Realizando petición a:', productDetailApiUrl);
 
-    return this.http.get<ProductCarouselItem>(productDetailApiUrl).pipe( // El backend ya debe enviar la URL de imagen completa
+    return this.http.get<ProductCarouselItem>(productDetailApiUrl).pipe(
       tap(data => console.log('ImageService (Product Detail): Datos recibidos:', data)),
       catchError(error => {
         console.error(`ImageService (Product Detail): Error al obtener producto con ID ${id}:`, error);
-        return of(null); // Retorna null o un objeto vacío en caso de error
+        return of(null);
       })
     );
   }
 
-  // 4. NUEVO MÉTODO: Obtener productos por ID de categoría
-  // Endpoint: http://localhost:3000/api/public/products/category/:categoryId
-  // O: http://localhost:3000/api/public/products?categoryId=xxx
-  // **Asegúrate de que tu backend tenga uno de estos endpoints para filtrar por categoría**
   getProductsByCategoryId(categoryId: string): Observable<ProductCarouselItem[]> {
-    // Usaremos la convención de query parameter como en discusiones anteriores,
-    // pero si tu backend usa /category/:id, ajusta esta URL.
+    if (!this.isClient()) {
+      return of([]);
+    }
+
     const categoryProductsApiUrl = `${this.apiBaseUrl}/public/products?categoryId=${categoryId}`;
     console.log('ImageService (Products by Category): Realizando petición a:', categoryProductsApiUrl);
 

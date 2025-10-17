@@ -17,8 +17,6 @@
         "build": {
           "builder": "@angular/build:application",
           "options": {
-            
-            
             "outputPath": "dist/frontend-angular",
             "index": "src/index.html",
             "browser": "src/main.ts",
@@ -37,28 +35,34 @@
               "src/styles.scss",
               "node_modules/primeicons/primeicons.css",
               "node_modules/primeflex/primeflex.css"
-              
             ],
-           
             "scripts": [],
             "server": "src/main.server.ts",
             "prerender": true,
             "ssr": {
               "entry": "server.ts"
-            }
+            },
+            "allowedCommonJsDependencies": [
+              "core-js",
+              "@babel/runtime",
+              "raf",
+              "rgbcolor",
+              "html2canvas",
+              "canvg"
+            ]
           },
           "configurations": {
             "production": {
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
+                  "maximumWarning": "2mb",
+                  "maximumError": "3mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "2kB",
-                  "maximumError": "4kB"
+                  "maximumWarning": "6kb",
+                  "maximumError": "10kb"
                 }
               ],
               "outputHashing": "all"
@@ -66,7 +70,15 @@
             "development": {
               "optimization": false,
               "extractLicenses": false,
-              "sourceMap": true
+              "sourceMap": true,
+              "allowedCommonJsDependencies": [
+                "core-js",
+                "@babel/runtime",
+                "raf",
+                "rgbcolor",
+                "html2canvas",
+                "canvg"
+              ]
             }
           },
           "defaultConfiguration": "production"
@@ -102,11 +114,10 @@
               }
             ],
             "styles": [
-                 "node_modules/primeicons/primeicons.css",                          
-                 "node_modules/primeflex/primeflex.css",                            
-                 "src/styles.scss" 
-              ],
-
+              "node_modules/primeicons/primeicons.css",
+              "node_modules/primeflex/primeflex.css",
+              "src/styles.scss"
+            ],
             "scripts": []
           }
         }
@@ -115,31 +126,5 @@
   },
   "cli": {
     "analytics": "b03795b1-0fb1-4d0e-b0ce-52fe3fcfec8c"
-  },
-  "schematics": {
-    "@schematics/angular:component": {
-      "type": "component"
-    },
-    "@schematics/angular:directive": {
-      "type": "directive"
-    },
-    "@schematics/angular:service": {
-      "type": "service"
-    },
-    "@schematics/angular:guard": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:interceptor": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:module": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:pipe": {
-      "typeSeparator": "."
-    },
-    "@schematics/angular:resolver": {
-      "typeSeparator": "."
-    }
   }
 }

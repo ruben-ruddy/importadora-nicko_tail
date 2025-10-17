@@ -1,9 +1,8 @@
-<!-- //sistema-ventas-frontend/src/app/modules/forecast/forecast.component.html -->
 <div class="min-h-screen bg-gray-50 p-4">
   <div class="max-w-7xl mx-auto">
     <!-- Header -->
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h1 class="text-3xl font-bold text-gray-800 mb-2">Pronóstico de Ventas</h1>
+      <h1 class="text-3xl font-bold text-gray-800 mb-2">Pronóstico de Ventas Mensuales</h1>
       <p class="text-gray-600">Analiza tendencias y genera predicciones para tu negocio usando el método de promedio móvil</p>
     </div>
 
@@ -61,100 +60,199 @@
     }
 
     <!-- Configuración Tab -->
-    @if (activeTab === 'config' && !loading) {
-    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 class="text-xl font-semibold mb-4 text-gray-800">Configuración del Pronóstico</h2>
+@if (activeTab === 'config' && !loading) {
+<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800">Configuración del Pronóstico</h2>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <!-- Período de análisis -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Período de Análisis</label>
-          <select [(ngModel)]="forecastRequest.periodo" (change)="loadHistoricalData()"
-            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-            <option value="diario">Diario</option>
-            <option value="semanal">Semanal</option>
-            <option value="mensual">Mensual</option>
-          </select>
-          <p class="mt-1 text-sm text-gray-500">Selecciona cómo quieres agrupar tus datos de ventas</p>
-        </div>
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <!-- Período de análisis -->
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Período de Análisis</label>
+      <select [(ngModel)]="forecastRequest.periodo" (change)="loadHistoricalData()"
+        class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <option value="mensual">Mensual</option>
+      </select>
+      <p class="mt-1 text-sm text-gray-500">Los pronósticos se generan únicamente para períodos mensuales</p>
+    </div>
 
-        <!-- Fechas -->
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Inicio</label>
-            <input type="date" [(ngModel)]="forecastRequest.fecha_inicio" (change)="loadHistoricalData()"
-              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Fin</label>
-            <input type="date" [(ngModel)]="forecastRequest.fecha_fin" (change)="loadHistoricalData()"
-              class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-          </div>
-        </div>
-
-        <!-- Parámetros del promedio móvil -->
-        <div class="bg-blue-50 p-4 rounded-lg">
-          <h3 class="text-lg font-medium text-blue-800 mb-3">Parámetros del Promedio Móvil</h3>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Períodos a Pronosticar</label>
-              <input type="number" [(ngModel)]="forecastRequest.parametros.periodos" min="1" max="24"
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <p class="mt-1 text-sm text-gray-500">Número de períodos futuros a predecir</p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Tamaño de Ventana</label>
-              <input type="number" [(ngModel)]="forecastRequest.parametros.ventana" min="2" max="12"
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <p class="mt-1 text-sm text-gray-500">Número de períodos para calcular el promedio</p>
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Factor de Suavizado (Alpha)</label>
-              <input type="number" [(ngModel)]="forecastRequest.parametros.alpha" min="0.1" max="1" step="0.1"
-                class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
-              <p class="mt-1 text-sm text-gray-500">Valor entre 0.1 y 1.0 para el suavizado exponencial</p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Estadísticas -->
-        <div class="bg-gray-50 p-4 rounded-lg">
-          <h3 class="text-lg font-medium text-gray-800 mb-3">Resumen de Datos Históricos</h3>
-          
-          <div class="grid grid-cols-2 gap-4">
-            <div>
-              <h4 class="text-sm font-medium text-gray-600">Total Ventas</h4>
-              <p class="text-2xl font-bold text-gray-800">{{ formatCurrency(totalSales) }}</p>
-            </div>
-            <div>
-              <h4 class="text-sm font-medium text-gray-600">Promedio por Período</h4>
-              <p class="text-2xl font-bold text-gray-800">{{ formatCurrency(averageSales) }}</p>
-            </div>
-            <div>
-              <h4 class="text-sm font-medium text-gray-600">Tasa de Crecimiento</h4>
-              <p class="text-2xl font-bold" [class]="growthRate >= 0 ? 'text-green-600' : 'text-red-600'">
-                {{ growthRate >= 0 ? '+' : '' }}{{ growthRate.toFixed(1) }}%
-              </p>
-            </div>
-            <div>
-              <h4 class="text-sm font-medium text-gray-600">Períodos Analizados</h4>
-              <p class="text-2xl font-bold text-gray-800">{{ historicalData.length }}</p>
-            </div>
-          </div>
-        </div>
+    <!-- Fechas -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Inicio</label>
+        <input type="month" [(ngModel)]="forecastRequest.fecha_inicio" (change)="loadHistoricalData()"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <p class="mt-1 text-sm text-gray-500">Mes inicial para el análisis histórico</p>
       </div>
 
-      <!-- Botón Generar -->
-      <button (click)="generateForecast()" [disabled]="historicalData.length === 0"
-        class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition duration-200">
-        {{ historicalData.length === 0 ? 'Cargando datos...' : 'Generar Pronóstico' }}
-      </button>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Fecha Fin</label>
+        <input type="month" [(ngModel)]="forecastRequest.fecha_fin" (change)="loadHistoricalData()"
+          class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+        <p class="mt-1 text-sm text-gray-500">Mes final para el análisis histórico</p>
+      </div>
     </div>
+
+    <!-- Parámetros del promedio móvil -->
+    <div class="bg-blue-50 p-4 rounded-lg md:col-span-2">
+      <h3 class="text-lg font-medium text-blue-800 mb-3">Parámetros del Promedio Móvil</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Meses a Pronosticar</label>
+          <input type="number" [(ngModel)]="forecastRequest.parametros.periodos" min="1" max="12"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <p class="mt-1 text-sm text-gray-500">Número de meses futuros a predecir (1-12)</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Tamaño de Ventana</label>
+          <input type="number" [(ngModel)]="forecastRequest.parametros.ventana" min="2" max="6"
+            (change)="updateRecommendations()"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <p class="mt-1 text-sm text-gray-500">Meses anteriores para calcular el promedio (2-6)</p>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Factor de Suavizado (Alpha)</label>
+          <input type="number" [(ngModel)]="forecastRequest.parametros.alpha" min="0.1" max="1" step="0.1"
+            (change)="updateRecommendations()"
+            class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+          <p class="mt-1 text-sm text-gray-500">Peso dado a datos recientes vs históricos (0.1-1.0)</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Estadísticas -->
+    <div class="bg-gray-50 p-4 rounded-lg md:col-span-2">
+      <h3 class="text-lg font-medium text-gray-800 mb-3">Resumen de Datos Históricos</h3>
+      
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="text-center">
+          <h4 class="text-sm font-medium text-gray-600">Total Ventas</h4>
+          <p class="text-2xl font-bold text-gray-800">{{ formatCurrency(totalSales) }}</p>
+          <p class="text-xs text-gray-500">Suma total de ventas</p>
+        </div>
+        <div class="text-center">
+          <h4 class="text-sm font-medium text-gray-600">Promedio Mensual</h4>
+          <p class="text-2xl font-bold text-gray-800">{{ formatCurrency(averageSales) }}</p>
+          <p class="text-xs text-gray-500">Promedio por mes</p>
+        </div>
+        <div class="text-center">
+          <h4 class="text-sm font-medium text-gray-600">Tasa de Crecimiento</h4>
+          <p class="text-2xl font-bold" [class]="growthRate >= 0 ? 'text-green-600' : 'text-red-600'">
+            {{ growthRate >= 0 ? '+' : '' }}{{ growthRate.toFixed(1) }}%
+          </p>
+          <p class="text-xs text-gray-500">Crecimiento mensual</p>
+        </div>
+        <div class="text-center">
+          <h4 class="text-sm font-medium text-gray-600">Meses Analizados</h4>
+          <p class="text-2xl font-bold text-gray-800">{{ historicalData.length }}</p>
+          <p class="text-xs text-gray-500">Períodos disponibles</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NUEVA SECCIÓN: Gráfico de Ventas Históricas y Recomendaciones -->
+  @if (historicalData.length > 0) {
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+    
+    <!-- Gráfico de Ventas Históricas -->
+    <div class="bg-white border border-gray-200 rounded-lg p-4">
+      <h3 class="text-lg font-medium text-gray-800 mb-4">Tendencia de Ventas Históricas</h3>
+      <div class="h-64">
+        <canvas baseChart [type]="historicalChartType" [data]="historicalChartData" 
+                [options]="historicalChartOptions"></canvas>
+      </div>
+      <div class="mt-3 text-sm text-gray-600">
+        <p><strong>Patrón detectado:</strong> {{ getSalesPattern() }}</p>
+        <p><strong>Volatilidad:</strong> {{ getVolatilityLevel() }}</p>
+      </div>
+    </div>
+
+    <!-- Recomendaciones de Parámetros -->
+    <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+      <h3 class="text-lg font-medium text-yellow-800 mb-3">Recomendaciones de Configuración</h3>
+      
+      <div class="space-y-3">
+        <!-- Recomendación para Ventana -->
+        <div class="bg-white p-3 rounded border">
+          <h4 class="font-medium text-gray-800 mb-2">📊 Tamaño de Ventana</h4>
+          <p class="text-sm text-gray-700 mb-2">{{ getWindowRecommendation() }}</p>
+          <div class="text-xs text-gray-500">
+            <p><strong>Ventana pequeña (2-3):</strong> Mejor para cambios rápidos</p>
+            <p><strong>Ventana grande (4-6):</strong> Mejor para tendencias estables</p>
+          </div>
+        </div>
+
+        <!-- Recomendación para Alpha -->
+        <div class="bg-white p-3 rounded border">
+          <h4 class="font-medium text-gray-800 mb-2">🎯 Factor de Suavizado (Alpha)</h4>
+          <p class="text-sm text-gray-700 mb-2">{{ getAlphaRecommendation() }}</p>
+          <div class="text-xs text-gray-500">
+            <p><strong>Alpha alto (0.7-1.0):</strong> Responde rápido a cambios recientes</p>
+            <p><strong>Alpha bajo (0.1-0.3):</strong> Suaviza mejor el ruido en los datos</p>
+          </div>
+        </div>
+
+        <!-- Resumen de Recomendación -->
+        <div class="bg-blue-50 p-3 rounded border border-blue-200">
+          <h4 class="font-medium text-blue-800 mb-1">💡 Recomendación Actual</h4>
+          <p class="text-sm text-blue-700">{{ getCurrentRecommendation() }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- Información del método -->
+  <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+    <h3 class="text-lg font-medium text-blue-800 mb-2">¿Cómo funciona el Promedio Móvil?</h3>
+    <p class="text-sm text-blue-700 mb-3">
+      El método de promedio móvil calcula las predicciones futuras basándose en el promedio de los meses anteriores. 
+      El <strong>factor de suavizado (alpha)</strong> determina qué tanto peso se le da a los datos más recientes vs los históricos. 
+      Un alpha más alto (cercano a 1.0) da más importancia a los datos recientes.
+    </p>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+      <div>
+        <h4 class="font-medium text-blue-800 mb-1">¿Cuándo aumentar la VENTANA?</h4>
+        <ul class="text-blue-700 list-disc list-inside space-y-1">
+          <li>Ventas muy estables sin cambios bruscos</li>
+          <li>Patrones estacionales claros</li>
+          <li>Quieres pronósticos más conservadores</li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="font-medium text-blue-800 mb-1">¿Cuándo aumentar el ALPHA?</h4>
+        <ul class="text-blue-700 list-disc list-inside space-y-1">
+          <li>Cambios recientes importantes en ventas</li>
+          <li>Patrones que están evolucionando</li>
+          <li>Quieres que el modelo responda rápido a tendencias nuevas</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Botón Generar -->
+  <button (click)="generateForecast()" [disabled]="historicalData.length === 0 || loading"
+    class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white font-semibold py-3 px-4 rounded-lg transition duration-200 flex items-center justify-center">
+    @if (loading) {
+    <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
     }
+    {{ historicalData.length === 0 ? 'Cargando datos...' : (loading ? 'Generando pronóstico...' : 'Generar Pronóstico') }}
+  </button>
+
+  @if (historicalData.length > 0) {
+  <p class="text-center text-sm text-gray-500 mt-2">
+    {{ historicalData.length }} meses de datos listos para análisis
+  </p>
+  }
+</div>
+}
 
     <!-- Resultados Tab -->
     @if (activeTab === 'results' && forecastResults.length > 0) {
@@ -162,12 +260,18 @@
       <div class="flex justify-between items-center mb-6">
         <h2 class="text-xl font-semibold text-gray-800">Resultados del Pronóstico - Promedio Móvil</h2>
         <div class="flex space-x-2">
-          <button (click)="exportToCSV()"
-            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm">
+          <!-- <button (click)="exportToCSV()"
+            class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg text-sm flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
             Exportar CSV
-          </button>
+          </button> -->
           <button (click)="exportStructuredPDF()"
-            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm">
+            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg text-sm flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
             Exportar PDF
           </button>
         </div>
@@ -176,7 +280,7 @@
       <!-- Métricas del Modelo -->
       <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
         <div class="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-          <h4 class="text-sm font-medium text-gray-600 mb-1">Precisión</h4>
+          <h4 class="text-sm font-medium text-gray-600 mb-1">Precisión General</h4>
           <p class="text-2xl font-bold" [class]="getPrecisionClass(forecastMetrics.accuracy)">
             {{ forecastMetrics.accuracy.toFixed(1) }}%
           </p>
@@ -210,14 +314,15 @@
         <table class="min-w-full divide-y divide-gray-200">
           <thead class="bg-gray-50">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mes</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ventas Previstas</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Intervalo de Confianza</th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precisión</th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Notas</th>
             </tr>
           </thead>
           <tbody class="bg-white divide-y divide-gray-200">
-            @for (result of forecastResults; track result.fecha) {
+            @for (result of forecastResults; track result.fecha; let i = $index) {
             <tr>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ result.fecha }}</td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ formatCurrency(result.ventas_previstas) }}</td>
@@ -229,31 +334,166 @@
                   {{ result.metrica_precision ? (result.metrica_precision.toFixed(1) + '%') : 'N/A' }}
                 </span>
               </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                @if (i === 0) {
+                <span class="text-green-600">Más confiable</span>
+                } @else if (i === forecastResults.length - 1) {
+                <span class="text-orange-600">Menos confiable</span>
+                }
+              </td>
             </tr>
             }
           </tbody>
         </table>
       </div>
+
+      <!-- Información adicional -->
+      <div class="mt-6 p-4 bg-blue-50 rounded-lg">
+        <h3 class="text-lg font-medium text-blue-800 mb-2">Interpretación de Resultados</h3>
+        <ul class="text-sm text-blue-700 space-y-1">
+          <li>• <strong>Intervalo de confianza:</strong> Rango donde se espera que caigan las ventas reales (95% de probabilidad)</li>
+          <li>• <strong>Precisión por mes:</strong> La confiabilidad disminuye para meses más futuros</li>
+          <li>• <strong>Error MAPE:</strong> Error porcentual promedio - valores menores indican mejor precisión</li>
+        </ul>
+      </div>
     </div>
     }
+
+    <!-- Sección de Recomendaciones Inteligentes -->
+@if (activeTab === 'results' && forecastResults.length > 0) {
+<div class="bg-white rounded-lg shadow-md p-6 mb-6">
+  <h2 class="text-xl font-semibold mb-4 text-gray-800">📊 Recomendaciones para Tu Negocio</h2>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    
+    <!-- Tarjeta de Evaluación del Modelo -->
+    <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-5">
+      <h3 class="text-lg font-semibold text-blue-800 mb-3">🎯 Evaluación del Modelo</h3>
+      
+      <div class="space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-gray-700">Precisión General:</span>
+          <span [class]="getPrecisionBadgeClass(forecastMetrics.accuracy)" 
+                class="px-2 py-1 rounded-full text-xs font-bold">
+            {{ forecastMetrics.accuracy.toFixed(1) }}%
+          </span>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-gray-700">Nivel de Confianza:</span>
+          <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-bold">
+            {{ getConfidenceLevel() }}
+          </span>
+        </div>
+        
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-gray-700">Calificación:</span>
+          <span class="px-2 py-1 bg-purple-100 text-purple-800 rounded-full text-xs font-bold">
+            {{ getModelGrade() }}
+          </span>
+        </div>
+      </div>
+      
+      <div class="mt-4 p-3 bg-white rounded border">
+        <p class="text-sm text-gray-700">{{ getModelEvaluation() }}</p>
+      </div>
+    </div>
+
+    <!-- Tarjeta de Recomendaciones de Negocio -->
+    <div class="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-lg p-5">
+      <h3 class="text-lg font-semibold text-green-800 mb-3">💼 Recomendaciones de Acción</h3>
+      
+      <div class="space-y-3">
+        @for (recommendation of getBusinessRecommendations(); track recommendation; let i = $index) {
+        <div class="flex items-start space-x-2">
+          <span [class]="getRecommendationIconClass(i)" class="flex-shrink-0 mt-0.5"></span>
+          <p class="text-sm text-gray-700">{{ recommendation }}</p>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Tarjeta de Planificación Financiera -->
+    <div class="bg-gradient-to-r from-orange-50 to-amber-50 border border-orange-200 rounded-lg p-5">
+      <h3 class="text-lg font-semibold text-orange-800 mb-3">💰 Planificación Financiera</h3>
+      
+      <div class="space-y-4">
+        <div>
+          <h4 class="font-medium text-gray-800 mb-2">Presupuesto Recomendado</h4>
+          <div class="grid grid-cols-2 gap-2 text-sm">
+            <div class="text-center p-2 bg-white rounded border">
+              <div class="text-xs text-gray-500">Mínimo Esperado</div>
+              <div class="font-bold text-blue-600">{{ formatCurrency(getMinimumExpectedRevenue()) }}</div>
+            </div>
+            <div class="text-center p-2 bg-white rounded border">
+              <div class="text-xs text-gray-500">Máximo Esperado</div>
+              <div class="font-bold text-green-600">{{ formatCurrency(getMaximumExpectedRevenue()) }}</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="p-3 bg-white rounded border">
+          <p class="text-sm text-gray-700">{{ getBudgetRecommendation() }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tarjeta de Alertas y Consideraciones -->
+    <div class="bg-gradient-to-r from-yellow-50 to-amber-50 border border-yellow-200 rounded-lg p-5">
+      <h3 class="text-lg font-semibold text-yellow-800 mb-3">⚠️ Consideraciones Importantes</h3>
+      
+      <div class="space-y-3">
+        @for (consideration of getImportantConsiderations(); track consideration; let i = $index) {
+        <div class="flex items-start space-x-2">
+          <span class="flex-shrink-0 mt-0.5 text-yellow-600">•</span>
+          <p class="text-sm text-gray-700">{{ consideration }}</p>
+        </div>
+        }
+      </div>
+      
+      <!-- Indicador de Riesgo -->
+      <div class="mt-4 p-3 bg-white rounded border">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-700">Nivel de Riesgo:</span>
+          <span [class]="getRiskLevelClass()" class="px-2 py-1 rounded-full text-xs font-bold">
+            {{ getRiskLevel() }}
+          </span>
+        </div>
+        <p class="text-xs text-gray-600">{{ getRiskExplanation() }}</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Resumen Ejecutivo -->
+  <div class="mt-6 bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-lg p-5">
+    <h3 class="text-lg font-semibold text-purple-800 mb-3">📋 Resumen Ejecutivo</h3>
+    <p class="text-sm text-gray-700 leading-relaxed">{{ getExecutiveSummary() }}</p>
+  </div>
+</div>
+}
 
     <!-- Análisis de Productos Tab -->
     @if (activeTab === 'productAnalysis') {
     <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-      <h2 class="text-xl font-semibold mb-4 text-gray-800">Análisis de Productos por Fecha</h2>
+      <h2 class="text-xl font-semibold mb-4 text-gray-800">Análisis de Productos por Mes</h2>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-        <!-- Fechas con mayores ventas -->
+        <!-- Meses con mayores ventas -->
         <div class="bg-blue-50 p-4 rounded-lg">
-          <h3 class="text-lg font-medium text-blue-800 mb-3">Fechas con Mayores Ventas</h3>
+          <h3 class="text-lg font-medium text-blue-800 mb-3">Meses con Mayores Ventas</h3>
+          <p class="text-sm text-blue-700 mb-4">Haz clic en un mes para ver los productos más vendidos</p>
           
           <button (click)="loadTopSellingDates()" [disabled]="loading"
-            class="mb-4 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm">
-            {{ hasTopSellingDates ? 'Actualizar' : 'Cargar Fechas' }}
+            class="mb-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-400 text-white px-4 py-2 rounded-lg text-sm flex items-center">
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
+            </svg>
+            {{ hasTopSellingDates ? 'Actualizar Lista' : 'Cargar Meses' }}
           </button>
 
           @if (topSellingDates.length > 0) {
-          <div class="space-y-3">
+          <div class="space-y-3 max-h-96 overflow-y-auto">
             @for (date of topSellingDates; track date.fecha) {
             <div (click)="loadTopProductsForDate(date.fecha)" 
                  class="p-3 bg-white rounded-lg border border-gray-200 cursor-pointer hover:bg-blue-100 transition-colors text-black">
@@ -261,16 +501,19 @@
                 <span class="font-medium">{{ date.fecha }}</span>
                 <span class="text-green-600 font-semibold">{{ formatCurrency(date.total_ventas) }}</span>
               </div>
-              <p class="text-sm text-gray-500 mt-1">{{ date.cantidad_productos }} Productos Vendidos</p>
+              <div class="flex justify-between text-sm text-gray-500 mt-1">
+                <span>{{ date.cantidad_transacciones }} transacciones</span>
+                <span>{{ date.cantidad_productos }} productos</span>
+              </div>
             </div>
             }
           </div>
-          } @else {
-          <p class="text-gray-500 italic">Haz clic en "Cargar Fechas" para ver las fechas con mayores ventas</p>
+          } @else if (!loading) {
+          <p class="text-gray-500 italic text-center py-4">Haz clic en "Cargar Meses" para ver los meses con mayores ventas</p>
           }
         </div>
 
-        <!-- Productos de fecha seleccionada -->
+        <!-- Productos del mes seleccionado -->
         <div class="bg-green-50 p-4 rounded-lg">
           <h3 class="text-lg font-medium text-green-800 mb-3">
             Productos más vendidos 
@@ -285,33 +528,48 @@
             <p class="mt-2 text-gray-600">Cargando productos...</p>
           </div>
           } @else if (selectedDateProducts.length > 0) {
-          <div class="bg-white p-4 rounded-lg">
-            <canvas baseChart [type]="productsChartType" [data]="productsChartData" [options]="productsChartOptions"
-              class="w-full h-64 mb-4"></canvas>
+          <div class="space-y-4">
+            <!-- Gráfico -->
+            <div class="bg-white p-4 rounded-lg">
+              <canvas baseChart [type]="productsChartType" [data]="productsChartData" [options]="productsChartOptions"
+                class="w-full h-48"></canvas>
+            </div>
             
-            <div class="overflow-x-auto">
-              <table class="min-w-full divide-y divide-gray-200">
-                <thead class="bg-gray-50">
-                  <tr>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
-                    <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ingresos</th>
-                  </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200">
-                  @for (product of selectedDateProducts; track product.producto_id; let i = $index) {
-                  <tr [class]="i < 3 ? 'bg-green-50' : ''">
-                    <td class="px-4 py-2 text-sm font-medium text-gray-900">{{ product.producto_nombre }}</td>
-                    <td class="px-4 py-2 text-sm text-gray-900">{{ product.cantidad_vendida }}</td>
-                    <td class="px-4 py-2 text-sm text-green-600 font-semibold">{{ formatCurrency(product.ingresos_totales) }}</td>
-                  </tr>
-                  }
-                </tbody>
-              </table>
+            <!-- Lista de productos -->
+            <div class="bg-white rounded-lg border border-gray-200">
+              <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Producto</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Cantidad</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ingresos</th>
+                      <th class="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">% del Total</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-gray-200">
+                    @for (product of selectedDateProducts; track product.producto_id; let i = $index) {
+                    <tr [class]="i < 3 ? 'bg-green-50' : ''">
+                      <td class="px-4 py-2 text-sm font-medium text-gray-900">
+                        <div class="max-w-xs truncate" [title]="product.producto_nombre">
+                          {{ product.producto_nombre }}
+                        </div>
+                        <div class="text-xs text-gray-500">{{ product.categoria }}</div>
+                      </td>
+                      <td class="px-4 py-2 text-sm text-gray-900">{{ product.cantidad_vendida }}</td>
+                      <td class="px-4 py-2 text-sm text-green-600 font-semibold">{{ formatCurrency(product.ingresos_totales) }}</td>
+                      <td class="px-4 py-2 text-sm text-blue-600">{{ product.porcentaje_del_total.toFixed(1) }}%</td>
+                    </tr>
+                    }
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
+          } @else if (selectedDateForAnalysis && !productsLoading) {
+          <p class="text-gray-500 italic text-center py-8">No se encontraron productos para este mes</p>
           } @else {
-          <p class="text-gray-500 italic">Selecciona una fecha para ver los productos más vendidos</p>
+          <p class="text-gray-500 italic text-center py-8">Selecciona un mes para ver los productos más vendidos</p>
           }
         </div>
       </div>

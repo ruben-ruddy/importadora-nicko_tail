@@ -5,16 +5,19 @@ import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
+import { ConfigService } from '@nestjs/config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
+  const configService = app.get(ConfigService);
   
   app.useStaticAssets(join(__dirname, '..', 'uploads'), {
     prefix: '/uploads/',
   });
 
   app.enableCors({
-    origin: '*',
+    //origin: '*',
+    origin: configService.get('FRONTEND_URL') || 'http://localhost:4200',
     methods: '*',
     allowedHeaders: '*',
     credentials: true,

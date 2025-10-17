@@ -13,54 +13,54 @@ import { ForecastResponse } from './interfaces/forecast.interface';
 export class ForecastController {
   constructor(private readonly forecastService: ForecastService) {}
 
-@Post()
-@UsePipes(new ValidationPipe({ transform: true }))
-@ApiOperation({ summary: 'Generar pronóstico de ventas con promedio móvil' })
-@ApiBody({ type: ForecastRequestDto })
-@ApiResponse({ 
-  status: 201, 
-  description: 'Pronóstico generado exitosamente',
-  schema: {
-    example: {
-      results: [
-        {
-          fecha: '2024-01-01',
-          ventas_previstas: 10000,
-          intervalo_confianza: { inferior: 8000, superior: 12000 },
-          metrica_precision: 85
+  @Post()
+  @UsePipes(new ValidationPipe({ transform: true }))
+  @ApiOperation({ summary: 'Generar pronóstico de ventas con promedio móvil' })
+  @ApiBody({ type: ForecastRequestDto })
+  @ApiResponse({ 
+    status: 201, 
+    description: 'Pronóstico generado exitosamente',
+    schema: {
+      example: {
+        results: [
+          {
+            fecha: '2024-01-01',
+            ventas_previstas: 10000,
+            intervalo_confianza: { inferior: 8000, superior: 12000 },
+            metrica_precision: 85
+          }
+        ],
+        metrics: {
+          mape: 12.5,
+          mae: 1250,
+          rmse: 1500,
+          accuracy: 87.5
+        },
+        model_info: {
+          type: 'moving_average',
+          window_size: 3,
+          alpha: 0.3,
+          periods: 6
         }
-      ],
-      metrics: {
-        mape: 12.5,
-        mae: 1250,
-        rmse: 1500,
-        accuracy: 87.5
-      },
-      model_info: {
-        type: 'moving_average',
-        window_size: 3,
-        alpha: 0.3,
-        periods: 6
       }
     }
+  })
+  @ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
+  @ApiResponse({ status: 404, description: 'No se encontraron datos históricos' })
+  async createForecast(@Body() forecastRequest: ForecastRequestDto): Promise<ForecastResponse> {
+    return this.forecastService.generateForecast(forecastRequest);
   }
-})
-@ApiResponse({ status: 400, description: 'Datos de entrada inválidos' })
-@ApiResponse({ status: 404, description: 'No se encontraron datos históricos' })
-async createForecast(@Body() forecastRequest: ForecastRequestDto): Promise<ForecastResponse> {
-  return this.forecastService.generateForecast(forecastRequest);
-}
 
   @Get('history')
   @UsePipes(new ValidationPipe({ transform: true }))
-  @ApiOperation({ summary: 'Obtener historial de ventas' })
+  @ApiOperation({ summary: 'Obtener historial de ventas mensual' })
   @ApiResponse({ status: 200, description: 'Historial obtenido exitosamente' })
   @ApiResponse({ status: 400, description: 'Parámetros de consulta inválidos' })
   async getSalesHistory(@Query() query: HistoryQueryDto) {
     return this.forecastService.getSalesHistory(query);
   }
 
-      @Get('top-dates')
+  @Get('top-dates')
   @UsePipes(new ValidationPipe({ 
     transform: true,
     exceptionFactory: (errors) => {
@@ -73,8 +73,8 @@ async createForecast(@Body() forecastRequest: ForecastRequestDto): Promise<Forec
       });
     }
   }))
-  @ApiOperation({ summary: 'Obtener fechas con mayores ventas' })
-  @ApiResponse({ status: 200, description: 'Fechas con mayores ventas obtenidas exitosamente' })
+  @ApiOperation({ summary: 'Obtener meses con mayores ventas' })
+  @ApiResponse({ status: 200, description: 'Meses con mayores ventas obtenidos exitosamente' })
   @ApiResponse({ status: 400, description: 'Parámetros de consulta inválidos' })
   async getTopSellingDates(@Query() query: TopDatesQueryDto) {
     try {
@@ -83,6 +83,54 @@ async createForecast(@Body() forecastRequest: ForecastRequestDto): Promise<Forec
       return await this.forecastService.getTopSellingDates(query);
     } catch (error) {
       throw new BadRequestException(error.message);
+    }
+  }
+
+  @Get('top-products/:date')
+  @UsePipes(new ValidationPipe({ 
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: false
+  }))
+  @ApiOperation({ summary: 'Obtener productos más vendidos en un mes específico' })
+  @ApiParam({ 
+    name: 'date', 
+    description: 'Mes en formato YYYY-MM (ej: 2024-01)' 
+  })
+  @ApiResponse({ status: 200, description: 'Productos más vendidos obtenidos exitosamente' })
+  @ApiResponse({ status: 400, description: 'Parámetros de consulta inválidos' })
+  @ApiResponse({ status: 404, description: 'No se encontraron ventas para el mes especificado' })
+  async getTopProductsByDate(
+    @Param('date') date: string,
+    @Query() query: TopProductsQueryDto
+  ) {
+    try {
+      console.log('📊 Received month from URL:', date);
+      console.log('📊 Query params:', query);
+      
+      // Validación básica del mes
+      if (!date || date.trim() === '') {
+        throw new BadRequestException('El mes no puede estar vacío');
+      }
+
+      // Validar formato YYYY-MM
+      if (!/^\d{4}-\d{2}$/.test(date)) {
+        throw new BadRequestException('Formato de mes inválido. Use YYYY-MM (ej: 2024-01)');
+      }
+
+      return await this.forecastService.getTopProductsByDate(date, query.limit || 10);
+    } catch (error) {
+      console.error('❌ Controller error:', error);
+      
+      if (error instanceof BadRequestException) {
+        throw error;
+      }
+      
+      throw new BadRequestException({
+        message: 'Error al procesar la solicitud',
+        details: error.message,
+        receivedDate: date
+      });
     }
   }
 
@@ -98,69 +146,4 @@ async createForecast(@Body() forecastRequest: ForecastRequestDto): Promise<Forec
       throw new Error('La fecha de inicio no puede ser mayor que la fecha de fin');
     }
   }
-
-
-@Get('top-products/:date')
-@UsePipes(new ValidationPipe({ 
-  transform: true,
-  whitelist: true,
-  forbidNonWhitelisted: false
-}))
-@ApiOperation({ summary: 'Obtener productos más vendidos en una fecha específica' })
-@ApiParam({ 
-  name: 'date', 
-  description: 'Fecha en formato YYYY-MM-DD (día), YYYY-MM (mes), o YYYY-WXX (semana)' 
-})
-@ApiResponse({ status: 200, description: 'Productos más vendidos obtenidos exitosamente' })
-@ApiResponse({ status: 400, description: 'Parámetros de consulta inválidos' })
-@ApiResponse({ status: 404, description: 'No se encontraron ventas para la fecha especificada' })
-async getTopProductsByDate(
-  @Param('date') date: string, // ← Este viene de la URL
-  @Query() query: TopProductsQueryDto // ← Este solo tiene 'limit'
-) {
-  try {
-    console.log('📍 Received date from URL:', date);
-    console.log('📍 Query params:', query);
-    
-    // Validación básica de la fecha
-    if (!date || date.trim() === '') {
-      throw new BadRequestException('La fecha no puede estar vacía');
-    }
-
-    return await this.forecastService.getTopProductsByDate(date, query.limit || 10);
-  } catch (error) {
-    console.error('❌ Controller error:', error);
-    
-    if (error instanceof BadRequestException) {
-      throw error;
-    }
-    
-    throw new BadRequestException({
-      message: 'Error al procesar la solicitud',
-      details: error.message,
-      receivedDate: date
-    });
-  }
-}
-
-
-private validateDateFormat(date: string) {
-  // Permitir diferentes formatos: YYYY-MM-DD, YYYY-MM, YYYY-WXX
-  const dateRegex = /^\d{4}-(?:[0-1][0-9]|W[0-5][0-9])$/;
-  const dateDayRegex = /^\d{4}-[0-1][0-9]-[0-3][0-9]$/;
-  
-  if (!dateDayRegex.test(date) && !dateRegex.test(date)) {
-    throw new Error('Formato de fecha inválido. Use YYYY-MM-DD, YYYY-MM, o YYYY-WXX');
-  }
-}
-
-@Post('validate')
-@ApiOperation({ summary: 'Validar precisión del modelo con datos históricos' })
-async validateModel(@Body() forecastRequest: ForecastRequestDto) {
-  try {
-    return await this.forecastService.validateForecastModel(forecastRequest);
-  } catch (error) {
-    throw new BadRequestException(error.message);
-  }
-}
 }

@@ -2,31 +2,29 @@ import { IsString, IsOptional, IsNumber, ValidateNested, IsIn, Min, Max } from '
 import { Type } from 'class-transformer';
 
 class ForecastParameters {
-  @IsOptional()
   @IsNumber()
   @Min(1)
-  periodos?: number = 6;
+  @Max(12)
+  periodos: number; 
   
-  @IsOptional()
   @IsNumber()
   @Min(2)
-  @Max(12)
-  ventana?: number = 3;
+  @Max(6)
+  ventana: number; 
   
-  @IsOptional()
   @IsNumber()
   @Min(0.1)
   @Max(1.0)
-  alpha?: number = 0.3;
+  alpha: number; 
 }
 
 export class ForecastRequestDto {
   @IsString()
-  @IsIn(['promedio_movil']) // Solo permitimos promedio móvil
+  @IsIn(['promedio_movil'])
   metodo: string;
 
   @IsString()
-  @IsIn(['diario', 'semanal', 'mensual'])
+  @IsIn(['mensual']) // ✅ Solo mensual
   periodo: string;
 
   @IsString()
@@ -35,8 +33,7 @@ export class ForecastRequestDto {
   @IsString()
   fecha_fin: string;
 
-  @IsOptional()
   @ValidateNested()
   @Type(() => ForecastParameters)
-  parametros?: ForecastParameters;
+  parametros: ForecastParameters; // ✅ Ahora es obligatorio
 }

@@ -1,6 +1,6 @@
 // src/app/modules/home/home-categories/home-categories.component.ts
-
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
@@ -8,7 +8,7 @@ import { RouterModule, Router } from '@angular/router';
 import { environment } from '../../../../environments/environment';
 
 import { CategoriesService } from './home-categories.service';
-import { Category } from '../../../interfaces/category.interface'; // Asegúrate de que esta ruta sea correcta
+import { Category } from '../../../interfaces/category.interface';
 
 import { HeaderHomeMainComponent } from "../header-home-main/header-home-main.component";
 import { FooterHomeMainComponent } from "../footer-home-main/footer-home-main.component";
@@ -30,11 +30,16 @@ export class HomeCategoriesComponent implements OnInit {
 
   constructor(
     private categoriesService: CategoriesService,
-    private router: Router
+    private router: Router,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit() {
-    this.loadCategories();
+    if (isPlatformBrowser(this.platformId)) {
+      this.loadCategories();
+    } else {
+      this.isLoading = false;
+    }
   }
 
   loadCategories() {
@@ -71,11 +76,9 @@ export class HomeCategoriesComponent implements OnInit {
     }
   }
 
-  // --- CORRECCIÓN AQUÍ: Navegar con parámetros de ruta ---
   viewProductsByCategory(categoryId: string, categoryName: string): void {
-    // Para una URL amigable, limpia el nombre de la categoría (ej. "Equipo Táctico" -> "Equipo-Tactico")
     const cleanedCategoryName = categoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
-    this.router.navigate(['/products', cleanedCategoryName, categoryId]); // <--- ¡CAMBIO AQUÍ!
+    this.router.navigate(['/products', cleanedCategoryName, categoryId]);
   }
 
   getFullImageUrl(relativeUrl: string | null | undefined): string {

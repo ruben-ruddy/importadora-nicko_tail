@@ -10,19 +10,12 @@ import { registerLocaleData } from '@angular/common';
 import { provideScReCaptchaSettings } from '@semantic-components/re-captcha';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 
-
 import { es } from 'date-fns/locale/es';
-
 import { DateFnsConfigurationService } from 'ngx-date-fns';
-
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { providePrimeNG } from 'primeng/config';
 import Lara from '@primeuix/themes/lara';
-
-// Corregimos la importación para que no use .forRoot()
-//import { RECAPTCHA_SETTINGS, RecaptchaSettings, RecaptchaModule, RecaptchaFormsModule } from 'ng-recaptcha';
 import { environment } from '../environments/environment';
-
 import localeEs from '@angular/common/locales/es';
 
 registerLocaleData(localeEs, 'es');
@@ -58,8 +51,6 @@ export const appConfig: ApplicationConfig = {
       languageCode: 'es',
     }),
 
-    // Importación de módulos que no tienen forRoot()
-    // La importación de módulos se hace por separado
     importProvidersFrom(
       TranslateModule.forRoot({
         loader: {
@@ -67,23 +58,12 @@ export const appConfig: ApplicationConfig = {
           useFactory: HttpLoaderFactory,
           deps: [HttpBackend],
         },
-        defaultLanguage: 'es'
-      }),
-      // RecaptchaModule, // Importación del módulo de reCAPTCHA
-      // RecaptchaFormsModule // Importación del módulo de formularios de reCAPTCHA
+        fallbackLang: 'es'
+      })
     ),
 
     { provide: DateFnsConfigurationService, useValue: dateFnsConfig },
-
-    // Configuración global de reCAPTCHA con el siteKey
-    // {
-    //   provide: RECAPTCHA_SETTINGS,
-    //   useValue: {
-    //     siteKey: environment.recaptcha.siteKey,
-    //   } as RecaptchaSettings,
-    // },
-    
     TranslateService,
-  provideCharts(withDefaultRegisterables())
+    provideCharts(withDefaultRegisterables())
   ]
 };

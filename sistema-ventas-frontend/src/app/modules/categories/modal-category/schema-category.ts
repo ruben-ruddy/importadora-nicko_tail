@@ -17,7 +17,7 @@ export const categoryFormFields = (catalogs: any) => {
               key: 'descripcion',
               label: 'Descripción',
               type: 'text',
-              validators: { required: true, maxLength: 100, minLength: 0 },
+              validators: { required: true, maxLength: 200, minLength: 0 },
             },
             {
               key: 'activo', // CAMPO NUEVO AÑADIDO
