@@ -121,4 +121,4 @@ export class HomeMainComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     // Cleanup
   }
-}
+}   
