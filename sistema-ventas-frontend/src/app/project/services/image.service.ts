@@ -5,13 +5,14 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
 import { map, tap, catchError } from 'rxjs/operators';
 import { ProductCarouselItem } from '../../interfaces/product.interface';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ImageService {
-  private apiBaseUrl = 'http://localhost:3000/api';
-  private serverBaseUrl = 'http://localhost:3000';
+  private apiBaseUrl = environment.apiUrl; // Usar environment.apiUrl
+  private serverBaseUrl = environment.backend_file; // Usar environment.backend_file
 
   constructor(
     private http: HttpClient,

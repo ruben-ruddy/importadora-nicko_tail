@@ -1,14 +1,19 @@
+// Importaciones de PrimeNG FIRST
 
+@import "primeicons/primeicons.css";
+@import "primeflex/primeflex.css";
+
+// Luego tus imports personalizados
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300..700&family=Montserrat:wght@500..900&display=swap');
 
-
+// Tailwind
 @layer tw {
     @tailwind base;
 }
 @tailwind components;
 @tailwind utilities;
 
-
+// Tus estilos personalizados
 .ticket-dialog .p-dialog {
   max-width: 340px !important;
   margin: 1rem auto !important;
@@ -29,14 +34,12 @@
   z-index: 10;
 }
 
-/* Permitir scroll en el dialog */
 .p-dialog-mask {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Asegurar que el contenido sea scrollable */
 .p-dialog-content {
   overflow-y: auto !important;
 }

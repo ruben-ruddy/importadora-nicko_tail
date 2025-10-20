@@ -1,4 +1,4 @@
-<!-- //sistemas-ventas-frontend/src/app/modules/home-main/home-main.component.html -->
+<!-- sistemas-ventas-frontend/src/app/modules/home-main/home-main.component.html -->
 <div class="design-container">
     <div class="design3 min-h-screen relative overflow-hidden
                  bg-gradient-to-br from-dark-blue-bg via-medium-blue-bg to-light-blue-bg">
@@ -7,85 +7,142 @@
 
         <app-header-home-main></app-header-home-main>
 
-        <section class="hero relative overflow-hidden h-[80vh] flex flex-column justify-content-center p-0
+        <section class="hero relative overflow-hidden h-[80vh] flex flex-col justify-center p-0
                 lg:h-[80vh] lg:px-5
-                md:h-[60vh] md:px-4 md:pt-8">
+                md:h-[60vh] md:px-4 md:pt-8
+                sm:h-[70vh]">
 
-            <p-carousel #carousel [value]="products" [numVisible]="1" [numScroll]="1" [autoplayInterval]="5000"
-                [circular]="true" [showIndicators]="false" [showNavigators]="false"
-                [responsiveOptions]="responsiveOptions" class="w-full h-full flex-grow-1 relative z-1">
+            <!-- Carousel Custom -->
+            <div class="carousel-container w-full h-full flex-grow relative z-10">
+                <div class="carousel-wrapper relative w-full h-full overflow-hidden">
+                    <div class="carousel-track flex transition-transform duration-500 ease-in-out h-full"
+                         [style.transform]="'translateX(-' + (currentSlide * 100) + '%)'">
+                         
+                        <div *ngFor="let product of products; let i = index" 
+                             class="carousel-slide flex-shrink-0 w-full h-full">
+                            <div class="carousel-item h-full flex flex-row items-center px-5 py-0 bg-white rounded-lg shadow-lg
+                                    lg:flex-row lg:px-5
+                                    md:flex-col md:px-3 md:py-3 md:text-center md:justify-center md:gap-4
+                                    sm:flex-col sm:px-4 sm:py-4 sm:text-center sm:justify-center sm:gap-4">
 
-                <ng-template let-product pTemplate="item">
-                    <div class="carousel-item h-full flex flex-row align-items-center px-5 py-0 surface-card border-round
-                            lg:flex-row lg:px-5
-                            md:flex-column md:px-3 md:py-3 md:text-center md:justify-content-center">
+                                <div class="carousel-content-left flex-1 flex flex-col justify-center pr-0 text-center
+                                        lg:pr-5 lg:text-left
+                                        md:w-full md:pr-0 md:mb-3 md:order-2
+                                        sm:w-full sm:pr-0 sm:mt-4 sm:order-2">
+                                    <h2 class="text-xl mb-3 text-primary-600 font-bold leading-8
+                                             lg:text-5xl 
+                                             md:text-2xl
+                                             sm:text-2xl sm:leading-8">{{ product.nombre_producto }}</h2>
+                                    <p class="text-lg text-gray-600 leading-8 mb-4
+                                         lg:text-base 
+                                         md:text-base
+                                         sm:text-sm sm:leading-6">{{ product.descripcion }}</p>
+                                </div>
 
-                        <div class="carousel-content-left flex-1 flex flex-column justify-content-center pr-0 text-white text-center
-                                lg:pr-5
-                                md:w-full md:pr-0 md:mb-3">
-                            <h2 class="text-xl mb-3 text-primary font-bold line-height-3
-                                     lg:text-5xl 
-                                     md:text-2xl">{{ product.nombre_producto }}</h2>
-                            <p class="text-lg text-gray-200 line-height-3 mb-4
-                                 lg:text-base 
-                                 md:text-sm">{{ product.descripcion }}</p>
-                        </div>
-
-                        <div class="carousel-image-right flex-1 flex justify-content-center align-items-center overflow-hidden
-                                lg:min-h-[400px]
-                                md:min-h-[250px] md:mt-3">
-                            <img [src]="product.imagen_url" [alt]="product.nombre_producto" class="w-auto h-auto max-w-full max-h-[350px] object-contain border-round
-                               lg:max-h-[300px]
-                               md:max-h-[200px]">
+                                <div class="carousel-image-right flex-1 flex justify-center items-center overflow-hidden
+                                        lg:min-h-[400px]
+                                        md:min-h-[250px] md:mt-0 md:order-1 md:w-full
+                                        sm:min-h-[200px] sm:mt-0 sm:order-1 sm:w-full">
+                                    <img [src]="product.imagen_url" [alt]="product.nombre_producto" 
+                                         class="w-auto h-auto max-w-full max-h-[350px] object-contain rounded-lg
+                                         lg:max-h-[350px]
+                                         md:max-h-[280px]
+                                         sm:max-h-[180px] sm:max-w-[90%]">
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </ng-template>
-            </p-carousel>
+                </div>
 
-            <!-- Botones de navegación DESKTOP (lados) -->
-            <button *ngIf="isDesktop" (click)="prevSlide()" pRipple class="custom-nav-button left absolute top-50% -translate-y-50% bg-primary text-white border-none w-3rem h-3rem border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
-                        lg:left-2
-                        md:left-1">
-                <i class="pi pi-angle-left text-xl"></i>
+                <!-- Indicadores - Solo mostrar en móvil -->
+                <div *ngIf="products.length > 1" class="carousel-indicators absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2 z-20
+                        lg:hidden md:hidden sm:flex">
+                    <button *ngFor="let product of products; let i = index" 
+                            (click)="goToSlide(i)"
+                            class="w-2 h-2 rounded-full transition-all duration-300"
+                            [class]="i === currentSlide ? 'bg-primary-600' : 'bg-white bg-opacity-50'">
+                    </button>
+                </div>
+            </div>
+
+            <!-- Botones de navegación DESKTOP (solo mostrar en desktop) -->
+            <button *ngIf="isDesktop && products.length > 1" 
+                    (click)="prevSlide()" 
+                    class="custom-nav-button left absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-1 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
+                            lg:left-4
+                            md:left-3
+                            hover:scale-110 active:scale-95">
+                <!-- Flecha izquierda SVG -->
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                </svg>
             </button>
 
-            <button *ngIf="isDesktop" (click)="nextSlide()" pRipple class="custom-nav-button right absolute top-50% -translate-y-50% bg-primary text-white border-none w-3rem h-3rem border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
-                        lg:right-2
-                        md:right-1">
-                <i class="pi pi-angle-right text-xl"></i>
+            <button *ngIf="isDesktop && products.length > 1" 
+                    (click)="nextSlide()" 
+                    class="custom-nav-button right absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-1 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
+                            lg:right-4
+                            md:right-3
+                            hover:scale-110 active:scale-95">
+                <!-- Flecha derecha SVG -->
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
             </button>
 
-            <!-- Botones de navegación MÓVIL (en los lados) -->
-            <button *ngIf="showMobileNav" (click)="prevSlide()" pRipple class="mobile-nav-button left absolute top-50% -translate-y-50% bg-primary text-white border-none w-10 h-10 border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
-                        md:left-2">
-                <i class="pi pi-angle-left"></i>
-            </button>
+<!-- Botones de navegación MOBILE (solo mostrar en móvil) -->
+<button *ngIf="!isDesktop && products.length > 1" 
+        (click)="prevSlide()" 
+        class="custom-nav-button left absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-1 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
+                md:left-4
+                sm:left-4
+                hover:scale-110 active:scale-95">
+    <!-- Flecha izquierda SVG -->
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+    </svg>
+</button>
 
-            <button *ngIf="showMobileNav" (click)="nextSlide()" pRipple class="mobile-nav-button right absolute top-50% -translate-y-50% bg-primary text-white border-none w-10 h-10 border-round-full flex align-items-center justify-content-center cursor-pointer z-2 transition-all shadow-3 hover:shadow-5
-                        md:right-2">
-                <i class="pi pi-angle-right"></i>
-            </button>
-
-            <!-- CTA Container responsivo -->
-            <div class="cta-container absolute left-50% -translate-x-50% bottom-3 z-3 flex gap-3 py-2 w-full justify-content-center
-                    lg:bottom-3
-                    md:bottom-4 md:flex-wrap">
-                <a routerLink="/products" routerLinkActive="active-link">
-                    <button pButton type="button" label="PRODUCTOS" icon="pi pi-box"
-                        class="p-button-rounded p-button-info" styleClass="p-button-raised p-button-rounded uppercase font-bold text-sm
-                           lg:text-sm lg:py-2
-                           md:text-xs md:py-1 md:px-2">
+<button *ngIf="!isDesktop && products.length > 1" 
+        (click)="nextSlide()" 
+        class="custom-nav-button absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-1 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
+                right-0 md:right-4 sm:right-4
+                hover:scale-110 active:scale-95">
+    <!-- Flecha derecha SVG -->
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+    </svg>
+</button>
+            
+            <div class="cta-container relative left-1/2 -translate-x-1/2 z-30 flex gap-3 py-2 w-full justify-center
+                    lg:bottom-6
+                    md:bottom-6 md:flex-wrap
+                    sm:bottom-6 sm:flex-wrap">
+                <a routerLink="/products" routerLinkActive="active-link" class="no-underline">
+                    <button type="button" class="bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-full uppercase shadow-lg hover:shadow-2xl-purple transition-all duration-300 flex items-center gap-2
+                                   text-sm py-3 px-6 
+                                   hover:-translate-y-0.5 active:translate-y-0">
+                        <!-- Icono caja SVG -->
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                        </svg>
+                        PRODUCTOS
                     </button>
                 </a>
-                <a routerLink="/categories" routerLinkActive="active-link">
-                    <button pButton type="button" label="CATEGORÍAS" icon="pi pi-tags"
-                        class="p-button-rounded p-button-info" styleClass="p-button-raised p-button-rounded uppercase font-bold text-sm
-                           lg:text-sm lg:py-2
-                           md:text-xs md:py-1 md:px-2">
+                <a routerLink="/categories" routerLinkActive="active-link" class="no-underline">
+                    <button type="button" class="bg-primary-600 hover:bg-primary-700 text-white font-bold rounded-full uppercase shadow-lg hover:shadow-2xl-purple transition-all duration-300 flex items-center gap-2
+                                   text-sm py-3 px-6 
+                                   hover:-translate-y-0.5 active:translate-y-0">
+                        <!-- Icono etiquetas SVG -->
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+                        </svg>
+                        CATEGORÍAS
                     </button>
                 </a>
             </div>
         </section>
+
     </div>
     <app-footer-home-main></app-footer-home-main>
 </div>

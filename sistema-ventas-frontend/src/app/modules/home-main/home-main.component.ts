@@ -1,14 +1,10 @@
-// src/app/modules/home-main/home-main.component.ts
-import { Component, OnInit, ViewChild, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
+// sistemas-ventas-frontend/src/app/modules/home-main/home-main.component.ts
+import { Component, OnInit, OnDestroy, HostListener, Inject, PLATFORM_ID } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { CarouselModule, Carousel } from 'primeng/carousel';
-import { ButtonModule } from 'primeng/button';
-import { RippleModule } from 'primeng/ripple';
 import { HttpClientModule } from '@angular/common/http';
 import { ImageService } from '../../project/services/image.service';
 import { ProductCarouselItem } from '../../interfaces/product.interface';
 import { RouterModule } from '@angular/router';
-import { ImageModule } from 'primeng/image';
 import { HeaderHomeMainComponent } from './header-home-main/header-home-main.component';
 import { FooterHomeMainComponent } from './footer-home-main/footer-home-main.component';
 
@@ -17,52 +13,19 @@ import { FooterHomeMainComponent } from './footer-home-main/footer-home-main.com
   standalone: true,
   imports: [
     CommonModule,
-    CarouselModule,
-    ButtonModule,
-    RippleModule,
     HttpClientModule,
     HeaderHomeMainComponent,
     FooterHomeMainComponent,
-    RouterModule,
-    ImageModule
+    RouterModule
   ],
   templateUrl: './home-main.component.html',
   styleUrl: './home-main.component.scss'
 })
 export class HomeMainComponent implements OnInit, OnDestroy {
-  @ViewChild('carousel') carousel!: Carousel;
-
   products: ProductCarouselItem[] = [];
   isDesktop: boolean = false;
-  showMobileNav: boolean = false; // Control para botones móviles
-
-  responsiveOptions = [
-    {
-      breakpoint: '1400px',
-      numVisible: 1,
-      numScroll: 1
-    },
-    {
-      breakpoint: '1200px',
-      numVisible: 1,
-      numScroll: 1
-    },
-    {
-      breakpoint: '992px',
-      numVisible: 1,
-      numScroll: 1
-    },
-    {
-      breakpoint: '768px',
-      numVisible: 1,
-      numScroll: 1
-    },
-    {
-      breakpoint: '576px',
-      numVisible: 1,
-      numScroll: 1
-    }
-  ];
+  currentSlide: number = 0;
+  private autoPlayInterval: any;
 
   constructor(
     private imageService: ImageService,
@@ -80,7 +43,6 @@ export class HomeMainComponent implements OnInit, OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       const width = window.innerWidth;
       this.isDesktop = width >= 768;
-      this.showMobileNav = width < 768; // Mostrar botones solo en móvil
     }
   }
 
@@ -88,16 +50,15 @@ export class HomeMainComponent implements OnInit, OnDestroy {
     if (isPlatformBrowser(this.platformId)) {
       const width = window.innerWidth;
       this.isDesktop = width >= 768;
-      this.showMobileNav = width < 768;
     } else {
       this.isDesktop = true;
-      this.showMobileNav = false;
     }
 
     this.imageService.getLatestProductImages().subscribe({
       next: (data) => {
         if (Array.isArray(data) && data.length > 0) {
           this.products = data;
+          this.startAutoPlay();
         } else {
           this.products = [];
         }
@@ -107,18 +68,38 @@ export class HomeMainComponent implements OnInit, OnDestroy {
   }
 
   nextSlide(): void {
-    if (this.carousel && isPlatformBrowser(this.platformId)) {
-      this.carousel.navForward({} as MouseEvent);
+    if (this.products.length > 0) {
+      this.currentSlide = (this.currentSlide + 1) % this.products.length;
     }
   }
 
   prevSlide(): void {
-    if (this.carousel && isPlatformBrowser(this.platformId)) {
-      this.carousel.navBackward({} as MouseEvent);
+    if (this.products.length > 0) {
+      this.currentSlide = this.currentSlide === 0 ? this.products.length - 1 : this.currentSlide - 1;
+    }
+  }
+
+  goToSlide(index: number): void {
+    if (this.products.length > 0) {
+      this.currentSlide = index;
+    }
+  }
+
+  startAutoPlay(): void {
+    if (isPlatformBrowser(this.platformId) && this.products.length > 1) {
+      this.autoPlayInterval = setInterval(() => {
+        this.nextSlide();
+      }, 5000);
+    }
+  }
+
+  stopAutoPlay(): void {
+    if (this.autoPlayInterval) {
+      clearInterval(this.autoPlayInterval);
     }
   }
 
   ngOnDestroy(): void {
-    // Cleanup
+    this.stopAutoPlay();
   }
-}   
+}
