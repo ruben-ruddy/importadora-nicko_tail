@@ -1,6 +1,9 @@
-
-<app-toast></app-toast>
-<app-loading-overlay></app-loading-overlay>
+<!-- sistema-ventas-frontend/src/app/app.component.html -->
 <main class="min-h-screen bg-gray-50">
   <router-outlet></router-outlet>
 </main>
+
+<!-- Elementos globales FUERA del router-outlet -->
+<div #modalContainer></div>
+<app-toast></app-toast>
+<app-loading-overlay></app-loading-overlay>

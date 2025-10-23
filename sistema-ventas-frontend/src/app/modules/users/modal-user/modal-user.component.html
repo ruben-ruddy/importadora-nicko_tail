@@ -1,15 +1,22 @@
 <!-- sistema-ventas-frontend/src/app/modules/users/modal-user/modal-user.component.html -->
-<div class="p-4 bg-white rounded-lg">
-  <div class="flex justify-between items-center mb-6">
+<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+  <!-- Header -->
+  <div class="flex-shrink-0 flex justify-between items-center p-6 border-b border-gray-200 bg-white rounded-t-lg">
     <h2 class="text-2xl font-bold text-gray-800">
-      {{ initialData ? 'Editar Usuario' : 'Nuevo Usuario' }}
+      {{ modalConfig?.title || 'Usuario' }}
     </h2>
-    <button (click)="close()" class="text-gray-500 hover:text-gray-700 transition-colors">
-      <i class="pi pi-times text-xl"></i>
+    <button 
+      (click)="close()" 
+      class="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-full hover:bg-gray-100"
+      [disabled]="saving">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
     </button>
   </div>
   
-  <div>
+  <!-- Contenido del formulario -->
+  <div class="flex-1 overflow-y-auto p-6">
     <dynamic-form
       [fields]="usersFormFields(catalogs)"
       [initialData]="initialData"
@@ -18,26 +25,36 @@
     </dynamic-form>
   </div>
   
-  <div class="flex justify-end gap-4 mt-6 pt-4 border-t border-gray-200">
-    <button (click)="close()" 
-            class="px-4 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50 transition-colors">
-      Cancelar
-    </button>
-    
-    <button 
-      (click)="save()"
-      [disabled]="!formData?.valid || saving"
-      [ngClass]="{
-        'bg-blue-600 hover:bg-blue-700 text-white': formData?.valid && !saving,
-        'bg-gray-300 cursor-not-allowed text-gray-500': !formData?.valid || saving
-      }"
-      class="px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
-      @if (saving) {
-        <i class="pi pi-spin pi-spinner"></i>
-        {{ initialData ? 'Actualizando...' : 'Creando...' }}
-      } @else {
-        {{ initialData ? 'Actualizar' : 'Crear Usuario' }}
-      }
-    </button>
+  <!-- Footer -->
+  <div class="flex-shrink-0 border-t border-gray-200 bg-gray-50 p-4 rounded-b-lg">
+    <div class="flex justify-end space-x-3">
+      <button 
+        type="button"
+        (click)="close()" 
+        [disabled]="saving"
+        class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed">
+        Cancelar
+      </button>
+      
+      <button 
+        type="button"
+        (click)="save()"
+        [disabled]="!formData?.valid || saving"
+        class="px-6 py-2.5 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+        [class]="formData?.valid && !saving 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                  : 'bg-gray-300 text-gray-500'">
+        @if (saving) {
+          <!-- Spinner -->
+          <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ isEditing ? 'Actualizando...' : 'Creando...' }}
+        } @else {
+          {{ isEditing ? 'Actualizar' : 'Crear Usuario' }}
+        }
+      </button>
+    </div>
   </div>
 </div>

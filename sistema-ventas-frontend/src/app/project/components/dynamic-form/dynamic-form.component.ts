@@ -1,13 +1,12 @@
 // sistema-ventas-frontend/src/app/project/components/dynamic-form/dynamic-form.component.ts
 import { CommonModule } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
-import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators,FormArray } from '@angular/forms';
-import { ImageModule } from 'primeng/image';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators, FormArray } from '@angular/forms';
 
 @Component({
   selector: 'dynamic-form',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, ImageModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './dynamic-form.component.html',
   styleUrl: './dynamic-form.component.scss'
 }) 
@@ -17,7 +16,7 @@ export class DynamicFormComponent implements OnInit {
   @Input() fields: any[] = [];
   @Input() initialData: any = {};
 
-  /** ✅ ahora es una función opcional que recibe el formulario */
+  /** ? ahora es una función opcional que recibe el formulario */
   @Input() askfor?: (form: FormGroup) => void;
 
   @Output() onFormChange = new EventEmitter<any>();
@@ -37,7 +36,7 @@ export class DynamicFormComponent implements OnInit {
     this.convertNumericStringValues();
   }, 100);
 
-    // ✅ Llamar a la función askfor si está definida
+    // ? Llamar a la función askfor si está definida
     if (this.askfor) {
       this.askfor(this.form);
     }
@@ -63,14 +62,14 @@ private convertNumericStringValues() {
   });
 }
 
-  private patchFormWithInitialData(): void {
-    // Patch valores normales primero
-      const patchData: any = {};
+private patchFormWithInitialData(): void {
+  if (!this.initialData) return;
+
+  const patchData: any = {};
   
   Object.keys(this.initialData).forEach(key => {
     const field = this.findFieldByKey(key);
     if (field && field.type === 'checkbox') {
-      // Asegurar que los checkboxes sean booleanos
       patchData[key] = Boolean(this.initialData[key]);
     } else {
       patchData[key] = this.initialData[key];
@@ -78,40 +77,31 @@ private convertNumericStringValues() {
   });
   
   this.form.patchValue(patchData);
-    this.form.patchValue(this.initialData);
 
-    // Manejar arrays específicamente
-    this.fields.forEach(field => {
-      if (field.type === 'array' && this.initialData[field.key]) {
-        const formArray = this.form.get(field.key) as FormArray;
-        // Limpiar array existente
-        while (formArray.length !== 0) {
-          formArray.removeAt(0);
-        }
-        // Agregar items del initialData
-        this.initialData[field.key].forEach((item: any) => {
-          formArray.push(this.createArrayItem(field, item));
+  // Manejar arrays
+  this.fields.forEach(field => {
+    if (field.type === 'array' && this.initialData[field.key]) {
+      const formArray = this.form.get(field.key) as FormArray;
+      while (formArray.length !== 0) {
+        formArray.removeAt(0);
+      }
+      this.initialData[field.key].forEach((item: any) => {
+        formArray.push(this.createArrayItem(field, item));
+      });
+    }
+
+    // Manejar files
+    if (field.columns) {
+      field.columns.forEach((s: any) => {
+        s.fields.forEach((fl: any) => {
+          if (fl.type === 'file' && this.initialData[fl.key]) {
+            this.previewFiles[fl.key] = this.initialData[fl.key];
+          }
         });
-      }
-
-      // Manejar files (tu código existente)
-      if (field.columns) {
-        field.columns.forEach((s: any) => {
-          s.fields.forEach((fl: any) => {
-            if (fl.type === 'file' && this.initialData[fl.key]) {
-              this.previewFiles[fl.key] = this.initialData[fl.key];
-              this.form.get(fl.key)?.setValue(this.initialData[fl.key]);
-            }
-          });
-        });
-      }
-
-      if (field.type === 'file' && this.initialData[field.key]) {
-        this.previewFiles[field.key] = this.initialData[field.key];
-        this.form.get(field.key)?.setValue(null);
-      }
-    });
-  }
+      });
+    }
+  });
+}
 
   private findFieldByKey(key: string): any {
   for (const field of this.fields) {
@@ -238,6 +228,7 @@ private getArrayItemInitialValue(itemField: any, itemData: any): any {
     this.calculateNewItemSubtotal(field.key, formArray.length - 1);
   }, 100);
 }
+
 // Nuevo método para calcular subtotal de nuevo item
 private calculateNewItemSubtotal(arrayKey: string, index: number) {
   const formArray = this.form.get(arrayKey) as FormArray;
@@ -252,6 +243,7 @@ private calculateNewItemSubtotal(arrayKey: string, index: number) {
   // Disparar evento de cambio para que el modal recalcule el total
   this.form.updateValueAndValidity();
 }
+
   removeArrayItem(fieldKey: string, index: number) {
     const formArray = this.form.get(fieldKey) as FormArray;
     if (formArray.length > 1) {
@@ -262,8 +254,6 @@ private calculateNewItemSubtotal(arrayKey: string, index: number) {
   getFormArray(fieldKey: string): FormArray {
     return this.form.get(fieldKey) as FormArray;
   }
-
-
 
 private addControl(field: any) {
   if (field.type === 'title') return;
@@ -306,14 +296,13 @@ private getInitialValue(field: any): any {
     case 'checkbox':
       return false;
     case 'number':
-      return null; // O 0 si prefieres
+      return null;
     case 'file':
       return null;
     default:
       return '';
   }
 }
-
 
 private mapValidators(validators: any): any[] {
   const v: any[] = [];
@@ -404,8 +393,6 @@ private mapValidators(validators: any): any[] {
          fileData.includes('image/');
 }
 
- 
-
   private fileValidator(validators: any) {
   return (control: FormControl) => {
     const value = control.value;
@@ -442,7 +429,6 @@ private mapValidators(validators: any): any[] {
     return null; // válido
   };
 }
-
 
 convertToNumber(event: Event, arrayKey: string, index: number, fieldKey: string) {
   const input = event.target as HTMLInputElement;
@@ -485,6 +471,4 @@ convertToNumber(event: Event, arrayKey: string, index: number, fieldKey: string)
     }
   }
 }
-
-
 }

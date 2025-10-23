@@ -1,4 +1,4 @@
-// schema.ts (actualizado para usuario automático)
+// sistema-ventas-frontend/src/app/modules/purchase/modal-purchase/schema.ts
 export const purchaseFormFields = (catalogs: any, currentUser: any = null) => {
   const isCurrentUserSet = currentUser && currentUser.id_usuario;
   

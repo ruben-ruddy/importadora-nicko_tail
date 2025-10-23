@@ -1,10 +1,9 @@
-// interfaces/purchase.interface.ts
+// sistema-ventas-frontend/src/app/interfaces/purchase.interface.ts
 export interface Purchase {
   id_compra?: string;
   id_usuario: string;
   numero_compra: string;
-  fecha_compra?: string | Date; // ← Hacer opcional
-  //fecha_compra_display?: string;
+  fecha_compra?: string | Date;
   total: number;
   estado: 'pendiente' | 'completada' | 'cancelada';
   observaciones?: string;
@@ -14,11 +13,13 @@ export interface Purchase {
     nombre_completo: string;
     email: string;
     nombre_usuario: string;
+    activo?: boolean; // ← Agregar esta propiedad como opcional
+    fecha_creacion?: string; // ← También agregar esta
   };
 }
 
 export interface PurchaseDetail {
-  id_detalle_compra?: string; // Hacer opcional para nuevos detalles
+  id_detalle_compra?: string;
   id_producto: string;
   cantidad: number;
   precio_unitario: number;

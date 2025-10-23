@@ -25,7 +25,6 @@ export class UsersService {
   getUsers(query: any = {}) {
     let params = new HttpParams();
     
-    // Agregar parámetros de consulta
     Object.keys(query).forEach(key => {
       if (query[key] !== undefined && query[key] !== null && query[key] !== '') {
         params = params.set(key, query[key]);
@@ -39,22 +38,24 @@ export class UsersService {
   }
 
   createUsers(data: any) {
+    console.log('Creating user with data:', data);
     return firstValueFrom(this.http.post(`${environment.backend}/users`, data, {
       headers: this.getHeaders()
     }));
   }
 
   updateUsers(id: string, data: any) {
+    console.log('Updating user', id, 'with data:', data);
     return firstValueFrom(this.http.patch(`${environment.backend}/users/${id}`, data, {
       headers: this.getHeaders()
     }));
   }
 
-deleteUser(id: string) {
-  return firstValueFrom(this.http.delete(`${environment.backend}/users/${id}`, {
-    headers: this.getHeaders()
-  }));
-}
+  deleteUser(id: string) {
+    return firstValueFrom(this.http.delete(`${environment.backend}/users/${id}`, {
+      headers: this.getHeaders()
+    }));
+  }
 
   getRoles() {
     return firstValueFrom(this.http.get(`${environment.backend}/roles`, {

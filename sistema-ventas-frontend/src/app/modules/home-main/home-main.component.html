@@ -68,7 +68,7 @@
             <!-- Botones de navegación DESKTOP (solo mostrar en desktop) -->
             <button *ngIf="isDesktop && products.length > 1" 
                     (click)="prevSlide()" 
-                    class="custom-nav-button left absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-1 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
+                    class="custom-nav-button left absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-16 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
                             lg:left-4
                             md:left-3
                             hover:scale-110 active:scale-95">
@@ -80,7 +80,7 @@
 
             <button *ngIf="isDesktop && products.length > 1" 
                     (click)="nextSlide()" 
-                    class="custom-nav-button right absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-1 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
+                    class="custom-nav-button right absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-16 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
                             lg:right-4
                             md:right-3
                             hover:scale-110 active:scale-95">
@@ -93,7 +93,7 @@
 <!-- Botones de navegación MOBILE (solo mostrar en móvil) -->
 <button *ngIf="!isDesktop && products.length > 1" 
         (click)="prevSlide()" 
-        class="custom-nav-button left absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-1 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
+        class="custom-nav-button left absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-16 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
                 md:left-4
                 sm:left-4
                 hover:scale-110 active:scale-95">
@@ -105,7 +105,7 @@
 
 <button *ngIf="!isDesktop && products.length > 1" 
         (click)="nextSlide()" 
-        class="custom-nav-button absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-1 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
+        class="custom-nav-button absolute top-1/2 -translate-y-1/2 bg-primary-600 text-white border border-white border-opacity-30 w-16 h-8 rounded-full flex items-center justify-center cursor-pointer z-20 transition-all duration-300 shadow-lg hover:shadow-xl hover:bg-primary-700 backdrop-blur-sm
                 right-0 md:right-4 sm:right-4
                 hover:scale-110 active:scale-95">
     <!-- Flecha derecha SVG -->

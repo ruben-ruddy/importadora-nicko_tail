@@ -1,32 +1,49 @@
-<!-- // sistema-ventas-frontend/src/app/modules/categories/modal-category/modal-category.component.html -->
-<div class="p-4">
-   <div class="flex justify-between items-center mb-6">
-    <h2 class="text-2xl font-bold text-gray-800">Categoría</h2>
-    <button (click)="close()" class="text-gray-500 hover:text-gray-700">
-      <i class="pi pi-times text-xl"></i>
+<!-- sistema-ventas-frontend/src/app/modules/categories/modal-category/modal-category.component.html -->
+<div class="bg-white rounded-lg shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col">
+  <!-- Header fijo -->
+  <div class="flex-shrink-0 flex justify-between items-center p-6 border-b border-gray-200 bg-white rounded-t-lg">
+    <h2 class="text-2xl font-bold text-gray-800">
+      {{ modalConfig?.title || 'Categoría' }}
+    </h2>
+    <button 
+      (click)="close()" 
+      class="text-gray-500 hover:text-gray-700 transition-colors p-1 rounded-full hover:bg-gray-100"
+      type="button">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
     </button>
   </div>
-    <div>
-        <dynamic-form
-            [fields]="PatientsFormFields(catalogs)"
-            [initialData]="initiaData"
-            [askfor]="onFormCreated"
-            (onFormChange)="handleFormChange($event)">
-        </dynamic-form>
-    </div>
-    <div class="flex  justify-end">
-         <button (click)="close()" class="bg-blue-500 text-white px-4 py-2 mr-4 hover:bg-blue-600 rounded-lg">Cancelar</button>
-        <button (click)="save()"
-               [disabled]="!formData?.valid" 
-               [ngClass]="formData?.valid 
-                          ? 'bg-blue-500 text-white' 
-                         : 'bg-gray-400 cursor-not-allowed'"
-               class="bg-blue-500 text-white px-4 py-2  rounded">
-               Guardar 
-            </button>
-       
-    </div>
-   
-   
   
+  <!-- Contenido del formulario con scroll -->
+  <div class="flex-1 overflow-y-auto p-6">
+    <dynamic-form
+        [fields]="categoryFormFields(catalogs)"
+        [initialData]="initialData"
+        [askfor]="onFormCreated"
+        (onFormChange)="handleFormChange($event)">
+    </dynamic-form>
+  </div>
+  
+  <!-- Footer fijo -->
+  <div class="flex-shrink-0 border-t border-gray-200 bg-gray-50 p-4 rounded-b-lg">
+    <div class="flex justify-end space-x-3">
+      <button 
+        type="button"
+        (click)="close()" 
+        class="px-6 py-2.5 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium">
+        Cancelar
+      </button>
+      <button 
+        type="button"
+        (click)="save()"
+        [disabled]="!formData?.valid" 
+        class="px-6 py-2.5 rounded-lg transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+        [class]="formData?.valid 
+                  ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                  : 'bg-gray-300 text-gray-500'">
+        Guardar 
+      </button>
+    </div>
+  </div>
 </div>

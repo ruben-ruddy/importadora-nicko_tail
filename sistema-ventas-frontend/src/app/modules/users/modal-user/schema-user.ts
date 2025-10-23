@@ -10,8 +10,10 @@ export const userFormFields = (catalogs: any) => {
               key: 'id_rol',
               label: 'Rol',
               type: 'select',
-              options: catalogs['role'],
-              validators: { required: true },
+              options: catalogs['role'] || [],
+              validators: { 
+                required: true 
+              },
               placeholder: 'Seleccione un rol'
             },
             {
@@ -21,7 +23,11 @@ export const userFormFields = (catalogs: any) => {
               validators: { 
                 required: true, 
                 maxLength: 50,
+                minLength: 3,
+                pattern: '^[a-zA-Z0-9_]+$'
               },
+              placeholder: 'Solo letras, números y _',
+              description: 'No usar espacios ni caracteres especiales'
             },
             {
               key: 'email',
@@ -29,20 +35,23 @@ export const userFormFields = (catalogs: any) => {
               type: 'text',
               validators: { 
                 required: true, 
-                email: true 
-              }
+                email: true,
+                maxLength: 100
+              },
+              placeholder: 'ejemplo@correo.com'
             },
             {
               key: 'password',
               label: 'Contraseña',
               type: 'text',
               validators: { 
-                required: true, 
-                minLength: 6 
+                required: (data: any) => !data?.id_usuario, // Solo requerido para nuevos
+                minLength: 6,
+                maxLength: 100
               },
-              feedback: 'Mínimo 6 caracteres',
-              // Solo requerido para creación, no para edición
-              hidden: (data: any) => !!data?.id_usuario
+              placeholder: 'Mínimo 6 caracteres',
+              description: 'Deje en blanco si no desea cambiar la contraseña',
+              hidden: (data: any) => !!data?.id_usuario // Ocultar en edición
             },
             {
               key: 'nombre_completo',
@@ -50,19 +59,23 @@ export const userFormFields = (catalogs: any) => {
               type: 'text',
               validators: { 
                 required: true,
-                maxLength: 100 
-              }
+                maxLength: 100,
+                minLength: 2
+              },
+              placeholder: 'Ingrese el nombre completo'
             },
             {
               key: 'telefono',
               label: 'Teléfono',
-              type: 'text', // Cambiado de 'number' a 'text'
+              type: 'text',
               validators: { 
-                required: false, // Cambiado a opcional
-                pattern: '^[0-9+()-]*$',
-                maxLength: 20 
+                required: false,
+                pattern: '^[0-9+()-\\s]*$',
+                maxLength: 20,
+                minLength: 8
               },
-              placeholder: 'Opcional'
+              placeholder: 'Opcional - solo números y +',
+              description: 'Mínimo 8 dígitos'
             }
           ]
         }

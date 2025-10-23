@@ -1,0 +1,40 @@
+/* Agregar estos estilos para mejoras visuales */
+.group:hover .group-hover\:scale-105 {
+  transform: scale(1.05);
+}
+
+.group:hover .group-hover\:scale-110 {
+  transform: scale(1.1);
+}
+
+.shadow-3xl {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Animaciones suaves para todos los elementos */
+* {
+  transition-property: transform, box-shadow, opacity, background-color;
+  transition-duration: 300ms;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Efecto de gradiente animado en el fondo */
+.bg-gradient-to-br {
+  background-size: 200% 200%;
+  animation: gradientShift 8s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Efecto de brillo en hover para iconos */
+.hover-glow:hover {
+  filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+}

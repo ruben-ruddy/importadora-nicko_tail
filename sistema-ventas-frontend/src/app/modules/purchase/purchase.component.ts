@@ -1,6 +1,5 @@
 // sistema-ventas-frontend/src/app/modules/purchase/purchase.component.ts
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CommonModule, DatePipe, CurrencyPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ModalPurchaseComponent } from './modal-purchase/modal-purchase.component';
@@ -10,19 +9,21 @@ import { PurchaseDetailsComponent } from './purchase-details/purchase-details.co
 import { GeneralService } from '../../core/gerneral.service';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
 
+// Servicios personalizados
+import { ModalService } from '../../project/services/modal.service';
+import { ToasterService } from '../../project/services/toaster.service';
+
 @Component({
   selector: 'app-purchase',
   standalone: true,
   imports: [CommonModule, DatePipe, CurrencyPipe, FormsModule],
-  templateUrl: './purchase.component.html',
-  providers: [DialogService],
+  templateUrl: './purchase.component.html'
 })
 export class PurchaseComponent implements OnInit, OnDestroy {
   Math = Math;
   purchases: Purchase[] = [];
   loading = true;
   error = '';
-  ref!: DynamicDialogRef;
   
   // Paginación
   totalRecords = 0;
@@ -43,8 +44,9 @@ export class PurchaseComponent implements OnInit, OnDestroy {
 
   constructor(
     private purchaseService: PurchaseService,
-    private dialogService: DialogService,
-    private generalService: GeneralService
+    private modalService: ModalService,
+    private generalService: GeneralService,
+    private toaster: ToasterService
   ) {
     // Configurar búsqueda en tiempo real con debounce
     this.searchSubject.pipe(
@@ -71,6 +73,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
   async loadCurrentUser() {
     try {
       this.currentUser = this.generalService.getUser();
+      console.log('👤 Usuario actual:', this.currentUser);
     } catch (error) {
       console.error('Error loading current user:', error);
     }
@@ -96,10 +99,17 @@ export class PurchaseComponent implements OnInit, OnDestroy {
       this.limit = response.limit;
       this.lastPage = response.lastPage;
       
+      console.log('✅ Compras cargadas:', this.purchases.length);
+      
     } catch (error: any) {
       console.error('Error loading purchases:', error);
       this.error = 'Error al cargar las compras';
       this.purchases = [];
+      this.toaster.showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error al cargar las compras'
+      });
     } finally {
       this.loading = false;
     }
@@ -181,17 +191,18 @@ export class PurchaseComponent implements OnInit, OnDestroy {
       id_usuario: this.currentUser.id_usuario 
     } : {};
     
-    this.ref = this.dialogService.open(ModalPurchaseComponent, {
+    console.log('➕ Abriendo modal para nueva compra');
+    
+    this.modalService.open(ModalPurchaseComponent, {
+      title: 'Nueva Compra',
       width: '900px',
-      styleClass: 'dark:bg-gray-900 dark:text-gray-100',
       data: { 
         data: initialData,
         currentUser: this.currentUser 
       }
-    });
-    
-    this.ref.onClose.subscribe((reload: boolean) => {
+    }).then((reload: boolean) => {
       if (reload) {
+        console.log('🔄 Recargando lista de compras...');
         this.loadPurchases();
       }
     });
@@ -203,34 +214,55 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     }
     
     if (purchase.estado?.toLowerCase() !== 'pendiente') {
+      this.toaster.showToast({
+        severity: 'warning',
+        summary: 'Advertencia',
+        detail: 'Solo se pueden editar compras pendientes'
+      });
       return;
     }
 
-    this.ref = this.dialogService.open(ModalPurchaseComponent, {
+    console.log('✏️ Abriendo modal para editar compra:', purchase.numero_compra);
+
+    this.modalService.open(ModalPurchaseComponent, {
+      title: 'Editar Compra',
       width: '900px',
-      styleClass: 'dark:bg-gray-900 dark:text-gray-100',
       data: { 
         data: purchase,
         currentUser: this.currentUser 
       }
-    });
-
-    this.ref.onClose.subscribe((reload: boolean) => {
+    }).then((reload: boolean) => {
       if (reload) {
+        console.log('🔄 Recargando lista de compras...');
         this.loadPurchases();
       }
     });
   }
 
-  viewPurchaseDetails(purchase: Purchase, event?: Event) {
+  async viewPurchaseDetails(purchase: Purchase, event?: Event) {
     if (event) {
       event.stopPropagation();
     }
     
-    this.ref = this.dialogService.open(PurchaseDetailsComponent, {
-      width: '800px',
-      styleClass: 'dark:bg-gray-900 dark:text-gray-100',
-      data: { purchase: purchase }
-    });
+    console.log('👁️ Abriendo detalles de compra:', purchase.numero_compra);
+    
+    try {
+      // Cargar los detalles completos de la compra
+      const purchaseWithDetails = await this.purchaseService.getPurchaseById(purchase.id_compra!);
+      console.log('✅ Detalles cargados para visualización:', purchaseWithDetails);
+      
+      this.modalService.open(PurchaseDetailsComponent, {
+        title: `Detalles de Compra - ${purchase.numero_compra}`,
+        width: '800px',
+        data: { purchase: purchaseWithDetails }
+      });
+    } catch (error) {
+      console.error('❌ Error loading purchase details:', error);
+      this.toaster.showToast({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'No se pudieron cargar los detalles de la compra'
+      });
+    }
   }
 }

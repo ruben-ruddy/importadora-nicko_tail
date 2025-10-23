@@ -1,4 +1,4 @@
-<!-- purchase-details.component.html -->
+<!-- sistema-ventas-frontend/src/app/modules/purchase/purchase-details/purchase-details.component.html -->
 <div class="p-6 max-w-4xl mx-auto bg-white">
   <!-- Header -->
   <div class="flex justify-between items-center mb-6">
@@ -32,7 +32,7 @@
       </div>
       <div>
         <p class="text-sm text-gray-600">Usuario Responsable</p>
-        <p class="font-medium text-gray-600 bg-gray-50">{{ purchase.user?.nombre_usuario }}</p>
+        <p class="font-medium text-gray-600 bg-gray-50">{{ getUserName() }}</p>
       </div>
     </div>
 
@@ -61,7 +61,7 @@
           <tr *ngFor="let detalle of purchase.detalle_compras" class="border-b">
             <td class="px-4 py-3">
               <div>
-                <p class="font-medium text-gray-600 bg-gray-50">{{ detalle.producto?.nombre_producto || 'Producto no encontrado' }}</p>
+                <p class="font-medium text-gray-600 bg-gray-50">{{ getProductName(detalle) }}</p>
               </div>
             </td>
             <td class="px-4 py-3 text-gray-600 ">{{ detalle.cantidad }}</td>

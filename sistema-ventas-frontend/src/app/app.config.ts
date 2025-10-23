@@ -13,8 +13,6 @@ import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
 import { es } from 'date-fns/locale/es';
 import { DateFnsConfigurationService } from 'ngx-date-fns';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { providePrimeNG } from 'primeng/config';
-import Lara from '@primeuix/themes/lara';
 import { environment } from '../environments/environment';
 import localeEs from '@angular/common/locales/es';
 
@@ -37,11 +35,6 @@ dateFnsConfig.setLocale(es);
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimationsAsync(),
-    providePrimeNG({
-      theme: {
-        preset: Lara
-      },
-    }),
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes),
     provideHttpClient(withInterceptors([AuthInterceptor]), withFetch()),

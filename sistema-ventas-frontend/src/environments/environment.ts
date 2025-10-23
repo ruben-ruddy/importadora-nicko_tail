@@ -15,8 +15,8 @@ export const environment = {
     companyName: 'Importadora Nicko',
     companyLogo: 'assets/images/nicko.png', // Ruta a tu logo
     companyAddress: 'La Paz - Bolivia',
-    companyPhone: '+591 XXX XXX XXX',
-    companyTaxId: '123456789'
+    companyPhone: '+591 74057107',
+    companyTaxId: '0'
     // ELIMINA ESTE OBJETO PARA QUE SE USE LA CLAVE DEL DEFAULT.TS
     // recaptcha: {
     //   siteKey: '6Lebp5grAAAAAMS_4bwZ54er5eGPJRIHbIQviKRO',

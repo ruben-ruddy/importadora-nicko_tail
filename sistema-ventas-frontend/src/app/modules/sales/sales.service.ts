@@ -96,8 +96,11 @@ export class SalesService {
 
   async getProducts(): Promise<Product[]> {
     try {
-      const response: any = await firstValueFrom(this.http.get(`${this.apiUrl}/products`));
-      return response.products || [];
+      // QUITAR PAGINACIÓN para obtener todos los productos
+      const response: any = await firstValueFrom(
+        this.http.get(`${this.apiUrl}/products?limit=1000`) // Aumentar límite o quitar paginación
+      );
+      return response.products || response.data || [];
     } catch (error) {
       return this.handleError(error);
     }

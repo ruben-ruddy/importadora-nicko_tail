@@ -53,42 +53,42 @@ export class PurchaseService {
     return [];
   }
 
-async getPurchases(query: PurchaseQuery = {}): Promise<PurchaseResponse> {
-  try {
-    let params = new HttpParams();
-    
-    // Asegurarse de que los números se envíen como strings
-    if (query.page) params = params.set('page', query.page.toString());
-    if (query.limit) params = params.set('limit', query.limit.toString());
-    
-    // CORREGIR: Usar 'numero_compra' en lugar de 'search'
-    if (query.search) params = params.set('numero_compra', query.search);
-    
-    if (query.estado) params = params.set('estado', query.estado);
-    if (query.startDate) params = params.set('startDate', query.startDate);
-    if (query.endDate) params = params.set('endDate', query.endDate);
+  async getPurchases(query: PurchaseQuery = {}): Promise<PurchaseResponse> {
+    try {
+      let params = new HttpParams();
+      
+      if (query.page) params = params.set('page', query.page.toString());
+      if (query.limit) params = params.set('limit', query.limit.toString());
+      
+      if (query.search) params = params.set('numero_compra', query.search);
+      
+      if (query.estado) params = params.set('estado', query.estado);
+      if (query.startDate) params = params.set('startDate', query.startDate);
+      if (query.endDate) params = params.set('endDate', query.endDate);
 
-    console.log('Parámetros enviados al backend:', {
-      page: query.page?.toString(),
-      limit: query.limit?.toString(),
-      numero_compra: query.search, // ← Ahora se envía como 'numero_compra'
-      estado: query.estado
-    });
+      console.log('Parámetros enviados al backend:', {
+        page: query.page?.toString(),
+        limit: query.limit?.toString(),
+        numero_compra: query.search,
+        estado: query.estado
+      });
 
-    const response = await firstValueFrom(
-      this.http.get<PurchaseResponse>(`${environment.backend}/purchases`, { params })
-    );
-    return response;
-  } catch (error) {
-    console.error('Error fetching purchases:', error);
-    return { data: [], total: 0, page: 1, limit: 10, lastPage: 1 };
+      const response = await firstValueFrom(
+        this.http.get<PurchaseResponse>(`${environment.backend}/purchases`, { params })
+      );
+      return response;
+    } catch (error) {
+      console.error('Error fetching purchases:', error);
+      return { data: [], total: 0, page: 1, limit: 10, lastPage: 1 };
+    }
   }
-}
+
   async getPurchaseById(id: string): Promise<Purchase> {
     try {
       const response = await firstValueFrom(
         this.http.get<Purchase>(`${environment.backend}/purchases/${id}`)
       );
+      console.log('Compra cargada por ID:', response);
       return response;
     } catch (error) {
       console.error('Error fetching purchase:', error);
@@ -110,10 +110,15 @@ async getPurchases(query: PurchaseQuery = {}): Promise<PurchaseResponse> {
 
   async getProducts(): Promise<any[]> {
     try {
+      // CORREGIDO: Quitar paginación para obtener TODOS los productos
       const response = await firstValueFrom(
-        this.http.get<any[]>(`${environment.backend}/products`)
+        this.http.get<any>(`${environment.backend}/products?limit=1000`)
       );
-      return this.extractArrayData(response);
+      
+      const products = this.extractArrayData(response);
+      console.log('✅ Productos cargados:', products.length);
+      
+      return products;
     } catch (error) {
       console.error('Error fetching products:', error);
       return [];

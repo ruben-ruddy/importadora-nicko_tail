@@ -1,34 +1,25 @@
 // sistema-ventas-frontend/src/app/modules/sales/sales.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { ModalSalesComponent } from './modal-sales/modal-sales.component';
 import { SalesService } from './sales.service';
-import { DynamicDialogModule } from 'primeng/dynamicdialog';
-import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
+import { ModalSalesComponent } from './modal-sales/modal-sales.component';
 import { Sale } from './types';
 import { SaleTicketComponent } from './sale-ticket/sale-ticket.component';
 import { FormsModule } from '@angular/forms';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
+
+// Servicios personalizados
+import { ModalService } from '../../project/services/modal.service';
+import { ToasterService } from '../../project/services/toaster.service';
 
 @Component({
   selector: 'app-sales',
   standalone: true,
   imports: [
     CommonModule, 
-    DynamicDialogModule, 
-    ButtonModule, 
-    InputTextModule,
-    FormsModule,
-    ConfirmDialogModule,
-    ToastModule
+    FormsModule
   ],
   templateUrl: './sales.component.html',
-  styleUrl: './sales.component.scss',
-  providers: [DialogService, ConfirmationService, MessageService],
+  styleUrl: './sales.component.scss'
 })
 export class SalesComponent implements OnInit {
   Math = Math;
@@ -39,7 +30,6 @@ export class SalesComponent implements OnInit {
     limit: 10,
     totalPages: 0
   };
-  ref!: DynamicDialogRef;
   loading = true;
   
   // Variables para paginación y búsqueda
@@ -49,9 +39,8 @@ export class SalesComponent implements OnInit {
 
   constructor(
     private salesService: SalesService,
-    private dialogService: DialogService,
-    private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private modalService: ModalService,
+    private toaster: ToasterService
   ) { }
 
   async ngOnInit() {
@@ -76,7 +65,7 @@ export class SalesComponent implements OnInit {
       this.sales.totalPages = Math.ceil(response.total / response.limit);
     } catch (error) {
       console.error('Error loading sales:', error);
-      this.messageService.add({
+      this.toaster.showToast({
         severity: 'error',
         summary: 'Error',
         detail: 'No se pudieron cargar las ventas'
@@ -146,23 +135,12 @@ export class SalesComponent implements OnInit {
   }
 
   openAddSaleModal() {
-    this.ref = this.dialogService.open(ModalSalesComponent, {
+    this.modalService.open(ModalSalesComponent, {
+      title: 'Nueva Venta',
       width: '90%',
-      styleClass: 'bg-white dark:bg-gray-800 rounded-lg shadow-xl',
-      style: { 
-        'max-width': '1200px',
-      },
-      contentStyle: { 
-        'padding': '0',
-        'border-radius': '8px',
-      },
-      baseZIndex: 10000,
-      modal: true,
-      dismissableMask: true
-    });
-    
-    this.ref.onClose.subscribe((data: any) => {
-      if (data) {
+      data: {} // Asegurar que data existe
+    }).then((result: any) => {
+      if (result) {
         this.loadSales();
       }
     });
@@ -173,15 +151,12 @@ export class SalesComponent implements OnInit {
       event.stopPropagation();
     }
     
-    this.ref = this.dialogService.open(ModalSalesComponent, {
-      data: { data: sale },
+    this.modalService.open(ModalSalesComponent, {
+      title: 'Editar Venta',
       width: '90%',
-      style: { 'max-width': '1200px' },
-      styleClass: 'bg-white dark:bg-gray-800'
-    });
-
-    this.ref.onClose.subscribe((data: any) => {
-      if (data) {
+      data: { data: sale } // Pasar los datos correctamente
+    }).then((result: any) => {
+      if (result) {
         this.loadSales();
       }
     });
@@ -192,46 +167,28 @@ export class SalesComponent implements OnInit {
       event.stopPropagation();
     }
     
-    this.ref = this.dialogService.open(SaleTicketComponent, {
+    this.modalService.open(SaleTicketComponent, {
+      title: 'Ticket de Venta',
+      width: '340px',
       data: { 
         saleData: sale,
         showPrintButton: true
-      },
-      header: 'Ticket de Venta',
-      width: '340px',
-      styleClass: 'ticket-dialog bg-white dark:bg-gray-800',
-      contentStyle: { 
-        'padding': '0',
-        'margin': '0',
-        'border-radius': '8px',
-        'overflow-y': 'auto',
-        'max-height': '80vh',
-        'max-width': '95vw'
-      },
-      baseZIndex: 10000,
-      modal: true,
-      closable: true,
-      dismissableMask: true
+      }
     });
   }
 
   confirmDelete(sale: Sale) {
-    this.confirmationService.confirm({
-      message: `¿Estás seguro de que quieres eliminar la venta ${sale.numero_venta}?`,
-      header: 'Confirmar eliminación',
-      icon: 'pi pi-exclamation-triangle',
-      acceptLabel: 'Sí',
-      rejectLabel: 'No',
-      accept: () => {
-        this.deleteSale(sale);
-      }
-    });
+    const confirmMessage = `¿Estás seguro de que quieres eliminar la venta ${sale.numero_venta}?`;
+    
+    if (confirm(confirmMessage)) {
+      this.deleteSale(sale);
+    }
   }
 
   async deleteSale(sale: Sale) {
     try {
       await this.salesService.deleteSale(sale.id_venta);
-      this.messageService.add({
+      this.toaster.showToast({
         severity: 'success',
         summary: 'Éxito',
         detail: 'Venta eliminada correctamente'
@@ -239,7 +196,7 @@ export class SalesComponent implements OnInit {
       this.loadSales();
     } catch (error) {
       console.error('Error deleting sale:', error);
-      this.messageService.add({
+      this.toaster.showToast({
         severity: 'error',
         summary: 'Error',
         detail: 'No se pudo eliminar la venta'

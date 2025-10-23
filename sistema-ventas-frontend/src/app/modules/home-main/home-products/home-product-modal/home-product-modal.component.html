@@ -1,25 +1,27 @@
-<div *ngIf="product" class="modal-content bg-gradient-to-br from-gray-800 to-gray-900 text-white rounded-lg shadow-2xl p-8 max-w-lg w-full relative">
-    <button (click)="closeModal()" class="close-button absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-bold z-10">&times;</button>
+<!-- Contenedor principal del modal -->
+<div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black bg-opacity-10">
+    <div *ngIf="product" class="modal-content bg-gradient-to-br from-gray-800 to-gray-900 text-white rounded-lg shadow-2xl p-8 max-w-lg w-full relative max-h-[90vh] overflow-y-auto">
+        <button (click)="closeModal()" class="close-button absolute top-4 right-4 text-gray-400 hover:text-white text-2xl font-bold z-10 bg-gray-700 hover:bg-gray-600 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-200">&times;</button>
 
-    <div class="modal-header text-center mb-6">
-        <h2 class="text-3xl font-extrabold text-blue-300 mb-2">{{ product.nombre_producto }}</h2>
-        <span class="text-sm text-gray-400">Categoría: {{ product.category }}</span>
-    </div>
-
-    <div class="modal-body flex flex-col md:flex-row items-center justify-center gap-6 mb-6">
-        <div class="product-image-container flex-shrink-0">
-            <img [src]="product.imagen_url" [alt]="product.nombre_producto" class="w-48 h-48 object-cover rounded-md border-2 border-green-400 p-1">
+        <div class="modal-header text-center mb-6">
+            <h2 class="text-3xl font-extrabold text-blue-300 mb-2">{{ product.nombre_producto }}</h2>
+            <span class="text-sm text-gray-400">Categoría: {{ product.category }}</span>
         </div>
-        <div class="product-details text-center md:text-left flex-grow">
-            <p class="text-lg text-gray-300 mb-3">{{ product.descripcion }}</p>
-            <p class="text-3xl font-bold text-yellow-300 mb-2">{{ product.price | currency:'Bs. ':'symbol':'1.2-2' }}</p>
-            <p *ngIf="product.stock !== undefined" class="text-md text-gray-400">Stock: {{ product.stock }} unidades</p>
+
+        <div class="modal-body flex flex-col md:flex-row items-center justify-center gap-6 mb-6">
+            <div class="product-image-container flex-shrink-0">
+                <img [src]="product.imagen_url" [alt]="product.nombre_producto" class="w-48 h-48 object-cover rounded-md border-2 border-green-400 p-1">
+            </div>
+            <div class="product-details text-center md:text-left flex-grow">
+                <p class="text-lg text-gray-300 mb-3">{{ product.descripcion }}</p>
+                <p class="text-3xl font-bold text-yellow-300 mb-2">{{ product.price | currency:'Bs. ':'symbol':'1.2-2' }}</p>
+                <p *ngIf="product.stock !== undefined" class="text-md text-gray-400">Stock: {{ product.stock }} unidades</p>
+            </div>
+        </div>
+
+        <div class="modal-footer text-center">
+            <button pButton type="button" label="Cerrar" (click)="closeModal()"
+                    class="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 font-semibold transition-colors duration-200">Cerrar</button>
         </div>
     </div>
-
-    <div class="modal-footer text-center">
-        <button pButton type="button" label="Cerrar" (click)="closeModal()"
-                class="px-6 py-3 bg-blue-500 text-white rounded-xl hover:bg-blue-600 font-semibold"></button>
-    </div>
-
 </div>
