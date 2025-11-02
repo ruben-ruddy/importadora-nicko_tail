@@ -7,13 +7,9 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateInventoryMovementDto, DtoMovementType } from './dto/create-inventory-movement.dto'; // Importa DtoMovementType
+import { CreateInventoryMovementDto, DtoMovementType } from './dto/create-inventory-movement.dto'; 
 import { UpdateInventoryMovementDto } from './dto/update-inventory-movement.dto';
-import { InventoryMovementQueryDto } from './dto/inventory-movement-query.dto'; // Asegúrate de que este DTO también esté actualizado
-
-// Si tu MovementType de Prisma es un enum, podrías necesitar importarlo
-// import { MovementType } from '@prisma/client';
-
+import { InventoryMovementQueryDto } from './dto/inventory-movement-query.dto'; 
 
 @Injectable()
 export class InventoryMovementsService {
@@ -24,7 +20,7 @@ export class InventoryMovementsService {
 
     // 1. Verificar si el producto existe
     const product = await this.prisma.product.findUnique({
-      where: { id_producto: id_producto }, // Usa id_producto
+      where: { id_producto: id_producto }, 
     });
 
     if (!product) {
@@ -33,7 +29,7 @@ export class InventoryMovementsService {
 
     // 2. Verificar si el usuario existe
     const user = await this.prisma.user.findUnique({
-      where: { id_usuario: id_usuario }, // Usa id_usuario
+      where: { id_usuario: id_usuario }, 
     });
 
     if (!user) {
@@ -158,23 +154,14 @@ export class InventoryMovementsService {
     if (!existingMovement) {
       throw new NotFoundException(`Movimiento de inventario con ID ${id_movimiento} no encontrado.`);
     }
-
-    // Aquí es donde la validación de updateInventoryMovementDto.quantity/type fallaba antes.
-    // Con PartialType, estas propiedades son opcionales. El error de TS(2339) aquí
-    // ocurre porque el compilador no sabe si la propiedad está presente en tiempo de ejecución.
-    // La forma correcta de manejarlo es la siguiente validación.
-    // Y reiteramos: modificar stock vía un PATCH directo es delicado.
     if (updateInventoryMovementDto.cantidad !== undefined || updateInventoryMovementDto.tipo_movimiento !== undefined) {
       throw new BadRequestException('No se permite actualizar directamente la cantidad o el tipo de un movimiento de inventario. Considere crear un nuevo movimiento de ajuste.');
     }
 
-    // Adaptar DTO para Prisma si es necesario (ej. para enums)
     const dataToUpdate: any = { ...updateInventoryMovementDto };
     if (dataToUpdate.tipo_movimiento) {
       dataToUpdate.tipo_movimiento = dataToUpdate.tipo_movimiento.toUpperCase();
     }
-    // Si la fecha_movimiento viene como string, Prisma la convertirá si el campo es DateTime.
-
     try {
       const updatedMovement = await this.prisma.inventoryMovement.update({
         where: { id_movimiento: id_movimiento }, // Usa id_movimiento
@@ -197,8 +184,6 @@ export class InventoryMovementsService {
     if (!existingMovement) {
       throw new NotFoundException(`Movimiento de inventario con ID ${id_movimiento} no encontrado.`);
     }
-
-    // Revertir el stock antes de eliminar el movimiento
     const product = await this.prisma.product.findUnique({
       where: { id_producto: existingMovement.id_producto }, // Usa id_producto
     });

@@ -16,7 +16,7 @@ export class ForecastService {
     private readonly httpService: HttpService,
     private configService: ConfigService
   ) {}
-
+// Obtener historial de ventas mensual
   async getSalesHistory(query: HistoryQueryDto): Promise<HistoricalData[]> {
     try {
       const { fecha_inicio, fecha_fin, periodo } = query;
@@ -69,7 +69,7 @@ export class ForecastService {
       throw error;
     }
   }
-
+// Procesar datos históricos para agrupar por mes
   private processHistoricalData(sales: any[], periodo: string): HistoricalData[] {
     const groupedData: { [key: string]: number } = {};
 
@@ -86,12 +86,12 @@ export class ForecastService {
       .map(([fecha, ventas]) => ({ fecha, ventas }))
       .sort((a, b) => a.fecha.localeCompare(b.fecha));
   }
-
+// Obtener clave de fecha según el período
   private getDateKey(date: Date, periodo: string): string {
     const d = new Date(date);
     return d.toISOString().substring(0, 7); // YYYY-MM (solo mensual)
   }
-
+// Generar pronóstico de ventas
   async generateForecast(forecastRequest: ForecastRequestDto): Promise<ForecastResponse> {
     try {
       const { fecha_inicio, fecha_fin, parametros } = forecastRequest;
@@ -123,9 +123,6 @@ export class ForecastService {
       if (historicalData.length < parametros.ventana) {
         throw new BadRequestException(`Se necesitan al menos ${parametros.ventana} meses de datos históricos para el análisis`);
       }
-
-      // Llamar al servicio Python
-      //const pythonServiceUrl = process.env.PYTHON_FORECAST_SERVICE || 'http://localhost:8000';
       const pythonServiceUrl = this.configService.get('PYTHON_FORECAST_SERVICE') || 'http://localhost:8000';
       
       const response = await firstValueFrom(
@@ -160,8 +157,6 @@ export class ForecastService {
 
     } catch (error) {
       console.error('Error generating forecast:', error);
-      
-      // Fallback a cálculo local si el servicio Python falla
       if (error.response?.status === 500 || error.code === 'ECONNREFUSED') {
         return await this.localMovingAverageForecast(forecastRequest);
       }
@@ -170,6 +165,7 @@ export class ForecastService {
     }
   }
 
+  // Pronóstico local de promedio móvil como respaldo
   private async localMovingAverageForecast(forecastRequest: ForecastRequestDto): Promise<ForecastResponse> {
     const historicalData = await this.getSalesHistory({
       fecha_inicio: forecastRequest.fecha_inicio,
@@ -197,7 +193,7 @@ export class ForecastService {
       }
     };
   }
-
+ // Cálculo de promedio móvil con suavizado exponencial
   private calculateMovingAverage(
     data: number[], 
     periods: number, 
@@ -242,7 +238,7 @@ export class ForecastService {
 
     return { results, predictions };
   }
-
+// Calcular intervalo de confianza
   private calculateConfidenceInterval(prediction: number, historicalData: number[]) {
     const stdDev = this.calculateStandardDeviation(historicalData);
     const marginOfError = 1.96 * stdDev;
@@ -252,7 +248,7 @@ export class ForecastService {
       superior: prediction + marginOfError
     };
   }
-
+// Calcular desviación estándar
   private calculateStandardDeviation(data: number[]): number {
     if (data.length === 0) return 0;
     
@@ -261,13 +257,13 @@ export class ForecastService {
     const variance = squaredDiffs.reduce((a, b) => a + b, 0) / data.length;
     return Math.sqrt(variance);
   }
-
+// Calcular precisión mensual decreciente
   private calculateMonthlyPrecision(baseAccuracy: number, monthIndex: number): number {
     // La precisión disminuye 3% cada mes futuro
     const precision = baseAccuracy * Math.pow(0.97, monthIndex);
     return Math.max(30, Math.min(baseAccuracy, precision)); // Límites: 30% - baseAccuracy
   }
-
+// Calcular métricas de precisión del pronóstico
   private calculateForecastAccuracy(historicalData: number[], predictions: number[]): {
     mape: number;
     mae: number;
@@ -311,7 +307,7 @@ export class ForecastService {
 
     return { mape, mae, rmse, accuracy };
   }
-
+  // Obtener meses con mayores ventas
   async getTopSellingDates(query: TopDatesQueryDto): Promise<TopSellingDate[]> {
     try {
       const { fecha_inicio, fecha_fin, limit = 10 } = query;
@@ -376,7 +372,7 @@ export class ForecastService {
       cantidad_productos: datos.cantidad_productos
     }));
   }
-
+// Obtener productos más vendidos en un mes específico
   async getTopProductsByDate(date: string, limit: number = 10): Promise<TopProduct[]> {
     try {
       const [startDate, endDate] = this.getMonthRangeFromString(date);
@@ -447,7 +443,7 @@ export class ForecastService {
       throw new Error(`Error al obtener productos: ${error.message}`);
     }
   }
-
+// Obtener rango de fechas para un mes específico
   private getMonthRangeFromString(monthString: string): [Date, Date] {
     try {
       const [year, month] = monthString.split('-');

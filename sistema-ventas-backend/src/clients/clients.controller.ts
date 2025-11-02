@@ -1,9 +1,9 @@
 // src/clients/clients.controller.ts (o la ruta donde tengas tu controlador de clientes)
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { ClientsService } from './clients.service'; // Asegúrate de que esta ruta sea correcta
-import { CreateClientDto } from './dto/create-client.dto'; // Asumiendo que tienes estos DTOs
+import { ClientsService } from './clients.service'; 
+import { CreateClientDto } from './dto/create-client.dto'; 
 import { UpdateClientDto } from './dto/update-client.dto';
-import { ClientQueryDto } from './dto/client-query.dto'; // Si tienes un DTO para consultas de clientes
+import { ClientQueryDto } from './dto/client-query.dto'; 
 
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/roles.guard';
@@ -17,7 +17,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery }
 @Controller('clients') // Prefijo de ruta para todos los endpoints de este controlador
 export class ClientsController {
   constructor(private readonly clientsService: ClientsService) {}
-
+  //endpoint para crear un cliente
   @Post()
   // Solo los Administradores y Vendedores pueden crear clientes
   //@Roles('Administrador', 'Vendedor')
@@ -31,7 +31,7 @@ export class ClientsController {
   create(@Body() createClientDto: CreateClientDto) {
     return this.clientsService.create(createClientDto);
   }
-
+//endpoint para obtener todos los clientes con filtros y paginación
   @Get()
   // Administradores, Vendedores y Cajeros pueden listar clientes
  // @Roles('Administrador', 'Vendedor', 'Cajero')
@@ -46,7 +46,7 @@ export class ClientsController {
   findAll(@Query() query: ClientQueryDto) {
     return this.clientsService.findAll(query);
   }
-
+//endpoint para obtener un cliente por id
   @Get(':id')
   // Administradores, Vendedores y Cajeros pueden ver un cliente específico
   //@Roles('Administrador', 'Vendedor', 'Cajero')
@@ -59,7 +59,7 @@ export class ClientsController {
   findOne(@Param('id') id: string) {
     return this.clientsService.findOne(id);
   }
-
+//endpoint para actualizar un cliente por id
   @Patch(':id')
   // Solo los Administradores y Vendedores pueden actualizar clientes
   //@Roles('Administrador', 'Vendedor')
@@ -74,7 +74,7 @@ export class ClientsController {
   update(@Param('id') id: string, @Body() updateClientDto: UpdateClientDto) {
     return this.clientsService.update(id, updateClientDto);
   }
-
+//endpoint para eliminar un cliente por id
   @Delete(':id')
   // Solo los Administradores pueden eliminar clientes
   //@Roles('Administrador')

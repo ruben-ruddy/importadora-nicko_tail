@@ -4,7 +4,7 @@ import { PublicCategoriesController } from './public-categories.controller';
 import { CategoriesModule } from '../categories/categories.module';
 
 @Module({
-  imports: [CategoriesModule], // Importa el módulo que contiene el servicio
+  imports: [CategoriesModule], 
   controllers: [PublicCategoriesController],
 })
 export class PublicCategoriesModule {}

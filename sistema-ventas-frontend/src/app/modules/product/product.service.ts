@@ -15,6 +15,7 @@ export class ProductService {
     private generalService: GeneralService
   ) { }
 
+  // Obtener la lista de productos con parámetros de consulta opcionales
   getProducts(queryParams?: any) {
     let params = new HttpParams();
     
@@ -27,14 +28,17 @@ export class ProductService {
     return firstValueFrom(this.http.get(`${environment.backend}/products`, { params }));
   }
 
+  // Crear un nuevo producto
   createProducts(data: any) {
     return firstValueFrom(this.http.post(`${environment.backend}/products`, data));
   }
 
+  // Actualizar un producto existente
   updateProducts(id: string, data: any) {
     return firstValueFrom(this.http.patch(`${environment.backend}/products/${id}`, data));
   }
 
+  // Obtener la lista de categorías
   getCategories() {
     return firstValueFrom(this.http.get(`${environment.backend}/categories`));
   }

@@ -1,3 +1,4 @@
+//sistema-ventas-frontend/src/app/project/services/toaster.service.ts
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
@@ -6,7 +7,7 @@ export interface ToastMessage {
   severity: 'success' | 'error' | 'info' | 'warning';
   summary: string;
   detail: string;
-  life?: number; // ms duración
+  life?: number; 
 }
 
 @Injectable({ providedIn: 'root' })
@@ -16,6 +17,7 @@ export class ToasterService {
 
   private counter = 0;
 
+  // Mostrar un nuevo toast
   showToast(params: Omit<ToastMessage, 'id'>) {
     const id = ++this.counter;
     const toast: ToastMessage = { id, ...params, life: params.life ?? 3000 };

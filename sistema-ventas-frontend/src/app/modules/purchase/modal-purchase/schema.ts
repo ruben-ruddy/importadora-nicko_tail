@@ -1,4 +1,5 @@
 // sistema-ventas-frontend/src/app/modules/purchase/modal-purchase/schema.ts
+// Definición de los campos del formulario para el módulo de compras
 export const purchaseFormFields = (catalogs: any, currentUser: any = null) => {
   const isCurrentUserSet = currentUser && currentUser.id_usuario;
   

@@ -6,14 +6,13 @@ import { PrismaService } from '../prisma/prisma.service';
 import { JwtModule } from '@nestjs/jwt';
 import { PassportModule } from '@nestjs/passport';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { JwtStrategy } from './jwt.strategy'; // Importa la nueva estrategia JWT
+import { JwtStrategy } from './jwt.strategy'; // Importa estrategia JWT
 import { HttpModule } from '@nestjs/axios';
 import { config } from 'process';
 
 @Module({
   imports: [
-    HttpModule, // Importa el módulo HTTP para realizar solicitudes HTTP  
-    ConfigModule,
+    HttpModule, 
     PassportModule.register({ defaultStrategy: 'jwt' }),
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -25,7 +24,7 @@ import { config } from 'process';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, PrismaService, JwtStrategy], // Añade JwtStrategy a los providers
+  providers: [AuthService, PrismaService, JwtStrategy],
   exports: [AuthService, JwtModule, PassportModule],
 })
 export class AuthModule {}

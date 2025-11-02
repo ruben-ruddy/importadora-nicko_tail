@@ -15,6 +15,7 @@ import {
 export class ReportsService {
   constructor(private prisma: PrismaService) {}
 
+  //  Generar reporte de ventas
   async generateSalesReport(query: ReportQueryDto): Promise<SalesReportResponse> {
     const { startDate, endDate, userId } = query;
     
@@ -76,6 +77,7 @@ export class ReportsService {
     };
   }
 
+  // Generar reporte de compras
   async generatePurchasesReport(query: ReportQueryDto): Promise<PurchasesReportResponse> {
     const { startDate, endDate } = query;
     
@@ -118,11 +120,12 @@ export class ReportsService {
       total_compras: total_egresos,
       total_egresos,
       cantidad_compras,
-      compras_por_proveedor: [], // Puedes implementar esto si tienes proveedores
+      compras_por_proveedor: [], 
       productos_mas_comprados: productosMasComprados
     };
   }
 
+  // Calcular ventas por vendedor
   private async calculateSalesByVendor(ventas: any[], totalVentas: number): Promise<VendedorVentas[]> {
     const vendorMap = new Map<string, VendedorVentas>();
 
@@ -203,6 +206,7 @@ export class ReportsService {
       .slice(0, 10);
   }
 
+  // Calcular productos más comprados
   private calculateTopPurchasedProducts(compras: any[]): ProductoComprado[] {
     const productMap = new Map<string, ProductoComprado>();
 

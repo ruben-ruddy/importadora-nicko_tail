@@ -11,9 +11,10 @@ import { Roles } from './auth/decorators/roles.decorator';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
+  // Endpoint para obtener el mensaje de bienvenida
   @Get() // Este es el endpoint GET en la raíz de tu API (ej. http://localhost:3000/)
-  @UseGuards(AuthGuard('jwt'), RolesGuard) // Aquí aplicamos el guardia de autenticación JWT y el guardia de roles
-  @Roles('Administrador') // Aquí especificamos que solo los usuarios con el rol 'Administrador' pueden acceder a esta ruta
+  @UseGuards(AuthGuard('jwt'), RolesGuard) // el guardia de autenticación JWT y el guardia de roles
+  @Roles('Administrador') // solo los usuarios con el rol 'Administrador' pueden acceder a esta ruta
   @ApiBearerAuth('access-token') // Decorador de Swagger para indicar que requiere token
   @ApiOperation({ summary: 'Obtiene el mensaje de bienvenida (requiere autenticación y rol de Administrador)' })
   @ApiResponse({ status: 200, description: 'Mensaje de bienvenida.' })

@@ -11,6 +11,7 @@ import * as bcrypt from 'bcryptjs';
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
+  // Crear un nuevo usuario
   async create(createUserDto: CreateUserDto): Promise<Omit<PrismaUser, 'password_hash'>> {
     // 1. Verificar si el rol existe
     const role = await this.prisma.role.findUnique({
@@ -56,6 +57,7 @@ export class UsersService {
     }
   }
 
+  // Obtener todos los usuarios con filtros y paginación
   async findAll(query: UserQueryDto): Promise<{ users: Omit<PrismaUser, 'password_hash'>[]; total: number; page: number; limit: number }> {
     const { search, id_rol, active, page = '1', limit = '50' } = query;
 
@@ -103,6 +105,7 @@ export class UsersService {
     return { users, total, page: parseInt(page, 10), limit: take };
   }
 
+  // Obtener un usuario por id
   async findOne(id_usuario: string): Promise<Omit<PrismaUser, 'password_hash'>> {
     const user = await this.prisma.user.findUnique({
       where: { id_usuario },
@@ -125,6 +128,7 @@ export class UsersService {
     return user;
   }
 
+  // Actualizar un usuario por id
   async update(id_usuario: string, updateUserDto: UpdateUserDto): Promise<Omit<PrismaUser, 'password_hash'>> {
     // 1. Verificar si el usuario existe
     const existingUserById = await this.prisma.user.findUnique({
@@ -149,7 +153,7 @@ export class UsersService {
         const existingUserByData = await this.prisma.user.findFirst({
             where: {
                 AND: [
-                    { id_usuario: { not: id_usuario } }, // Excluir el usuario actual
+                    { id_usuario: { not: id_usuario } }, 
                     {
                         OR: [
                             ...(updateUserDto.nombre_usuario ? [{ nombre_usuario: updateUserDto.nombre_usuario }] : []),
@@ -183,13 +187,13 @@ export class UsersService {
                 id_rol: updateUserDto.id_rol,
                 nombre_usuario: updateUserDto.nombre_usuario,
                 email: updateUserDto.email,
-                password_hash: updateUserDto.password, // Ya hasheada si se proporcionó
+                password_hash: updateUserDto.password, 
                 nombre_completo: updateUserDto.nombre_completo,
                 telefono: updateUserDto.telefono,
                 activo: updateUserDto.activo,
-                // ultimo_acceso no se actualiza aquí, es manejado por el login
+             
             },
-            select: { // Excluir el password_hash de la respuesta
+            select: {
                 id_usuario: true,
                 id_rol: true,
                 nombre_usuario: true,
@@ -208,6 +212,7 @@ export class UsersService {
     }
   }
 
+  // Eliminar un usuario por id
 async remove(id_usuario: string): Promise<void> {
   try {
     const existingUser = await this.prisma.user.findUnique({

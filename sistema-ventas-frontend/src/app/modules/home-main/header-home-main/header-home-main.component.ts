@@ -20,6 +20,7 @@ export class HeaderHomeMainComponent implements OnInit, OnDestroy {
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) { }
 
+ // Ciclo de vida del componente
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       this.checkScreenSize();
@@ -38,11 +39,13 @@ export class HeaderHomeMainComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Limpiar suscripciones al destruir el componente
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  // Verificar el tamaño de la pantalla y ajustar el menú
   checkScreenSize(): void {
     if (isPlatformBrowser(this.platformId)) {
       const previousIsDesktop = this.isDesktop;
@@ -60,6 +63,7 @@ export class HeaderHomeMainComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Alternar el estado del menú en móvil
   toggleMenu(): void {
     if (!this.isDesktop) {
       this.isMenuOpen = !this.isMenuOpen;
@@ -67,7 +71,7 @@ export class HeaderHomeMainComponent implements OnInit, OnDestroy {
     }
   }
 
-  // MÉTODO NUEVO AÑADIDO - Cierra el menú en móvil
+  // Cierra el menú en móvil
   closeMenu(): void {
     if (!this.isDesktop) {
       this.isMenuOpen = false;

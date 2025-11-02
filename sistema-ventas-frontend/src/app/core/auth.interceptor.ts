@@ -9,19 +9,17 @@ import {
 import { inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { Observable, throwError, catchError } from 'rxjs';
-/* import { ToasterService } from '@project/services/toaster.service'; */
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from '../../environments/environment';
 import { GeneralService } from './gerneral.service';
 
-
+//Interceptor para agregar el token de autenticación a las solicitudes HTTP
 export const AuthInterceptor: HttpInterceptorFn = (
   req: HttpRequest<any>,
   next: HttpHandlerFn
 ): Observable<HttpEvent<unknown>> => {
   const router = inject(Router);
   const storage = inject(GeneralService);
-/*   const toaster = inject(ToasterService); */
   const translate = inject(TranslateService)
   const token = storage.getToken() ?? 'aaaaa';
   console.log(token);
@@ -39,11 +37,6 @@ export const AuthInterceptor: HttpInterceptorFn = (
     catchError((error) => {
       if (error instanceof HttpErrorResponse) {
         if (error.status === 401) {
-          /* toaster.showToast({
-            severity: 'error',
-            detail: translate.instant("message.userDisable"),
-            summary: ''
-          }) */
 
           router.navigate(['/login']);
         }

@@ -17,6 +17,7 @@ export class ReportService {
     private exportService: ExportService
   ) { }
 
+  // Obtener el reporte de ventas según los filtros proporcionados
   async getSalesReport(filters: ReportFilters): Promise<SalesReport> {
     const params: any = {
       startDate: filters.fecha_inicio,
@@ -32,6 +33,7 @@ export class ReportService {
     );
   }
 
+  // Obtener el reporte de compras según los filtros proporcionados
   async getPurchasesReport(filters: ReportFilters): Promise<PurchasesReport> {
     const params: any = {
       startDate: filters.fecha_inicio,
@@ -43,6 +45,7 @@ export class ReportService {
     );
   }
 
+  // Obtener el reporte combinado de ventas y compras según los filtros proporcionados
   async getCombinedReport(filters: ReportFilters): Promise<{
     sales: SalesReport;
     purchases: PurchasesReport;
@@ -64,6 +67,7 @@ export class ReportService {
     );
   }
 
+  // Exportar el reporte a PDF
   async exportToPDF(reportData: any, reportType: string, fecha_inicio: string, fecha_fin: string): Promise<void> {
     const elementId = 'report-content';
     const filename = `Reporte_${reportType}_${fecha_inicio}_a_${fecha_fin}`;
@@ -74,6 +78,7 @@ export class ReportService {
     await this.exportService.exportToPDF(elementId, filename);
   }
 
+  // Exportar el reporte a Excel
   async exportToExcel(reportData: any, reportType: string, fecha_inicio: string, fecha_fin: string): Promise<void> {
     try {
       const filename = `Reporte_${reportType}_${fecha_inicio}_a_${fecha_fin}`;
@@ -91,6 +96,7 @@ export class ReportService {
     }
   }
 
+  // Exportar el reporte a Excel
   private exportSalesToExcel(salesReport: SalesReport, filename: string): void {
     const sheets = [
       {
@@ -133,6 +139,7 @@ export class ReportService {
     this.exportService.exportMultipleSheetsToExcel(sheets, filename);
   }
 
+  // Exportar el reporte de compras a Excel
   private exportPurchasesToExcel(purchasesReport: PurchasesReport, filename: string): void {
     const sheets = [
       {
@@ -158,6 +165,7 @@ export class ReportService {
     this.exportService.exportMultipleSheetsToExcel(sheets, filename);
   }
 
+  // Exportar el reporte combinado de ventas y compras a Excel
   private exportCombinedToExcel(combinedReport: any, filename: string): void {
     const sheets = [
       {

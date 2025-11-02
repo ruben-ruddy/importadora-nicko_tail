@@ -2,6 +2,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsUUID, IsNotEmpty, IsNumber, Min, Max } from 'class-validator';
 
+// DTO para crear un detalle de venta
 export class CreateSaleDetailDto {
   @ApiProperty({ description: 'ID del producto vendido', example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef' })
   @IsUUID('4', { message: 'El ID de producto debe ser un UUID válido.' })

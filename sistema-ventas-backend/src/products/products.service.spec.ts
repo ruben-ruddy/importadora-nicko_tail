@@ -30,7 +30,7 @@ const mockProduct = {
   category: mockCategory,
 };
 
-// CORREGIDO: Quitamos stock_minimo del CreateProductDto ya que no se usa en el create del servicio
+// DTOs for creating and updating products
 const mockCreateProductDto: CreateProductDto = {
   id_categoria: 'a1b2c3d4-e5f6-7890-1234-567890abcdef',
   nombre_producto: 'Smartphone X',
@@ -39,7 +39,7 @@ const mockCreateProductDto: CreateProductDto = {
   precio_venta: 799.99,
   precio_compra: 600.00,
   stock_actual: 150,
-  stock_minimo: 10, // Este campo está en el DTO pero no se usa en el servicio
+  stock_minimo: 10,
   imagen_url: '/uploads/image123.jpg',
   activo: true,
 };
@@ -48,7 +48,7 @@ const mockUpdateProductDto: UpdateProductDto = {
   nombre_producto: 'Smartphone X Pro',
   precio_venta: 899.99,
 };
-
+// Begin test suite
 describe('ProductsService', () => {
   let service: ProductsService;
   let prismaService: PrismaService;
@@ -68,7 +68,7 @@ describe('ProductsService', () => {
     },
     $transaction: jest.fn(),
   };
-
+// Setup the testing module
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -104,7 +104,7 @@ describe('ProductsService', () => {
       });
       expect(mockPrismaService.product.findFirst).toHaveBeenCalled();
       
-      // CORREGIDO: El servicio no incluye stock_minimo en el create
+      
       expect(mockPrismaService.product.create).toHaveBeenCalledWith({
         data: {
           id_categoria: mockCreateProductDto.id_categoria,
@@ -173,7 +173,6 @@ describe('ProductsService', () => {
       await service.create(createDtoWithoutCode);
 
       // Assert
-      // CORREGIDO: El servicio no incluye stock_minimo en el create
       expect(mockPrismaService.product.create).toHaveBeenCalledWith({
         data: {
           id_categoria: createDtoWithoutCode.id_categoria,

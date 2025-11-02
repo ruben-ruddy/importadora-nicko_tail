@@ -39,7 +39,7 @@ import { ReportsModule } from './reports/reports.module';
     PublicCategoriesModule,
     RolesModule,
     ForecastModule,
-    ReportsModule, // <-- ¡Añade UsersModule aquí!
+    ReportsModule, 
   ],
   controllers: [AppController],
   providers: [AppService],

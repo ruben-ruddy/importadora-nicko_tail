@@ -4,8 +4,6 @@ import { Component, inject } from '@angular/core';
 import { ClientsService } from './clients.service';
 import { GeneralService } from '../../core/gerneral.service';
 import { ModalClientsComponent } from './modal-clients/modal-clients.component';
-
-// Servicios personalizados
 import { ModalService } from '../../project/services/modal.service';
 import { ToasterService } from '../../project/services/toaster.service';
 
@@ -23,7 +21,6 @@ export class ClientsComponent {
   itemsPerPage: number = 10;
   searchTerm: string = '';
 
-  // Usar inject() en lugar de constructor
   private clientsService = inject(ClientsService);
   private modalService = inject(ModalService);
   private generalService = inject(GeneralService);
@@ -34,6 +31,7 @@ export class ClientsComponent {
     this.loadClients();
   }
 
+  // Cargar los clientes desde el servicio
   async loadClients(page: number = 1, limit: number = 10) {
     try {
       this.clients = await this.clientsService.getClients(page, limit, this.searchTerm);
@@ -51,19 +49,23 @@ export class ClientsComponent {
     }
   }
 
+  // Manejar cambios en el término de búsqueda
   onSearchChange(event: any) {
     this.searchTerm = event.target.value;
     this.loadClients(1, this.itemsPerPage);
   }
 
+  // Cambiar de página
   changePage(page: number) {
     this.loadClients(page, this.itemsPerPage);
   }
 
+  // Cambiar la cantidad de elementos por página
   changeItemsPerPage(limit: number) {
     this.loadClients(1, limit);
   }
 
+  // Abrir el modal para agregar un nuevo cliente
   openAddClientsModal() {
     this.modalService.open(ModalClientsComponent, {
       title: 'Nuevo Cliente',
@@ -75,6 +77,7 @@ export class ClientsComponent {
     });
   }
 
+  // Abrir el modal para editar un cliente existente
   openEditClientsModal(client: any){
     this.modalService.open(ModalClientsComponent, {
       title: 'Editar Cliente',
@@ -87,6 +90,7 @@ export class ClientsComponent {
     });
   }
 
+  // Confirmar eliminación de un cliente
   confirmDelete(client: any) {
     const confirmMessage = `¿Está seguro de eliminar al cliente "${client.nombre_completo}"?`;
     
@@ -95,6 +99,7 @@ export class ClientsComponent {
     }
   }
 
+  // Eliminar un cliente
   async deleteClient(id: string) {
     try {
       await this.clientsService.deleteClients(id);
@@ -122,6 +127,7 @@ export class ClientsComponent {
     }
   }
 
+  // Obtener las páginas para la paginación
   getPages(): (number | string)[] {
     const pages: (number | string)[] = [];
     const totalPages = this.clients.totalPages;

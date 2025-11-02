@@ -13,22 +13,24 @@ import { ModalService } from '../../project/services/modal.service';
   templateUrl: './categories.component.html',
   styleUrl: './categories.component.scss'
 })
+// Componente para gestionar las categorías de productos
 export class CategoriesComponent implements OnInit {
-  category: any[] = []; // Cambiar a array para mejor manejo
+  category: any[] = []; 
   
   private categoriesService = inject(CategoriesService);
   private generalService = inject(GeneralService);
   private modalService = inject(ModalService);
 
+  // Ciclo de vida del componente
   ngOnInit(): void {
     this.generalService.show();
     this.loadCategory();
   }
 
+  // Cargar las categorías desde el servicio
   async loadCategory() {
     try {
       const categories = await this.categoriesService.getCategory();
-      // Asegurarse de que sea un array
       this.category = Array.isArray(categories) ? categories : [categories];
       console.log('CategoriesComponent - Categories loaded:', this.category);
     } catch (error) {
@@ -39,6 +41,7 @@ export class CategoriesComponent implements OnInit {
     }
   }
 
+  // Abrir el modal para agregar una nueva categoría
   openAddProductModal() {
     console.log('CategoriesComponent - Opening add category modal');
     
@@ -49,13 +52,14 @@ export class CategoriesComponent implements OnInit {
       }).then(result => {
         console.log('CategoriesComponent - Add modal closed with result:', result);
         if (result) {
-          // Recargar categorías después de agregar
+          // Recargar categorías después de agregar una nueva
           this.loadCategory();
         }
       });
     }, 100);
   }
 
+  // Abrir el modal para editar una categoría existente
   openEditProductModal(product: any) {
     console.log('CategoriesComponent - Opening edit category modal for:', product);
     

@@ -7,8 +7,6 @@ import { purchaseFormFields } from './schema';
 import { PurchaseService } from '../purchase.service';
 import { ToasterService } from '../../../project/services/toaster.service';
 import { Purchase, PurchaseDetail } from '../../../interfaces/purchase.interface';
-
-// Servicio de modales
 import { ModalService } from '../../../project/services/modal.service';
 
 @Component({
@@ -26,10 +24,9 @@ export class ModalPurchaseComponent implements OnInit {
   public formData: any;
   onFormCreated = (form: FormGroup) => {
     this.formReference = form;
-    console.log('✅ Formulario creado:', form);
+    console.log(' Formulario creado:', form);
   };
-  
-  // Inicializar con valores por defecto según la interface
+
   initialData: Purchase = {
     id_usuario: '',
     numero_compra: '',
@@ -56,9 +53,9 @@ export class ModalPurchaseComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      console.log('🔄 Iniciando modal de compra...');
+      console.log(' Iniciando modal de compra...');
       
-      // Obtener usuario actual del config
+
       this.currentUser = this.modalData?.currentUser;
       
       // Si hay datos iniciales, mezclarlos con los valores por defecto
@@ -67,7 +64,7 @@ export class ModalPurchaseComponent implements OnInit {
           ...this.initialData,
           ...this.modalData.data
         };
-        console.log('📦 Datos iniciales recibidos:', this.initialData);
+        console.log(' Datos iniciales recibidos:', this.initialData);
       }
 
       // Si hay usuario logeado y es una nueva compra, asignarlo automáticamente
@@ -77,14 +74,14 @@ export class ModalPurchaseComponent implements OnInit {
       }
 
       // Cargar catálogos necesarios
-      console.log('📥 Cargando catálogos...');
+      console.log(' Cargando catálogos...');
       const [usersArray, productsArray] = await Promise.all([
         this.purchaseService.getUsers(),
         this.purchaseService.getProducts()
       ]);
 
-      console.log('✅ Users loaded:', usersArray.length);
-      console.log('✅ Products loaded:', productsArray.length);
+      console.log('Users loaded:', usersArray.length);
+      console.log('Products loaded:', productsArray.length);
 
       this.catalogs.users = usersArray.map((user: any) => ({
         label: user.nombre_completo || user.nombre_usuario || 'Usuario sin nombre',
@@ -114,10 +111,10 @@ export class ModalPurchaseComponent implements OnInit {
       this.view = true;
       this.loading = false;
 
-      console.log('✅ Modal listo para mostrar');
+      console.log('Modal listo para mostrar');
 
     } catch (error) {
-      console.error('❌ Error en inicialización:', error);
+      console.error(' Error en inicialización:', error);
       this.toaster.showToast({
         severity: 'error',
         summary: 'Error',
@@ -127,11 +124,12 @@ export class ModalPurchaseComponent implements OnInit {
     }
   }
 
+  // Cargar detalles de compra para edición
   private async loadPurchaseDetails() {
     try {
-      console.log('📥 Cargando detalles de compra para edición...');
+      console.log(' Cargando detalles de compra para edición...');
       const purchaseDetails = await this.purchaseService.getPurchaseById(this.initialData.id_compra!);
-      console.log('✅ Detalles cargados:', purchaseDetails);
+      console.log(' Detalles cargados:', purchaseDetails);
       
       if (purchaseDetails.detalle_compras && Array.isArray(purchaseDetails.detalle_compras)) {
         this.initialData.detalle_compras = purchaseDetails.detalle_compras.map((detalle: PurchaseDetail) => ({
@@ -142,10 +140,10 @@ export class ModalPurchaseComponent implements OnInit {
           subtotal: detalle.subtotal,
           producto: detalle.producto
         }));
-        console.log('✅ Detalles procesados:', this.initialData.detalle_compras.length);
+        console.log('Detalles procesados:', this.initialData.detalle_compras.length);
       } else {
         this.initialData.detalle_compras = [];
-        console.warn('⚠️ No hay detalles de compra');
+        console.warn(' No hay detalles de compra');
       }
       
       // Actualizar otros campos de la compra
@@ -155,14 +153,15 @@ export class ModalPurchaseComponent implements OnInit {
       };
       
     } catch (error) {
-      console.error('❌ Error loading purchase details:', error);
+      console.error(' Error loading purchase details:', error);
       this.initialData.detalle_compras = [];
     }
   }
 
+  // Configurar cálculos automáticos en el formulario
   private setupCalculations() {
     if (!this.formReference) {
-      console.warn('⚠️ FormReference no disponible');
+      console.warn(' FormReference no disponible');
       return;
     }
 
@@ -177,9 +176,10 @@ export class ModalPurchaseComponent implements OnInit {
     // Configurar suscripciones iniciales
     this.setupArraySubscriptions();
     
-    console.log('✅ Cálculos configurados');
+    console.log('Cálculos configurados');
   }
 
+  // Configurar suscripciones para cada ítem del array de detalles
   private setupArraySubscriptions() {
     if (!this.formReference) return;
 
@@ -197,6 +197,7 @@ export class ModalPurchaseComponent implements OnInit {
     });
   }
 
+  // Calcular subtotales y total
   private calculateAllSubtotals() {
     if (!this.formReference) return;
 
@@ -206,6 +207,7 @@ export class ModalPurchaseComponent implements OnInit {
     });
   }
 
+  // Calcular subtotal para un ítem
   private calculateSubtotal(index: number) {
     if (!this.formReference) return;
 
@@ -222,6 +224,7 @@ export class ModalPurchaseComponent implements OnInit {
     this.calculateTotal();
   }
 
+  // Calcular el total de la compra
   private calculateTotal() {
     if (!this.formReference) return;
 
@@ -237,6 +240,7 @@ export class ModalPurchaseComponent implements OnInit {
     this.formReference.get('total')?.setValue(total, { emitEvent: false });
   }
 
+  // Generar campos del formulario dinámicamente
   purchaseFormFields(catalogs: any): any[] {
     const fields = purchaseFormFields(catalogs, this.currentUser);
     console.log('📋 Form fields generated - Users:', catalogs.users?.length, 'Products:', catalogs.products?.length);
@@ -250,7 +254,7 @@ export class ModalPurchaseComponent implements OnInit {
     dirty: boolean;
     complete: boolean;
   }) {
-    console.log('📝 Form changed - Valid:', event.valid);
+    console.log(' Form changed - Valid:', event.valid);
     this.formData = event;
     
     // Configurar cálculos cuando el formulario esté listo
@@ -263,6 +267,7 @@ export class ModalPurchaseComponent implements OnInit {
     }
   }
 
+  // Guardar la compra (crear o actualizar)
   async save() {
     if (this.formData?.valid) {
       try {
@@ -297,7 +302,7 @@ export class ModalPurchaseComponent implements OnInit {
           0
         );
 
-        console.log('📤 Datos a enviar al backend:', purchaseData);
+        console.log(' Datos a enviar al backend:', purchaseData);
 
         if (this.initialData.id_compra) {
           await this.purchaseService.updatePurchase(this.initialData.id_compra, purchaseData);
@@ -317,7 +322,7 @@ export class ModalPurchaseComponent implements OnInit {
           this.modalService.close(true);
         }
       } catch (error: any) {
-        console.error('❌ Error completo:', error);
+        console.error(' Error completo:', error);
         if (error.error) {
           console.error('📡 Respuesta del servidor:', error.error);
         }
@@ -328,7 +333,7 @@ export class ModalPurchaseComponent implements OnInit {
         });
       }
     } else {
-      console.warn('⚠️ Formulario inválido');
+      console.warn('Formulario inválido');
       this.toaster.showToast({
         severity: 'error',
         summary: 'Error',
@@ -355,13 +360,15 @@ export class ModalPurchaseComponent implements OnInit {
     return result;
   }
 
+  // Cerrar el modal
   close() {
     this.modalService.close();
   }
 
+  // Agregar un nuevo producto al detalle de la compra
   addNewProduct() {
     if (!this.formReference) {
-      console.warn('⚠️ FormReference no disponible');
+      console.warn(' FormReference no disponible');
       return;
     }
     

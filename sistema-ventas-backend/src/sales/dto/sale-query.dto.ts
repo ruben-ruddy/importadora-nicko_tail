@@ -5,6 +5,7 @@ import { Type } from 'class-transformer';
 import { DtoSaleState } from './create-sale.dto';
 import { SaleState } from '@prisma/client';
 
+// DTO para las consultas de ventas con filtros y paginación
 export class SaleQueryDto {
   @ApiProperty({ description: 'ID del usuario que realizó la venta a filtrar', required: false, format: 'uuid' })
   @IsOptional()

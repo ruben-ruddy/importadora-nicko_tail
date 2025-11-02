@@ -17,10 +17,12 @@ export class CategoriesService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
+  //
   private isClient(): boolean {
     return isPlatformBrowser(this.platformId);
   }
 
+  // Construir los encabezados de autorización
   private getAuthHeaders(): HttpHeaders {
     if (!this.isClient()) {
       return new HttpHeaders();
@@ -30,6 +32,7 @@ export class CategoriesService {
     return new HttpHeaders().set('Authorization', `Bearer ${token}`);
   }
 
+  // Obtener todas las categorías
   getCategories(): Observable<Category[]> {
     if (!this.isClient()) {
       return of([]);
@@ -38,6 +41,7 @@ export class CategoriesService {
     return this.http.get<Category[]>(this.apiUrl, { headers: this.getAuthHeaders() });
   }
 
+  // Obtener una categoría por ID
   getCategoryById(id: string): Observable<Category> {
     if (!this.isClient()) {
       return of({} as Category);

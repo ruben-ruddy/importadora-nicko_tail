@@ -3,11 +3,11 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router } from '@angular/router';
 import { GeneralService } from './gerneral.service';
 
+//Guard para proteger las rutas que requieren autenticación
 export const authGuard: CanActivateFn = (route, state) => {
   const router = inject(Router);
    const storage = inject(GeneralService);
-/*     const translate = inject(TranslateService) */
-  const isLoggedIn = storage.getToken() ; // o tu lógica de auth
+  const isLoggedIn = storage.getToken() ; 
 
   if (!isLoggedIn) {
     router.navigate(['/login']);

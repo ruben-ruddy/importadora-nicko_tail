@@ -1,4 +1,5 @@
 // sistema-ventas-frontend/src/app/modules/users/modal-user/schema-user.ts
+// Definición de los campos del formulario para el usuario
 export const userFormFields = (catalogs: any) => {
   return [
     {
@@ -24,7 +25,7 @@ export const userFormFields = (catalogs: any) => {
                 required: true, 
                 maxLength: 50,
                 minLength: 3,
-                pattern: '^[a-zA-Z0-9_]+$'
+                pattern: '^[a-zA-Z0-9._-]+$'
               },
               placeholder: 'Solo letras, números y _',
               description: 'No usar espacios ni caracteres especiales'
@@ -45,13 +46,13 @@ export const userFormFields = (catalogs: any) => {
               label: 'Contraseña',
               type: 'text',
               validators: { 
-                required: (data: any) => !data?.id_usuario, // Solo requerido para nuevos
+                required: (data: any) => !data?.id_usuario, 
                 minLength: 6,
                 maxLength: 100
               },
               placeholder: 'Mínimo 6 caracteres',
               description: 'Deje en blanco si no desea cambiar la contraseña',
-              hidden: (data: any) => !!data?.id_usuario // Ocultar en edición
+              hidden: (data: any) => !!data?.id_usuario 
             },
             {
               key: 'nombre_completo',

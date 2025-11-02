@@ -12,7 +12,7 @@ import { ForecastResponse } from './interfaces/forecast.interface';
 @Controller('forecast')
 export class ForecastController {
   constructor(private readonly forecastService: ForecastService) {}
-
+// Endpoint para generar un pronóstico de ventas
   @Post()
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOperation({ summary: 'Generar pronóstico de ventas con promedio móvil' })
@@ -50,7 +50,7 @@ export class ForecastController {
   async createForecast(@Body() forecastRequest: ForecastRequestDto): Promise<ForecastResponse> {
     return this.forecastService.generateForecast(forecastRequest);
   }
-
+// Endpoint para obtener el historial de ventas mensual
   @Get('history')
   @UsePipes(new ValidationPipe({ transform: true }))
   @ApiOperation({ summary: 'Obtener historial de ventas mensual' })
@@ -59,7 +59,7 @@ export class ForecastController {
   async getSalesHistory(@Query() query: HistoryQueryDto) {
     return this.forecastService.getSalesHistory(query);
   }
-
+// Endpoint para obtener los meses con mayores ventas
   @Get('top-dates')
   @UsePipes(new ValidationPipe({ 
     transform: true,
@@ -85,7 +85,7 @@ export class ForecastController {
       throw new BadRequestException(error.message);
     }
   }
-
+// Endpoint para obtener los productos más vendidos en un mes específico
   @Get('top-products/:date')
   @UsePipes(new ValidationPipe({ 
     transform: true,
@@ -100,6 +100,8 @@ export class ForecastController {
   @ApiResponse({ status: 200, description: 'Productos más vendidos obtenidos exitosamente' })
   @ApiResponse({ status: 400, description: 'Parámetros de consulta inválidos' })
   @ApiResponse({ status: 404, description: 'No se encontraron ventas para el mes especificado' })
+
+  // Endpoint para obtener los productos más vendidos en un mes específico
   async getTopProductsByDate(
     @Param('date') date: string,
     @Query() query: TopProductsQueryDto
@@ -133,7 +135,7 @@ export class ForecastController {
       });
     }
   }
-
+// Validación adicional de fechas
   private validateDates(fechaInicio: string, fechaFin: string) {
     const startDate = new Date(fechaInicio);
     const endDate = new Date(fechaFin);

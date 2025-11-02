@@ -12,7 +12,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiQuery } from '@nestjs/swagger';
 @Controller('reports')
 export class ReportsController {
   constructor(private readonly reportsService: ReportsService) {}
-
+// Endpoint para generar reporte de ventas
   @Get('sales')
   @ApiOperation({ summary: 'Generar reporte de ventas' })
   @ApiResponse({ status: 200, description: 'Reporte de ventas generado exitosamente' })
@@ -20,7 +20,7 @@ export class ReportsController {
   async getSalesReport(@Query() query: ReportQueryDto): Promise<SalesReportResponse> {
     return this.reportsService.generateSalesReport(query);
   }
-
+// Endpoint para generar reporte de compras
   @Get('purchases')
   @ApiOperation({ summary: 'Generar reporte de compras' })
   @ApiResponse({ status: 200, description: 'Reporte de compras generado exitosamente' })
@@ -28,7 +28,7 @@ export class ReportsController {
   async getPurchasesReport(@Query() query: ReportQueryDto): Promise<PurchasesReportResponse> {
     return this.reportsService.generatePurchasesReport(query);
   }
-
+// Endpoint para generar reporte combinado de ventas y compras
   @Get('combined')
   @ApiOperation({ summary: 'Generar reporte combinado de ventas y compras' })
   @ApiResponse({ status: 200, description: 'Reporte combinado generado exitosamente' })

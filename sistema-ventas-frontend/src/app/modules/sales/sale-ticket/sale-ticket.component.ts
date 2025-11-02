@@ -17,13 +17,16 @@ export class SaleTicketComponent implements OnInit {
   @Input() modalData: any = {};
   @Input() modalConfig: any = {};
   
+  // Datos de la venta
   saleData: any = null;
   showPrintButton: boolean = true;
   
+  // Información de la empresa desde el entorno
   companyName: string = environment.companyName || 'Mi Empresa';
   companyAddress: string = environment.companyAddress || 'Dirección de la empresa';
   companyPhone: string = environment.companyPhone || 'Teléfono';
 
+  // Fecha y hora actuales
   currentDate: string = new Date().toLocaleDateString();
   currentTime: string = new Date().toLocaleTimeString();
 
@@ -31,6 +34,7 @@ export class SaleTicketComponent implements OnInit {
     private modalService: ModalService
   ) {}
 
+  // Ciclo de vida del componente
   ngOnInit() {
     if (this.modalData) {
       this.saleData = this.modalData.saleData;
@@ -41,11 +45,13 @@ export class SaleTicketComponent implements OnInit {
     }
   }
 
+  // Imprimir el ticket de venta
   printTicket() {
     console.log('Imprimiendo ticket...');
     window.print();
   }
 
+  // Cerrar el diálogo del ticket
   closeDialog() {
     this.modalService.close();
   }

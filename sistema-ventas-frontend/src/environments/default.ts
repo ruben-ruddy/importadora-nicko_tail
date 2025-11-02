@@ -1,4 +1,5 @@
 // sistema-ventas-frontend/src/environments/default.ts
+// Configuración de entorno por defecto
 export const environmentDefault = {
     platformVersion: '1.0.0',
     appCode: 'back-f',

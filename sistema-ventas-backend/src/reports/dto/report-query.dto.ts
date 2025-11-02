@@ -2,6 +2,7 @@
 import { IsOptional, IsString, IsDateString, IsEnum } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
+// DTO para las consultas de reportes con filtros
 export class ReportQueryDto {
   @ApiProperty({ description: 'Fecha de inicio del reporte (YYYY-MM-DD)', example: '2024-01-01' })
   @IsDateString()

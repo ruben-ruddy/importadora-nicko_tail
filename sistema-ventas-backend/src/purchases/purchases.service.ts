@@ -14,7 +14,7 @@ import { PurchaseState, MovementType } from '@prisma/client';
 @Injectable()
 export class PurchasesService {
   constructor(private prisma: PrismaService) {}
-
+// Crear una nueva compra
   async create(createPurchaseDto: CreatePurchaseDto) {
     const {
       id_usuario,
@@ -24,13 +24,13 @@ export class PurchasesService {
       estado,
     } = createPurchaseDto;
 
-    // 1. Validar existencia de usuario
+    //Validar existencia de usuario
     const user = await this.prisma.user.findUnique({ where: { id_usuario } });
     if (!user) {
       throw new NotFoundException(`Usuario con ID ${id_usuario} no encontrado.`);
     }
 
-    // 2. Pre-procesar los detalles de la compra y calcular el subtotal
+    //Pre-procesar los detalles de la compra y calcular el subtotal
     let calculatedTotal = 0;
     const productsToUpdateStock: { product: Product; quantity: number }[] = [];
 
@@ -59,7 +59,7 @@ export class PurchasesService {
     const prismaPurchaseState = estado ? 
       (estado.toLowerCase() as PurchaseState) : PurchaseState.pendiente;
 
-    // 3. Generar número de compra automático
+    //Generar número de compra automático
     const lastPurchase = await this.prisma.purchase.findFirst({
       orderBy: { fecha_compra: 'desc' },
       select: { numero_compra: true }
@@ -74,7 +74,7 @@ export class PurchasesService {
       }
     }
 
-    // 4. Iniciar transacción
+    // Iniciar transacción
     const result = await this.prisma.$transaction(async (prisma) => {
       // Crear la compra principal
       const purchase = await prisma.purchase.create({
@@ -124,10 +124,10 @@ export class PurchasesService {
     return result;
   }
 
+  // Obtener todas las compras con filtros y paginación
 async findAll(query: PurchaseQueryDto) {
   const { id_usuario, numero_compra, estado, startDate, endDate } = query;
-  
-  // Convierte los strings de la consulta a números de forma segura
+
   const page = query.page ? parseInt(query.page, 10) : 1;
   const limit = query.limit ? parseInt(query.limit, 10) : 10;
   const skip = (page - 1) * limit;
@@ -199,6 +199,7 @@ async findAll(query: PurchaseQueryDto) {
   };
 }
 
+// Obtener una compra por ID
   async findOne(id_compra: string) {
     const purchase = await this.prisma.purchase.findUnique({
       where: { id_compra },
@@ -233,6 +234,7 @@ async findAll(query: PurchaseQueryDto) {
     return purchase;
   }
 
+  // Actualizar una compra existente
   async update(id_compra: string, updatePurchaseDto: UpdatePurchaseDto) {
     const existingPurchase = await this.prisma.purchase.findUnique({
       where: { id_compra },
@@ -313,7 +315,7 @@ async findAll(query: PurchaseQueryDto) {
       throw error;
     }
   }
-
+// Eliminar una compra
   async remove(id_compra: string) {
     const existingPurchase = await this.prisma.purchase.findUnique({
       where: { id_compra },
@@ -326,7 +328,6 @@ async findAll(query: PurchaseQueryDto) {
 
     try {
       await this.prisma.$transaction(async (prisma) => {
-        // Revertir stock para cada producto
         for (const detail of existingPurchase.detalle_compras) {
           await prisma.product.update({
             where: { id_producto: detail.id_producto },

@@ -1,5 +1,6 @@
 //sistema-ventas-frontend/src/app/modules/product/modal-product/schema.ts
 
+// Definición de los campos del formulario para el módulo de productos
 export const productFormFields=(catalogs: any)=> {
     
       return ([
@@ -80,7 +81,7 @@ export const productFormFields=(catalogs: any)=> {
 
                 },
                 {
-                  key: 'activo', // CAMBIADO A SELECT
+                  key: 'activo', 
                   label: 'Estado',
                   type: 'select',
                   options: [

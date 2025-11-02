@@ -16,7 +16,6 @@ export class DynamicFormComponent implements OnInit {
   @Input() fields: any[] = [];
   @Input() initialData: any = {};
 
-  /** ? ahora es una función opcional que recibe el formulario */
   @Input() askfor?: (form: FormGroup) => void;
 
   @Output() onFormChange = new EventEmitter<any>();
@@ -24,6 +23,7 @@ export class DynamicFormComponent implements OnInit {
   form!: FormGroup;
   constructor(private fb: FormBuilder) { }
 
+  // Ciclo de vida del componente
   ngOnInit(): void {
     this.form = this.fb.group({});
     this.buildForm(this.fields);
@@ -44,6 +44,7 @@ export class DynamicFormComponent implements OnInit {
     this.subscribeToFormChanges();
   }
 
+  // Convertir valores numéricos en cadenas a números reales
 private convertNumericStringValues() {
   Object.keys(this.form.controls).forEach(key => {
     const control = this.form.get(key);
@@ -62,6 +63,7 @@ private convertNumericStringValues() {
   });
 }
 
+// Parchar el formulario con los datos iniciales
 private patchFormWithInitialData(): void {
   if (!this.initialData) return;
 
@@ -103,6 +105,7 @@ private patchFormWithInitialData(): void {
   });
 }
 
+// Buscar el campo en la configuración por su key
   private findFieldByKey(key: string): any {
   for (const field of this.fields) {
     if (field.type === 'column' && field.columns) {
@@ -117,6 +120,7 @@ private patchFormWithInitialData(): void {
   return null;
 }
 
+// Suscribirse a los cambios del formulario
   private subscribeToFormChanges(): void {
     this.form.valueChanges.subscribe(() => {
       const isComplete = this.checkAllRequiredFieldsFilled();
@@ -130,6 +134,7 @@ private patchFormWithInitialData(): void {
       });
     });
   }
+  // Verificar si todos los campos requeridos están llenos
   private checkAllRequiredFieldsFilled(): boolean {
     for (const key in this.form.controls) {
       const control = this.form.get(key);
@@ -142,6 +147,7 @@ private patchFormWithInitialData(): void {
     return true;
   }
 
+  // Construir el formulario dinámicamente
   buildForm(fields: any[]) {
     fields.forEach(field => {
       if (field.type === 'column') {
@@ -156,6 +162,7 @@ private patchFormWithInitialData(): void {
     });
   }
 
+  // Agregar un control de tipo array
     private addArrayControl(field: any) {
     const formArray = this.fb.array([]);
     this.form.addControl(field.key, formArray);
@@ -173,6 +180,7 @@ private patchFormWithInitialData(): void {
     }
   }
 
+  // Crear un item del array
 private createArrayItem(field: any, itemData: any = {}): FormGroup {
   const itemGroup = this.fb.group({});
   
@@ -218,6 +226,7 @@ private getArrayItemInitialValue(itemField: any, itemData: any): any {
   }
 }
 
+// Agregar un nuevo item al array
   addArrayItem(field: any, itemData: any = {}) {
   const formArray = this.form.get(field.key) as FormArray;
   const newItem = this.createArrayItem(field, itemData);
@@ -230,7 +239,7 @@ private getArrayItemInitialValue(itemField: any, itemData: any): any {
 }
 
 // Nuevo método para calcular subtotal de nuevo item
-private calculateNewItemSubtotal(arrayKey: string, index: number) {
+  private calculateNewItemSubtotal(arrayKey: string, index: number) {
   const formArray = this.form.get(arrayKey) as FormArray;
   const itemGroup = formArray.at(index) as FormGroup;
   
@@ -244,6 +253,7 @@ private calculateNewItemSubtotal(arrayKey: string, index: number) {
   this.form.updateValueAndValidity();
 }
 
+// Eliminar un item del array
   removeArrayItem(fieldKey: string, index: number) {
     const formArray = this.form.get(fieldKey) as FormArray;
     if (formArray.length > 1) {
@@ -251,10 +261,12 @@ private calculateNewItemSubtotal(arrayKey: string, index: number) {
     }
   }
 
+  // Obtener un FormArray por su key
   getFormArray(fieldKey: string): FormArray {
     return this.form.get(fieldKey) as FormArray;
   }
 
+  // Agregar un control individual al formulario
 private addControl(field: any) {
   if (field.type === 'title') return;
 
@@ -304,6 +316,7 @@ private getInitialValue(field: any): any {
   }
 }
 
+// Mapear validadores desde la configuración al formato de Angular
 private mapValidators(validators: any): any[] {
   const v: any[] = [];
   if (!validators) return v;
@@ -320,11 +333,12 @@ private mapValidators(validators: any): any[] {
   
   return v;
 }
-
+ // Obtener un control del formulario por su key
   getControl(key: string) {
     return this.form.get(key);
   }
 
+  // Verificar si un campo debe ser visible según reglas de showOn
   isFieldVisible(field: any): boolean {
     if (!field.showOn) return true;
     const { rules } = field.showOn;
@@ -334,11 +348,13 @@ private mapValidators(validators: any): any[] {
     });
   }
 
+  // Disparar el input file
   triggerFileInput(key: string): void {
     const input = document.getElementById('fileInput_' + key) as HTMLInputElement;
     input?.click();
   }
 
+  // Manejar el cambio de archivo
  onFileChange(event: Event, key: string): void {
   const input = event.target as HTMLInputElement;
   const file = input.files?.[0];
@@ -384,6 +400,7 @@ private mapValidators(validators: any): any[] {
   reader.readAsDataURL(file);
 }
 
+// Verificar si el valor es una imagen para previsualización
   isImage(fileData: string | null | undefined): boolean {
   if (!fileData || typeof fileData !== 'string') {
     return false;
@@ -393,6 +410,7 @@ private mapValidators(validators: any): any[] {
          fileData.includes('image/');
 }
 
+// Validador personalizado para archivos
   private fileValidator(validators: any) {
   return (control: FormControl) => {
     const value = control.value;
@@ -430,6 +448,7 @@ private mapValidators(validators: any): any[] {
   };
 }
 
+// Convertir el valor de un input a número
 convertToNumber(event: Event, arrayKey: string, index: number, fieldKey: string) {
   const input = event.target as HTMLInputElement;
   const value = input.value;

@@ -10,7 +10,6 @@ export class CreateClientDto {
   nombre_completo: string;
 
   @ApiProperty({ description: 'Email del cliente (opcional)', example: 'juan.perez@example.com', required: false })
-  //@IsEmail({}, { message: 'El email debe ser una dirección de correo válida.' })
   @IsOptional()
   @MaxLength(100, { message: 'El email no puede exceder los 100 caracteres.' })
   email?: string;

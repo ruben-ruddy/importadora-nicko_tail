@@ -17,16 +17,19 @@ export class ToastComponent implements OnInit {
 
   constructor(private toaster: ToasterService) {}
 
+  // Suscribirse al servicio de toasts al inicializar el componente
   ngOnInit() {
     this.sub = this.toaster.toasts.subscribe(messages => {
       this.toasts = messages;
     });
   }
 
+  // Limpiar la suscripción al destruir el componente
   ngOnDestroy() {
     this.sub?.unsubscribe();
   }
 
+  // Obtener las clases CSS basadas en la severidad del toast
   toastClasses(severity: string) {
     switch(severity) {
       case 'success': return 'bg-green-500';

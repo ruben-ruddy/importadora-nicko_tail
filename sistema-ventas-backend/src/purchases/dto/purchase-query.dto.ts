@@ -4,6 +4,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import { DtoPurchaseState } from './create-purchase.dto'; // Importa el enum de tu DTO de creación
 
+// DTO para las consultas de compras con filtros y paginación
 export class PurchaseQueryDto {
   @ApiProperty({ description: 'ID del usuario que realizó la compra a filtrar', required: false, format: 'uuid' })
   @IsOptional()

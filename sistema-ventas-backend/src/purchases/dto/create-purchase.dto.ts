@@ -16,15 +16,14 @@ import {
 import { Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 
-// Si tu enum en Prisma es PurchaseState y tiene valores 'pendiente', 'completada', etc.
-// Definimos el DTO enum para usarlo en la validación y documentación de Swagger
+// Estado posible de una compra
 export enum DtoPurchaseState {
   PENDIENTE = 'pendiente',
   COMPLETADA = 'completada',
   CANCELADA = 'cancelada',
 }
 
-// DTO para los detalles de cada ítem de la compra
+// DTO para los detalles de cada producto en una compra
 export class CreatePurchaseDetailDto {
   @ApiProperty({ description: 'ID del producto comprado', format: 'uuid' })
   @IsUUID()
@@ -49,6 +48,7 @@ export class CreatePurchaseDetailDto {
   subtotal: number;
 }
 
+// DTO para crear una nueva compra
 export class CreatePurchaseDto {
   @ApiProperty({ description: 'ID del usuario', format: 'uuid' })
   @IsUUID()

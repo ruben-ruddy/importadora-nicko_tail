@@ -1,13 +1,12 @@
 // src/sales/sales.controller.ts 
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { SalesService } from './sales.service'; // Asegúrate de que esta ruta sea correcta
-import { CreateSaleDto } from './dto/create-sale.dto'; // Asumiendo que tienes estos DTOs
+import { SalesService } from './sales.service'; 
+import { CreateSaleDto } from './dto/create-sale.dto'; 
 import { UpdateSaleDto } from './dto/update-sale.dto';
-import { SaleQueryDto } from './dto/sale-query.dto'; // Si tienes un DTO para consultas de ventas
-
+import { SaleQueryDto } from './dto/sale-query.dto'; 
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator'; // Importa el decorador Roles
+import { Roles } from '../auth/decorators/roles.decorator'; 
 
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
 
@@ -18,6 +17,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery }
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
 
+  // Endpoint para crear una nueva venta
   @Post()
   // Solo los Vendedores y Administradores pueden crear ventas
   //@Roles('Administrador', 'Vendedor')
@@ -32,6 +32,7 @@ export class SalesController {
     return this.salesService.create(createSaleDto);
   }
 
+  // Endpoint para obtener todas las ventas con filtros y paginación
   @Get()
   // Administradores, Vendedores y Cajeros pueden listar ventas
   //@Roles('Administrador', 'Vendedor', 'Cajero')
@@ -49,6 +50,7 @@ export class SalesController {
     return this.salesService.findAll(query);
   }
 
+  // Endpoint para obtener una venta por id
   @Get(':id')
   // Administradores, Vendedores y Cajeros pueden ver una venta específica
   //@Roles('Administrador', 'Vendedor', 'Cajero')
@@ -62,6 +64,7 @@ export class SalesController {
     return this.salesService.findOne(id);
   }
 
+  // Endpoint para actualizar una venta por id
   @Patch(':id')
   // Solo los Administradores y Vendedores pueden actualizar ventas (con mucha precaución)
   //@Roles('Administrador', 'Vendedor')
@@ -79,6 +82,7 @@ export class SalesController {
     return this.salesService.update(id, updateSaleDto);
   }
 
+  // Endpoint para eliminar una venta por id
   @Delete(':id')
   // Solo los Administradores pueden eliminar ventas (con extrema precaución)
   //@Roles('Administrador')
@@ -91,9 +95,6 @@ export class SalesController {
   @ApiResponse({ status: 404, description: 'Venta no encontrada.' })
   @ApiResponse({ status: 409, description: 'Conflicto de integridad referencial o de stock.' })
   remove(@Param('id') id: string) {
-    // La eliminación de ventas suele ser una operación muy delicada que puede requerir
-    // reversión de inventario y ajustes contables. Muchos sistemas optan por estados
-    // de "cancelado" o "anulado" en lugar de la eliminación física.
     return this.salesService.remove(id);
   }
 }

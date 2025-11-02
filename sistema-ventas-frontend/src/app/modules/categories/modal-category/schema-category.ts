@@ -1,4 +1,5 @@
 // sistema-ventas-frontend/src/app/modules/categories/modal-category/schema-category.ts
+// Definición de los campos del formulario para la creación/edición de categorías
 export const categoryFormFields = (catalogs: any) => {
   return [
     {

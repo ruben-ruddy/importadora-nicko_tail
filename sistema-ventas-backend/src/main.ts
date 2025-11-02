@@ -7,6 +7,7 @@ import { join } from 'path';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { ConfigService } from '@nestjs/config';
 
+// Función principal para arrancar la aplicación
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const configService = app.get(ConfigService);
@@ -23,7 +24,7 @@ async function bootstrap() {
     credentials: true,
   });
 
-  app.setGlobalPrefix('api'); // <--- ¡AÑADE ESTA LÍNEA AQUÍ!
+  app.setGlobalPrefix('api'); 
 
   // Habilita la validación global de DTOs
   app.useGlobalPipes(new ValidationPipe({
@@ -32,6 +33,7 @@ async function bootstrap() {
     transform: true,
   }));
 
+  // Configuración de Swagger
   const config = new DocumentBuilder()
     .setTitle('Sistema de Ventas y Compras con Catálogo en Línea')
     .setDescription('API para la gestión de ventas, compras e inventario, incluyendo un catálogo de productos.')
@@ -49,8 +51,9 @@ async function bootstrap() {
     )
     .build();
 
+    // Crear el documento de Swagger
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api/docs', app, document); // Swagger ya usa 'api/docs', pero esto solo es para su UI.
+  SwaggerModule.setup('api/docs', app, document); 
 
   await app.listen(3000);
   console.log(`Aplicación ejecutándose en: ${await app.getUrl()}`);

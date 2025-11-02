@@ -24,6 +24,7 @@ export class ForecastComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   
   activeTab: 'config' | 'results' | 'productAnalysis' = 'config';
+  // Configuración del pronóstico
   forecastRequest: ForecastRequest = {
     metodo: 'promedio_movil',
     periodo: 'mensual',
@@ -36,6 +37,7 @@ export class ForecastComponent implements OnInit, OnDestroy {
     }
   };
 
+  // Resultados del pronóstico
   forecastResults: ForecastResult[] = [];
   historicalData: HistoricalData[] = [];
   loading = false;
@@ -57,6 +59,7 @@ export class ForecastComponent implements OnInit, OnDestroy {
     accuracy: 0
   };
 
+  // Estadísticas generales
   totalSales = 0;
   averageSales = 0;
   growthRate = 0;
@@ -68,6 +71,7 @@ export class ForecastComponent implements OnInit, OnDestroy {
   public salesChartType: ChartType = 'line';
   public productsChartType: ChartType = 'bar';
 
+  // Datos y opciones del gráfico de ventas
   public salesChartData: ChartConfiguration['data'] = {
     labels: [],
     datasets: [
@@ -91,6 +95,7 @@ export class ForecastComponent implements OnInit, OnDestroy {
     ]
   };
 
+  // Opciones del gráfico de ventas
   public salesChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     plugins: {
@@ -144,6 +149,7 @@ export class ForecastComponent implements OnInit, OnDestroy {
     }
   };
 
+  // Datos y opciones del gráfico de productos más vendidos
   public productsChartData: ChartConfiguration['data'] = {
     labels: [],
     datasets: [
@@ -158,6 +164,7 @@ export class ForecastComponent implements OnInit, OnDestroy {
     ]
   };
 
+  //
   public productsChartOptions: ChartConfiguration['options'] = {
     responsive: true,
     plugins: {
@@ -185,6 +192,7 @@ export class ForecastComponent implements OnInit, OnDestroy {
     }
   };
 
+  // Datos y opciones del gráfico de ventas históricas
   public historicalChartType: ChartType = 'line';
 public historicalChartData: ChartConfiguration['data'] = {
   labels: [],
@@ -200,6 +208,7 @@ public historicalChartData: ChartConfiguration['data'] = {
   ]
 };
 
+// Opciones del gráfico de ventas históricas
 public historicalChartOptions: ChartConfiguration['options'] = {
   responsive: true,
   plugins: {
@@ -237,20 +246,24 @@ public historicalChartOptions: ChartConfiguration['options'] = {
 
   constructor(private forecastService: ForecastService) { }
 
+  // Ciclo de vida del componente
   async ngOnInit() {
     await this.loadHistoricalData();
   }
 
+  // Obtener la fecha de inicio por defecto (hace un año)
   private getDefaultStartDate(): string {
     const date = new Date();
     date.setFullYear(date.getFullYear() - 1);
     return date.toISOString().substring(0, 7);
   }
 
+  // Obtener la fecha de fin por defecto (mes actual)
   private getDefaultEndDate(): string {
     return new Date().toISOString().substring(0, 7);
   }
 
+  // Cargar datos históricos de ventas
   async loadHistoricalData() {
     try {
       this.loading = true;
@@ -278,6 +291,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     }
   }
 
+  // Calcular estadísticas generales
   async generateForecast() {
     this.loading = true;
     this.error = null;
@@ -310,6 +324,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     }
   }
 
+  // Calcular estadísticas generales de ventas
   private updateSalesChart() {
     if (this.historicalData.length === 0 && this.forecastResults.length === 0) return;
 
@@ -347,6 +362,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     }
   }
 
+  // Calcular estadísticas generales de ventas
   private updateProductsChart() {
     if (!this.selectedDateProducts || this.selectedDateProducts.length === 0) return;
 
@@ -375,6 +391,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
   }
 
 
+  // Calcular estadísticas generales de ventas
   getErrorClass(precision: number | undefined): string {
     if (precision === undefined || precision === null) return 'text-gray-500 bg-gray-100';
     if (precision >= 80) return 'text-green-600 bg-green-50';
@@ -383,13 +400,14 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     return 'text-red-600 bg-red-50';
   }
 
+  // Calcular estadísticas generales de ventas
   getPrecisionClass(precision: number | undefined): string {
     if (precision === undefined) return 'text-gray-500';
     if (precision >= 80) return 'text-green-600';
     if (precision >= 60) return 'text-yellow-600';
     return 'text-red-600';
   }
-
+// Calcular estadísticas generales de ventas
   formatCurrency(value: number): string {
     return new Intl.NumberFormat('es-ES', {
       style: 'currency',
@@ -397,10 +415,12 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     }).format(value);
   }
 
+  // Calcular estadísticas generales de ventas
   get totalForecastedSales(): number {
     return this.forecastResults.reduce((sum, r) => sum + r.ventas_previstas, 0);
   }
 
+  // Cargar los meses con mayores ventas
   async loadTopSellingDates() {
     try {
       this.loading = true;
@@ -424,6 +444,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     }
   }
 
+  // Cargar los productos más vendidos para una fecha seleccionada
   async loadTopProductsForDate(date: string) {
     if (this.destroy$.closed) return;
 
@@ -452,6 +473,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     }
   }
 
+  // Calcular estadísticas generales de ventas
   private handleError(error: any, action: string) {
     console.error(`Error al ${action}:`, error);
     
@@ -468,6 +490,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     }
   }
 
+  
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
@@ -477,6 +500,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     return this.topSellingDates.length > 0;
   }
 
+  
   exportToCSV() {
     try {
       const csvContent = this.convertToCSV();
@@ -487,6 +511,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     }
   }
 
+  // Convertir los resultados del pronóstico a formato CSV
   private convertToCSV(): string {
     const headers = ['Mes', 'Ventas Previstas', 'Límite Inferior', 'Límite Superior', 'Precisión'];
     const rows = this.forecastResults.map(result => [
@@ -500,6 +525,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     return [headers, ...rows].map(row => row.join(',')).join('\n');
   }
 
+  // Descargar el archivo CSV
   private downloadCSV(content: string, filename: string) {
     const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -512,6 +538,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     document.body.removeChild(link);
   }
 
+  // Exportar el reporte a PDF
   exportStructuredPDF() {
     try {
       const pdf = new jsPDF();
@@ -581,6 +608,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
     }
   }
 
+  // Agregar una métrica al PDF
   private addMetric(pdf: any, label: string, value: string, x: number, y: number) {
     pdf.setTextColor(80, 80, 80);
     pdf.text(`${label}:`, x, y);
@@ -609,6 +637,7 @@ public historicalChartOptions: ChartConfiguration['options'] = {
   };
 }
 
+// Calcular la tasa de crecimiento real
 getSalesPattern(): string {
   if (this.historicalData.length < 3) return 'Datos insuficientes para análisis';
   
@@ -627,6 +656,7 @@ getSalesPattern(): string {
   return 'Tendencia variable';
 }
 
+// Calcular el nivel de volatilidad
 getVolatilityLevel(): string {
   if (this.historicalData.length < 2) return 'Datos insuficientes';
   
@@ -641,6 +671,7 @@ getVolatilityLevel(): string {
   return 'Alta volatilidad';
 }
 
+// Generar recomendaciones para la ventana
 getWindowRecommendation(): string {
   const volatility = this.getVolatilityLevel();
   const pattern = this.getSalesPattern();
@@ -661,6 +692,7 @@ getWindowRecommendation(): string {
   return '⚖️ Ventana actual balanceada para el patrón detectado';
 }
 
+// Generar recomendaciones para el alpha
 getAlphaRecommendation(): string {
   const volatility = this.getVolatilityLevel();
   const currentAlpha = this.forecastRequest.parametros.alpha;
@@ -681,6 +713,7 @@ getAlphaRecommendation(): string {
   return '⚖️ Alpha actual adecuado para el nivel de volatilidad';
 }
 
+// Obtener recomendación combinada
 getCurrentRecommendation(): string {
   const windowRec = this.getWindowRecommendation();
   const alphaRec = this.getAlphaRecommendation();
@@ -703,19 +736,12 @@ updateRecommendations() {
   }, 100);
 }
 
-// En el método loadHistoricalData, agregar al final:
-
+// Calcular estadísticas generales de ventas
 private calculateStatistics() {
   this.totalSales = this.historicalData.reduce((sum, item) => sum + item.ventas, 0);
   this.averageSales = this.historicalData.length > 0 ? this.totalSales / this.historicalData.length : 0;
 
   if (this.historicalData.length > 1) {
-    // ❌ CÁLCULO VIEJO (eliminar):
-    // const first = this.historicalData[0].ventas;
-    // const last = this.historicalData[this.historicalData.length - 1].ventas;
-    // this.growthRate = first > 0 ? ((last - first) / first) * 100 : 0;
-    
-    // ✅ CÁLCULO MEJORADO (agregar):
     this.growthRate = this.calculateRealGrowthRate();
   } else {
     this.growthRate = 0;
@@ -724,6 +750,7 @@ private calculateStatistics() {
   this.updateHistoricalChart();
 }
 
+// Calcular la tasa de crecimiento real basada en datos históricos
 private calculateRealGrowthRate(): number {
   if (this.historicalData.length < 2) return 0;
 
@@ -837,6 +864,7 @@ getMaximumExpectedRevenue(): number {
   return this.forecastResults[0].intervalo_confianza.superior * this.forecastResults.length;
 }
 
+// Generar recomendación de presupuesto basada en volatilidad
 getBudgetRecommendation(): string {
   const minRevenue = this.getMinimumExpectedRevenue();
   const maxRevenue = this.getMaximumExpectedRevenue();
@@ -853,6 +881,7 @@ getBudgetRecommendation(): string {
   }
 }
 
+// Consideraciones importantes para el usuario
 getImportantConsiderations(): string[] {
   const considerations: string[] = [];
   const dataMonths = this.historicalData.length;
@@ -880,6 +909,7 @@ getImportantConsiderations(): string[] {
   return considerations;
 }
 
+// Evaluar el nivel de riesgo del pronóstico
 getRiskLevel(): string {
   const accuracy = this.forecastMetrics.accuracy;
   const dataMonths = this.historicalData.length;
@@ -894,6 +924,7 @@ getRiskLevel(): string {
   }
 }
 
+// Obtener clase CSS para el nivel de riesgo
 getRiskLevelClass(): string {
   const riskLevel = this.getRiskLevel();
   switch (riskLevel) {
@@ -918,6 +949,7 @@ getRiskExplanation(): string {
   }
 }
 
+// Generar resumen ejecutivo del pronóstico
 getExecutiveSummary(): string {
   const accuracy = this.forecastMetrics.accuracy;
   const totalSales = this.totalForecastedSales;
@@ -929,6 +961,7 @@ getExecutiveSummary(): string {
           Nivel de riesgo ${riskLevel.toLowerCase()}. ${this.getPrimaryRecommendation()}`;
 }
 
+// Obtener la recomendación principal basada en métricas clave
 getPrimaryRecommendation(): string {
   const accuracy = this.forecastMetrics.accuracy;
   const growth = this.growthRate;
@@ -944,6 +977,7 @@ getPrimaryRecommendation(): string {
   }
 }
 
+// Obtener clase CSS para la precisión
 getPrecisionBadgeClass(accuracy: number): string {
   if (accuracy >= 90) return 'bg-green-100 text-green-800';
   if (accuracy >= 80) return 'bg-blue-100 text-blue-800';
@@ -951,6 +985,7 @@ getPrecisionBadgeClass(accuracy: number): string {
   return 'bg-red-100 text-red-800';
 }
 
+// Obtener ícono para la recomendación
 getRecommendationIconClass(index: number): string {
   const icons = ['📈', '💰', '🛒', '👥', '📊', '🎯'];
   return icons[index] || '✅';

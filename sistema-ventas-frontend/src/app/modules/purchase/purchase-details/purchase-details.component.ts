@@ -2,8 +2,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Purchase, PurchaseDetail } from '../../../interfaces/purchase.interface';
-
-// Servicio de modales
 import { ModalService } from '../../../project/services/modal.service';
 
 @Component({
@@ -17,6 +15,7 @@ export class PurchaseDetailsComponent implements OnInit {
   @Input() modalData: any = {};
   @Input() modalConfig: any = {};
 
+  //
   purchase: Purchase = {
     id_compra: '',
     id_usuario: '',
@@ -31,7 +30,6 @@ export class PurchaseDetailsComponent implements OnInit {
       nombre_usuario: '',
       nombre_completo: '',
       email: ''
-      // Quitar 'activo' y 'fecha_creacion' ya que no están en la interfaz
     }
   };
 
@@ -39,10 +37,10 @@ export class PurchaseDetailsComponent implements OnInit {
     private modalService: ModalService
   ) {}
 
+  // Ciclo de vida del componente
   ngOnInit() {
-    console.log('🔄 Iniciando componente de detalles...');
+    console.log(' Iniciando componente de detalles...');
     
-    // CORREGIDO: Inicializar después de que los inputs estén disponibles
     if (this.modalData?.purchase) {
       this.purchase = {
         ...this.purchase,
@@ -72,13 +70,14 @@ export class PurchaseDetailsComponent implements OnInit {
         };
       }
       
-      console.log('✅ Datos de compra cargados:', this.purchase);
-      console.log('📦 Número de detalles:', this.purchase.detalle_compras.length);
+      console.log(' Datos de compra cargados:', this.purchase);
+      console.log(' Número de detalles:', this.purchase.detalle_compras.length);
     } else {
-      console.error('❌ No se recibieron datos de compra');
+      console.error(' No se recibieron datos de compra');
     }
   }
 
+  // Formatear moneda en BOB
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('es-BO', {
       style: 'currency',
@@ -86,6 +85,7 @@ export class PurchaseDetailsComponent implements OnInit {
     }).format(amount || 0);
   }
 
+  // Formatear fecha legible
   formatDate(date: string | Date): string {
     if (!date) return 'N/A';
     try {
@@ -101,10 +101,12 @@ export class PurchaseDetailsComponent implements OnInit {
     }
   }
 
+  // Cerrar el modal
   close() {
     this.modalService.close();
   }
 
+  // Obtener clase CSS según el estado de la compra
   getStatusClass(estado: string): string {
     switch (estado?.toLowerCase()) {
       case 'pendiente':
@@ -118,10 +120,12 @@ export class PurchaseDetailsComponent implements OnInit {
     }
   }
 
+  // Obtener el nombre del producto desde el detalle de compra
   getProductName(detalle: PurchaseDetail): string {
     return detalle.producto?.nombre_producto || 'Producto no encontrado';
   }
 
+  // Obtener el nombre del usuario responsable de la compra
   getUserName(): string {
     return this.purchase.user?.nombre_completo || 
            this.purchase.user?.nombre_usuario || 

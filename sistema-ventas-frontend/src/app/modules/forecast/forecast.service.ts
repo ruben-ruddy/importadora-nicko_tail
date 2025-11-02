@@ -21,6 +21,7 @@ export class ForecastService {
 
   constructor(private http: HttpClient) { }
 
+  // Obtener el historial de ventas para el pronóstico
   async getSalesHistory(query: HistoryQuery): Promise<HistoricalData[]> {
     try {
       let params = new HttpParams()
@@ -39,6 +40,7 @@ export class ForecastService {
     }
   }
 
+  // Generar el pronóstico de ventas basado en los datos históricos
   async generateForecast(request: ForecastRequest): Promise<ForecastResponse> {
     try {
       const response = await firstValueFrom(
@@ -71,6 +73,7 @@ export class ForecastService {
     }
   }
 
+  // Obtener los productos más vendidos en una fecha específica
   async getTopProductsByDate(date: string, limit: number = 10): Promise<TopProduct[]> {
     try {
       const formattedDate = encodeURIComponent(date);
@@ -88,6 +91,7 @@ export class ForecastService {
     }
   }
 
+  // Manejar errores del servicio de manera centralizada
   private handleServiceError(error: any, action: string): Error {
     if (error.status === 404) {
       return new Error(`No se encontraron datos para ${action}`);

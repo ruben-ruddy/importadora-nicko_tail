@@ -2,6 +2,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsNumberString, IsBooleanString } from 'class-validator';
 
+// DTO para las consultas de usuarios con filtros y paginación
 export class UserQueryDto {
   @ApiPropertyOptional({ description: 'Buscar usuarios por nombre de usuario, email o nombre completo', example: 'admin' })
   @IsOptional()

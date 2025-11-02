@@ -1,5 +1,5 @@
 // interfaces/report.interface.ts
-// interfaces/report.interface.ts
+// Definición de las interfaces para los reportes de ventas y compras
 export interface ReportFilters {
   fecha_inicio: string;
   fecha_fin: string;
@@ -7,6 +7,7 @@ export interface ReportFilters {
   id_usuario?: string;
 }
 
+// Definición de la interfaz SalesReport para los reportes de ventas
 export interface SalesReport {
   fecha_inicio: string;
   fecha_fin: string;
@@ -18,6 +19,7 @@ export interface SalesReport {
   productos_mas_vendidos: ProductoVendido[];
 }
 
+// Definición de la interfaz PurchasesReport para los reportes de compras
 export interface PurchasesReport {
   fecha_inicio: string;
   fecha_fin: string;
@@ -28,6 +30,7 @@ export interface PurchasesReport {
   productos_mas_comprados: ProductoComprado[];
 }
 
+// Definición de interfaces auxiliares
 export interface VendedorVentas {
   id_usuario: string;
   nombre_completo: string;
@@ -36,12 +39,14 @@ export interface VendedorVentas {
   porcentaje: number;
 }
 
+// Definición de la interfaz VentasPor
 export interface VentasPorDia {
   fecha: string;
   cantidad_ventas: number;
   total_ventas: number;
 }
 
+// Definición de la interfaz ProductoVendido
 export interface ProductoVendido {
   id_producto: string;
   nombre_producto: string;
@@ -49,6 +54,7 @@ export interface ProductoVendido {
   total_ventas: number;
 }
 
+// Definición de la interfaz ProductoComprado
 export interface ProductoComprado {
   id_producto: string;
   nombre_producto: string;

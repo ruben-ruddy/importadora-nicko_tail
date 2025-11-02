@@ -14,7 +14,7 @@ export class DmsService {
       fs.mkdirSync(this.uploadPath, { recursive: true });
     }
   }
-
+  // Endpoint para subir un archivo al DMS
   async uploadFile(file: Express.Multer.File, userId?: string, moduleName?: string): Promise<DMS> {
     if (!file) {
       throw new BadRequestException('No se proporcionó ningún archivo.');
@@ -22,7 +22,7 @@ export class DmsService {
 
     const uniqueFilename = `${Date.now()}-${file.originalname}`;
     const filePath = join(this.uploadPath, uniqueFilename);
-    const fileUrl = `/uploads/${uniqueFilename}`; // URL pública para acceder al archivo
+    const fileUrl = `/uploads/${uniqueFilename}`;
 
     try {
       fs.writeFileSync(filePath, file.buffer);
@@ -33,13 +33,13 @@ export class DmsService {
           mimeType: file.mimetype,
           type: file.mimetype.split('/')[0],
           path: filePath,
-          url: fileUrl, // <--- Guardamos la URL aquí
+          url: fileUrl, 
           size: file.size,
           user: userId,
           module: moduleName,
         },
       });
-      return newDmsEntry; // newDmsEntry ya incluirá 'url'
+      return newDmsEntry; 
     } catch (error) {
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
@@ -48,7 +48,7 @@ export class DmsService {
       throw new BadRequestException('Error al procesar el archivo DMS.');
     }
   }
-
+  // Endpoint para obtener los metadatos de un archivo DMS por su ID
   async findDmsEntryById(id: string): Promise<DMS> {
     const dmsEntry = await this.prisma.dMS.findUnique({
       where: { id },
@@ -56,9 +56,9 @@ export class DmsService {
     if (!dmsEntry) {
       throw new BadRequestException('Entrada DMS no encontrada.');
     }
-    return dmsEntry; // dmsEntry ya incluirá 'url'
+    return dmsEntry; 
   }
-
+  // Endpoint para eliminar una entrada DMS y su archivo asociado por su ID
   async deleteDmsEntry(id: string) {
     const dmsEntry = await this.prisma.dMS.findUnique({ where: { id } });
     if (!dmsEntry) {

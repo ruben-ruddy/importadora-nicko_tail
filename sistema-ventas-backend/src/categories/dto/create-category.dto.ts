@@ -26,11 +26,11 @@ export class CreateCategoryDto {
   })
   @IsBoolean({ message: 'El estado activo debe ser un valor booleano.' })
   @IsOptional()
-  activo?: boolean = true; // Por defecto es true
+  activo?: boolean = true; 
 
   @ApiPropertyOptional({ description: 'URL de la imagen del producto (obtenida del DMS)', example: '/uploads/1678912345-mi-imagen.jpg' })
   @IsOptional()
   @IsString()
-  icono_url?: string; // Ahora contendrá la URL devuelta por el servicio DMS
+  icono_url?: string; 
 
 }

@@ -32,6 +32,7 @@ export function HttpLoaderFactory(_httpBackend: HttpBackend) {
 const dateFnsConfig = new DateFnsConfigurationService();
 dateFnsConfig.setLocale(es);
 
+// Configuración global de la aplicación
 export const appConfig: ApplicationConfig = {
   providers: [
     provideAnimationsAsync(),

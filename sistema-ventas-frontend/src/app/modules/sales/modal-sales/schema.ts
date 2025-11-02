@@ -1,4 +1,5 @@
 // sistema-ventas-frontend/src/app/modules/sales/modal-sales/schema.ts
+// Definición de los campos del formulario para el módulo de ventas
 export const saleFormFields = (catalogs: any) => {
   return [
     {
@@ -127,6 +128,7 @@ export const saleFormFields = (catalogs: any) => {
   ];
 };
 
+// Función para actualizar el subtotal de un ítem y el total de la venta
 function updateItemTotal(form: any, index: number) {
   const cantidad = form.get('detalle_ventas').at(index).get('cantidad').value || 0;
   const precioUnitario = form.get('detalle_ventas').at(index).get('precio_unitario').value || 0;
@@ -136,6 +138,7 @@ function updateItemTotal(form: any, index: number) {
   updateSaleTotal(form);
 }
 
+// Función para actualizar el total de la venta
 function updateSaleTotal(form: any) {
   const detalles = form.get('detalle_ventas').value || [];
   const subtotal = detalles.reduce((sum: number, item: any) => sum + (item.subtotal || 0), 0);

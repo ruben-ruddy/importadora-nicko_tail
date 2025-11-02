@@ -5,7 +5,7 @@ import { CommonModule } from '@angular/common';
 import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { FormsModule } from '@angular/forms';
 import { Product } from '../types';
-import { Subscription } from 'rxjs'; // Importar Subscription para gestionar la suscripción
+import { Subscription } from 'rxjs'; 
 
 @Component({
   selector: 'app-sale-detail',
@@ -34,6 +34,7 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
     private fb: FormBuilder
   ) {}
 
+  // Ciclo de vida del componente
   ngOnInit() {
     this.updateProductsDetail();
 
@@ -43,6 +44,7 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Ciclo de vida del componente
   ngOnDestroy(): void {
     // Es crucial desuscribirse para evitar fugas de memoria
     if (this.formArraySubscription) {
@@ -50,6 +52,7 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Agregar un producto al detalle de la venta
   addProduct() {
     if (this.isEditMode) {
       alert('No se pueden agregar productos en modo edición');
@@ -94,6 +97,7 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
     this.cantidad = 1;
   }
 
+  // Eliminar un producto del detalle de la venta
   removeProduct(index: number) {
     if (this.isEditMode) {
       alert('No se pueden eliminar productos en modo edición');
@@ -102,6 +106,7 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
     this.formArray.removeAt(index);
   }
 
+  // Actualizar el detalle de productos y totales
   updateProductsDetail() {
     // Mapear los controles del FormArray a un formato visualizable
     this.productsDetail = this.formArray.controls.map((control) => {
@@ -119,11 +124,13 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
     this.calculateTotal();
   }
 
+  // Calcular el total de la venta
   calculateTotal() {
     const total = this.productsDetail.reduce((sum, item) => sum + item.subtotal, 0);
     this.totalUpdated.emit(total);
   }
 
+  // Manejar cambios en cantidad
   onCantidadChange(index: number) {
     if (this.isEditMode) {
       alert('No se puede modificar la cantidad en modo edición');
@@ -140,6 +147,7 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
   }
 
 
+  // Manejar cambios en precio unitario
   onPrecioChange(index: number) {
     if (this.isEditMode) {
       alert('No se puede modificar el precio en modo edición');
@@ -156,6 +164,7 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
   }
 
 
+  // Obtener opciones de productos para el select
   getProductOptions() {
     return this.products.map(product => ({
       label: `${product.codigo_producto} - ${product.nombre_producto} (Stock: ${product.stock_actual})`,
@@ -165,6 +174,7 @@ export class SaleDetailComponent implements OnInit, OnDestroy {
     }));
   }
 
+  // Calcular el total de los productos en el detalle
   getTotal(): number {
     return this.productsDetail.reduce((sum, item) => sum + item.subtotal, 0);
   }

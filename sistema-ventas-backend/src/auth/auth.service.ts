@@ -7,7 +7,7 @@ import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { User } from '@prisma/client';
 
-import { HttpService } from '@nestjs/axios'; // <-- Importa HttpService
+import { HttpService } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config'
 
 @Injectable()
@@ -37,7 +37,7 @@ export class AuthService {
 
     let targetRoleId: string;
     if (id_rol) {
-        // Si se proporciona un ID de rol, úsalo directamente (asumiendo que es un UUID válido)
+        // Si se proporciona un ID de rol, se usa directamente (asumiendo que es un UUID válido)
         targetRoleId = id_rol;
     } else {
         // Si no se proporciona, busca el rol 'Vendedor' por su nombre y obtén su UUID
@@ -61,7 +61,7 @@ export class AuthService {
           telefono,
           id_rol: targetRoleId,
           fecha_creacion: new Date(),
-          activo: true, // Asegúrate de que el campo activo se establezca por defecto
+          activo: true, 
         },
         select: {
           id_usuario: true,
@@ -119,7 +119,6 @@ export class AuthService {
     });
 
     this.logger.log(`Usuario ${user.nombre_usuario} ha iniciado sesión.`);
-    //console.log(user);
     return { accessToken,user };
   }
 

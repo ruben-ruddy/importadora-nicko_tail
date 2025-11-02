@@ -2,6 +2,7 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, MaxLength, IsEmail, IsOptional, IsBoolean, IsUUID } from 'class-validator';
 
+// DTO para crear un usuario
 export class CreateUserDto {
   @ApiProperty({ description: 'ID del rol asignado al usuario (UUID)', example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef' })
   @IsUUID('4', { message: 'El ID de rol debe ser un UUID válido.' })

@@ -8,7 +8,7 @@ export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [ // Cambiado a string[]
+    const requiredRoles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [ 
       context.getHandler(),
       context.getClass(),
     ]);
@@ -18,10 +18,9 @@ export class RolesGuard implements CanActivate {
     }
 
     const { user } = context.switchToHttp().getRequest();
-    // Importante: Asegúrate de que user.roles sea un array de strings (ej: ['Administrador', 'Vendedor'])
-    // Esto lo debe manejar tu JwtStrategy al validar el token y adjuntar el usuario.
+
     if (!user || !user.roles || !Array.isArray(user.roles)) {
-      return false; // Si el usuario o sus roles no están definidos correctamente, deniega el acceso
+      return false; // Si el usuario o sus roles no están definidos correctamente se niega el acceso
     }
 
     return requiredRoles.some((role) => user.roles.includes(role));

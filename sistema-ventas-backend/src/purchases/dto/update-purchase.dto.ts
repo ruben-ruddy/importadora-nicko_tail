@@ -25,18 +25,14 @@ export class UpdatePurchaseDetailDto extends PartialType(CreatePurchaseDetailDto
   })
   @IsOptional()
   @IsUUID(undefined, { message: 'El id_detalle_compra debe ser un UUID válido si está presente.' })
-  id_detalle_compra?: string; // Campo único de tu PurchaseDetail
+  id_detalle_compra?: string; 
 }
 
-/**
- * DTO para actualizar una compra.
- * Se crea a partir de CreatePurchaseDto, omitiendo 'detalle_compras'
- * para luego definirla explícitamente con UpdatePurchaseDetailDto.
- */
+// DTO para la actualización de una compra completa.
 export class UpdatePurchaseDto extends PartialType(
-  OmitType(CreatePurchaseDto, ['detalle_compras']), // ¡CAMBIO CLAVE AQUÍ!
+  OmitType(CreatePurchaseDto, ['detalle_compras']), 
 ) {
-  // Ahora definimos explícitamente 'detalle_compras' con el tipo correcto
+ 
   @ApiProperty({
     type: [UpdatePurchaseDetailDto],
     description: 'Lista de detalles de productos comprados. Para actualizar un detalle existente, incluya su id_detalle_compra. Para añadir uno nuevo, omita el id_detalle_compra. Para eliminar uno, no lo incluya en la lista.',
@@ -48,7 +44,6 @@ export class UpdatePurchaseDto extends PartialType(
   @Type(() => UpdatePurchaseDetailDto)
   detalle_compras?: UpdatePurchaseDetailDto[];
 
-  // Mantén las otras propiedades que desees sobrescribir o añadir
   @ApiProperty({ description: 'Nuevo número único de la compra (opcional)', example: 'COMPRA-2024-0002', required: false })
   @IsOptional()
   @IsString()
@@ -60,7 +55,6 @@ export class UpdatePurchaseDto extends PartialType(
   @IsNumber()
   @Min(0)
   @Type(() => Number)
-  //@IsDecimal({ decimal_digits: '1,2' })
   total?: number;
 
   @ApiProperty({ description: 'Estado actual de la compra', enum: DtoPurchaseState, required: false })

@@ -9,13 +9,14 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
 
-@ApiTags('Productos') // Etiqueta para Swagger UI
+@ApiTags('Productos') 
 // @ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
 // @UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador
 @Controller('products') // Prefijo de ruta para todos los endpoints de este controlador
 export class ProductsController {
   constructor(private readonly productsService: ProductsService) {}
 
+  //endpoint para crear un producto
   @Post()
   //@Roles('Administrador', 'Almacenero') // Solo administradores y almaceneros pueden crear productos
   @HttpCode(HttpStatus.CREATED) // Código de estado 201 para creación exitosa
@@ -30,6 +31,7 @@ export class ProductsController {
     return this.productsService.create(createProductDto);
   }
 
+  //endpoint para obtener todos los productos con filtros y paginación
   @Get()
   //@Roles('Administrador', 'Vendedor', 'Almacenero', 'Cajero') // Roles que pueden listar productos
   @ApiOperation({ summary: 'Obtiene todos los productos (Roles: Administrador, Vendedor, Almacenero, Cajero)' })
@@ -45,6 +47,7 @@ export class ProductsController {
     return this.productsService.findAll(query);
   }
 
+  //endpoint para obtener un producto por id
   @Get(':id')
  // @Roles('Administrador', 'Vendedor', 'Almacenero', 'Cajero') // Roles que pueden ver un producto específico
   @ApiOperation({ summary: 'Obtiene un producto por ID (Roles: Administrador, Vendedor, Almacenero, Cajero)' })
@@ -57,6 +60,7 @@ export class ProductsController {
     return this.productsService.findOne(id);
   }
 
+  //endpoint para actualizar un producto por id
   @Patch(':id')
   //@Roles('Administrador', 'Almacenero') // Solo administradores y almaceneros pueden actualizar productos
   @ApiOperation({ summary: 'Actualiza un producto por ID (Roles: Administrador, Almacenero)' })
@@ -71,6 +75,7 @@ export class ProductsController {
     return this.productsService.update(id, updateProductDto);
   }
 
+  //endpoint para eliminar un producto por id
   @Delete(':id')
   //º@Roles('Administrador', 'Almacenero') // Solo administradores y almaceneros pueden eliminar productos
   @HttpCode(HttpStatus.NO_CONTENT) // Código de estado 204 para eliminación exitosa (sin contenido de respuesta)

@@ -1,4 +1,5 @@
 // sistema-ventas-frontend/src/app/interfaces/purchase.interface.ts
+// Definición de la interfaz Purchase para representar una compra
 export interface Purchase {
   id_compra?: string;
   id_usuario: string;
@@ -13,11 +14,12 @@ export interface Purchase {
     nombre_completo: string;
     email: string;
     nombre_usuario: string;
-    activo?: boolean; // ← Agregar esta propiedad como opcional
-    fecha_creacion?: string; // ← También agregar esta
+    activo?: boolean; 
+    fecha_creacion?: string; 
   };
 }
 
+// Definición de la interfaz PurchaseDetail para los detalles de una compra
 export interface PurchaseDetail {
   id_detalle_compra?: string;
   id_producto: string;

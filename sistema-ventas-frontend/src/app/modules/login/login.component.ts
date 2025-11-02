@@ -9,7 +9,6 @@ import { environment } from '../../../environments/environment';
 import { ScCheckboxReCaptcha } from '@semantic-components/re-captcha';
 import { log } from 'console';
 import { ToasterService } from '../../project/services/toaster.service';
-//import { RecaptchaModule, RecaptchaFormsModule } from 'ng-recaptcha'; 
 
 @Component({
   selector: 'app-login',
@@ -18,33 +17,35 @@ import { ToasterService } from '../../project/services/toaster.service';
     ReactiveFormsModule, 
     CommonModule, 
     ScCheckboxReCaptcha,
-    //RecaptchaModule, 
-    //RecaptchaFormsModule // <-- ¡Agregué este módulo aquí!
+
   ],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
 export class LoginComponent {
   
+  // Definición del formulario de login
   loginForm = this.fb.group({
     nombre_usuario: ['', [Validators.required]],
     password: ['', Validators.required],
-    captcha: ['', Validators.required] // <-- Este control ya está bien
+    captcha: ['', Validators.required] 
   });
-  errorMessage: string | null = null; // Propiedad para mensajes de error
-  siteKey = environment.recaptcha.siteKey; // Asegúrate de que este valor esté definido en tu entorno
+  errorMessage: string | null = null; 
+  siteKey = environment.recaptcha.siteKey; 
   constructor(
     private apiService: ApiService,
     private router: Router,
     private fb: FormBuilder,
-    private toastService: ToasterService // Asegúrate de que ApiService tenga el método login
+    private toastService: ToasterService 
   ) {}
 
+  // Manejar el envío del formulario de login
   onSubmit() {
   console.log('Formulario enviado:', this.loginForm.value);
   
     if (this.loginForm.valid) {
 
+      // Extraer los valores del formulario
       const { nombre_usuario, password } = this.loginForm.value;
       this.apiService.login({nombre_usuario:nombre_usuario!, password:password!}).subscribe({
         next: () => {this.router.navigate(['/home'])

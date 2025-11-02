@@ -7,7 +7,6 @@ import { Sale } from './types';
 import { SaleTicketComponent } from './sale-ticket/sale-ticket.component';
 import { FormsModule } from '@angular/forms';
 
-// Servicios personalizados
 import { ModalService } from '../../project/services/modal.service';
 import { ToasterService } from '../../project/services/toaster.service';
 
@@ -47,6 +46,7 @@ export class SalesComponent implements OnInit {
     await this.loadSales();
   }
 
+  // Cargar las ventas desde el servicio
   async loadSales() {
     try {
       this.loading = true;
@@ -75,11 +75,13 @@ export class SalesComponent implements OnInit {
     }
   }
 
+  // Manejar cambios en el campo de búsqueda
   onSearchChange(event: any) {
     this.searchTerm = event.target.value;
     this.debounceSearch();
   }
 
+  // Debounce para la búsqueda
   private debounceTimer: any;
   private debounceSearch() {
     clearTimeout(this.debounceTimer);
@@ -89,18 +91,21 @@ export class SalesComponent implements OnInit {
     }, 300);
   }
 
+  // Cambiar página
   changePage(page: number) {
     if (page < 1 || page > this.sales.totalPages) return;
     this.currentPage = page;
     this.loadSales();
   }
 
+  // Cambiar cantidad de ítems por página
   changeItemsPerPage(limit: number) {
     this.itemsPerPage = Number(limit);
     this.currentPage = 1;
     this.loadSales();
   }
 
+  // Obtener las páginas para la paginación
   getPages(): (number | string)[] {
     const pages: (number | string)[] = [];
     const totalPages = this.sales.totalPages;
@@ -134,6 +139,7 @@ export class SalesComponent implements OnInit {
     return pages;
   }
 
+  // Abrir modal para agregar una nueva venta
   openAddSaleModal() {
     this.modalService.open(ModalSalesComponent, {
       title: 'Nueva Venta',
@@ -146,6 +152,7 @@ export class SalesComponent implements OnInit {
     });
   }
 
+  // Abrir modal para editar una venta existente
   openEditSaleModal(sale: Sale, event?: Event) {
     if (event) {
       event.stopPropagation();
@@ -162,6 +169,7 @@ export class SalesComponent implements OnInit {
     });
   }
 
+  // Abrir modal para imprimir el ticket de venta
   openPrintTicketModal(sale: Sale, event?: Event) {
     if (event) {
       event.stopPropagation();
@@ -177,6 +185,7 @@ export class SalesComponent implements OnInit {
     });
   }
 
+  // Confirmar eliminación de una venta
   confirmDelete(sale: Sale) {
     const confirmMessage = `¿Estás seguro de que quieres eliminar la venta ${sale.numero_venta}?`;
     
@@ -185,6 +194,7 @@ export class SalesComponent implements OnInit {
     }
   }
 
+  // Eliminar una venta
   async deleteSale(sale: Sale) {
     try {
       await this.salesService.deleteSale(sale.id_venta);
@@ -204,13 +214,16 @@ export class SalesComponent implements OnInit {
     }
   }
 
+  // Formatear moneda
   formatCurrency(amount: number) {
-    return new Intl.NumberFormat('es-CO', {
+    return new Intl.NumberFormat('es-BO', {
       style: 'currency',
-      currency: 'COP'
+      currency: 'BOB'
     }).format(amount);
   }
 
+
+  // Formatear fecha
   formatDate(dateString: string) {
     return new Date(dateString).toLocaleDateString('es-CO');
   }

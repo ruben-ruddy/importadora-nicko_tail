@@ -6,8 +6,6 @@ import { HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { Observable, Subscription } from 'rxjs';
 import { environment } from '../../../../environments/environment';
-
-// Tus interfaces y servicios
 import { ProductCarouselItem } from '../../../interfaces/product.interface';
 import { ImageService } from '../../../project/services/image.service';
 import { HeaderHomeMainComponent } from "../header-home-main/header-home-main.component";
@@ -48,16 +46,19 @@ export class HomeProductsComponent implements OnInit, OnDestroy {
     private modalService: ModalService
   ) { }
 
+  // Ciclo de vida del componente
   ngOnInit(): void {
     this.loadAllProducts();
   }
 
+  // Limpiar suscripciones al destruir el componente
   ngOnDestroy(): void {
     if (this.modalSubscription) {
       this.modalSubscription.unsubscribe();
     }
   }
 
+  // Cargar todos los productos públicos
   loadAllProducts(): void {
     this.isLoading = true;
     this.errorMessage = null;
@@ -79,6 +80,7 @@ export class HomeProductsComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Filtrar productos según el término de búsqueda
   filterProducts(): void {
     if (!this.searchTerm) {
       this.filteredProducts = [...this.products];
@@ -90,6 +92,7 @@ export class HomeProductsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Obtener la URL completa de la imagen del producto
   getFullImageUrl(relativeUrl: string | null | undefined): string {
     if (relativeUrl) {
       if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
@@ -100,6 +103,7 @@ export class HomeProductsComponent implements OnInit, OnDestroy {
     return 'assets/placeholder-product.png';
   }
 
+  // Abrir el modal de producto
   openProductModal(product: ProductCarouselItem): void {
     this.modalService.open(HomeProductModalComponent, {
       title: product.nombre_producto,

@@ -42,6 +42,7 @@ export class HomeCategoriesComponent implements OnInit {
     }
   }
 
+  // Cargar categorías desde el servicio
   loadCategories() {
     this.isLoading = true;
     this.errorMessage = null;
@@ -66,6 +67,7 @@ export class HomeCategoriesComponent implements OnInit {
     });
   }
 
+  // Filtrar categorías según el término de búsqueda
   filterCategories() {
     if (!this.searchTerm) {
       this.filteredCategories = [...this.categories];
@@ -76,11 +78,13 @@ export class HomeCategoriesComponent implements OnInit {
     }
   }
 
+  // Navegar a la vista de productos por categoría
   viewProductsByCategory(categoryId: string, categoryName: string): void {
     const cleanedCategoryName = categoryName.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
     this.router.navigate(['/products', cleanedCategoryName, categoryId]);
   }
 
+  // Obtener la URL completa de la imagen de la categoría
   getFullImageUrl(relativeUrl: string | null | undefined): string {
     if (relativeUrl && !relativeUrl.startsWith('http://') && !relativeUrl.startsWith('https://')) {
       return `${this.backendBaseUrl}${relativeUrl}`;

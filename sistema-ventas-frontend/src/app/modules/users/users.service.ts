@@ -22,6 +22,7 @@ export class UsersService {
     });
   }
 
+  // Obtener la lista de usuarios con parámetros de consulta opcionales
   getUsers(query: any = {}) {
     let params = new HttpParams();
     
@@ -37,6 +38,7 @@ export class UsersService {
     }));
   }
 
+  // Crear un nuevo usuario
   createUsers(data: any) {
     console.log('Creating user with data:', data);
     return firstValueFrom(this.http.post(`${environment.backend}/users`, data, {
@@ -44,6 +46,7 @@ export class UsersService {
     }));
   }
 
+  // Actualizar un usuario existente
   updateUsers(id: string, data: any) {
     console.log('Updating user', id, 'with data:', data);
     return firstValueFrom(this.http.patch(`${environment.backend}/users/${id}`, data, {
@@ -51,12 +54,14 @@ export class UsersService {
     }));
   }
 
+  // Eliminar un usuario por su ID
   deleteUser(id: string) {
     return firstValueFrom(this.http.delete(`${environment.backend}/users/${id}`, {
       headers: this.getHeaders()
     }));
   }
 
+  // Obtener la lista de roles
   getRoles() {
     return firstValueFrom(this.http.get(`${environment.backend}/roles`, {
       headers: this.getHeaders()

@@ -3,10 +3,9 @@ import { IsString, IsNotEmpty, IsNumber, Min, IsEnum, IsOptional, IsUUID, IsDeci
 import { ApiProperty } from '@nestjs/swagger';
 import { Type } from 'class-transformer'; // Necesario para IsDecimal si usas Type
 
-// Si tu enum en Prisma es MovementType y tiene valores 'ENTRADA', 'SALIDA'
-// y quieres usar strings 'entrada', 'salida' en tu DTO:
+
 export enum DtoMovementType {
-  ENTRADA = 'entrada', // Mapea el valor de Prisma a un string más amigable
+  ENTRADA = 'entrada', 
   SALIDA = 'salida',
 }
 
@@ -14,45 +13,45 @@ export class CreateInventoryMovementDto {
   @ApiProperty({ description: 'ID del producto afectado', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
-  id_producto: string; // Coincide con schema.prisma
+  id_producto: string; 
 
   @ApiProperty({ description: 'ID del usuario que realiza el movimiento', format: 'uuid' })
   @IsUUID()
   @IsNotEmpty()
-  id_usuario: string; // Coincide con schema.prisma
+  id_usuario: string; 
 
   @ApiProperty({ description: 'Tipo de movimiento (entrada o salida)', enum: DtoMovementType })
   @IsEnum(DtoMovementType)
   @IsNotEmpty()
-  tipo_movimiento: DtoMovementType; // Coincide con schema.prisma (usando el DtoMovementType)
+  tipo_movimiento: DtoMovementType; 
 
   @ApiProperty({ description: 'Cantidad de unidades del movimiento', example: 10 })
   @IsNumber()
   @Min(1)
   @IsNotEmpty()
-  cantidad: number; // Coincide con schema.prisma
+  cantidad: number; 
 
   @ApiProperty({ description: 'Precio unitario del producto en el momento del movimiento', required: false, type: Number, format: 'float', example: 25.50 })
   @IsOptional()
   @IsNumber({}, { message: 'El precio unitario debe ser un número.' })
-  @Type(() => Number) // Importante para transformar de string a number si viene de query/body
+  @Type(() => Number) 
   @IsDecimal({ decimal_digits: '1,2' }, { message: 'El precio unitario debe tener hasta 2 decimales.' })
-  precio_unitario?: number; // Coincide con schema.prisma
+  precio_unitario?: number; 
 
   @ApiProperty({ description: 'Referencia del movimiento (ej. número de factura, nota de envío)', required: false, maxLength: 100 })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  referencia?: string; // Coincide con schema.prisma
+  referencia?: string; 
 
   @ApiProperty({ description: 'Observaciones adicionales sobre el movimiento', required: false })
   @IsOptional()
   @IsString()
   @IsNotEmpty()
-  observaciones?: string; // Coincide con schema.prisma
+  observaciones?: string; 
 
   @ApiProperty({ description: 'Fecha y hora del movimiento (ISO 8601)', required: false, example: '2025-07-11T10:00:00Z' })
   @IsOptional()
   @IsDateString()
-  fecha_movimiento?: Date; // Coincide con schema.prisma
+  fecha_movimiento?: Date; 
 }

@@ -31,6 +31,7 @@ export class UsersComponent implements OnInit {
     this.loadUsers();
   }
 
+  // Cargar usuarios con manejo de errores y actualización de la UI
   async loadUsers(query: any = {}) {
     try {
       this.currentQuery = { ...this.currentQuery, ...query };
@@ -48,6 +49,7 @@ export class UsersComponent implements OnInit {
     }
   }
 
+  // Abrir el modal para agregar un nuevo usuario
   openAddUserModal() {
     console.log('Opening add user modal');
     this.modalService.open(ModalUserComponent, {
@@ -59,6 +61,7 @@ export class UsersComponent implements OnInit {
     });
   }
 
+  // Abrir el modal para editar un usuario existente
   openEditUserModal(user: any) {
     console.log('Opening edit user modal for:', user);
     
@@ -73,6 +76,7 @@ export class UsersComponent implements OnInit {
     });
   }
 
+  // Confirmar y eliminar un usuario
   confirmDelete(user: any) {
     const confirmMessage = `¿Está seguro de eliminar al usuario "${user.nombre_completo}"?\nEsta acción no se puede deshacer.`;
     
@@ -83,6 +87,7 @@ export class UsersComponent implements OnInit {
     }
   }
 
+  // Eliminar un usuario con manejo de errores detallado
   async deleteUser(userId: string) {
     try {
       await this.usersService.deleteUser(userId);
@@ -118,22 +123,26 @@ export class UsersComponent implements OnInit {
     }
   }
 
+  // Paginación
   nextPage() {
     if (this.users.page * this.users.limit < this.users.total) {
       this.loadUsers({ page: this.users.page + 1 });
     }
   }
 
+  // Navegar a la página anterior
   previousPage() {
     if (this.users.page > 1) {
       this.loadUsers({ page: this.users.page - 1 });
     }
   }
 
+  // Buscar usuarios por término
   searchUsers(searchTerm: string) {
     this.loadUsers({ search: searchTerm, page: 1 });
   }
 
+  // Filtrar usuarios por estado activo/inactivo
   filterByStatus(active: boolean) {
     this.loadUsers({ active: active.toString(), page: 1 });
   }

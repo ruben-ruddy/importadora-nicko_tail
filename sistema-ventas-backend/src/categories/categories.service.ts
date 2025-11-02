@@ -19,10 +19,10 @@ async create(createCategoryDto: CreateCategoryDto, iconFile?: Express.Multer.Fil
     throw new ConflictException(`La categoría "${createCategoryDto.nombre_categoria}" ya existe.`);
   }
 
-  // 1. Manejo explícito del icono
-  let icono_url = createCategoryDto.icono_url || null; // Respeta el valor del DTO o null
+  //Manejo  del icono
+  let icono_url = createCategoryDto.icono_url || null; 
 
-  // 2. Subir archivo si existe
+  //Subir archivo si existe
   if (iconFile) {
     try {
       const uploadedFile = await this.dmsService.uploadFile(iconFile, null, 'category_icons');
@@ -33,24 +33,25 @@ async create(createCategoryDto: CreateCategoryDto, iconFile?: Express.Multer.Fil
     }
   }
 
-  // 3. Creación con datos explícitos
+  // Crear la categoría en la base de datos
   return this.prisma.category.create({
     data: {
       nombre_categoria: createCategoryDto.nombre_categoria,
-      descripcion: createCategoryDto.descripcion || null, // Manejo explícito
-      activo: createCategoryDto.activo ?? true, // Valor por defecto
-      icono_url: icono_url // Usa el valor determinado
+      descripcion: createCategoryDto.descripcion || null, 
+      activo: createCategoryDto.activo ?? true, 
+      icono_url: icono_url 
     }
   });
 }
 
-
+  //obtener todas las categorías
   async findAll(): Promise<PrismaCategory[]> {
     return this.prisma.category.findMany({
-      orderBy: { nombre_categoria: 'asc' }, // Opcional: ordenar por nombre
+      orderBy: { nombre_categoria: 'asc' },
     });
   }
 
+  //obtener una categoría por id
   async findOne(id_categoria: string): Promise<PrismaCategory> {
     const category = await this.prisma.category.findUnique({
       where: { id_categoria },
@@ -61,12 +62,14 @@ async create(createCategoryDto: CreateCategoryDto, iconFile?: Express.Multer.Fil
     return category;
   }
 
+  //actualizar una categoría
 async update(
   id_categoria: string,
   updateCategoryDto: UpdateCategoryDto,
   iconFile?: Express.Multer.File
 ): Promise<PrismaCategory> {
-  // 1. Verificar existencia de la categoría
+  
+  //Verifica existencia de la categoría
   const existingCategory = await this.prisma.category.findUnique({ 
     where: { id_categoria } 
   });
@@ -74,7 +77,7 @@ async update(
     throw new NotFoundException(`Categoría con ID "${id_categoria}" no encontrada`);
   }
 
-  // 2. Verificar conflicto de nombre (si se está cambiando)
+  //Verifica conflicto de nombre (si se está cambiando)
   if (updateCategoryDto.nombre_categoria && updateCategoryDto.nombre_categoria !== existingCategory.nombre_categoria) {
     const categoryWithSameName = await this.prisma.category.findUnique({
       where: { nombre_categoria: updateCategoryDto.nombre_categoria },
@@ -84,8 +87,8 @@ async update(
     }
   }
 
-  // 3. Manejo del icono (prioridades claras)
-  let finalIconUrl = existingCategory.icono_url; // Por defecto: mantener el existente
+  // Manejo del icono (prioridades claras)
+  let finalIconUrl = existingCategory.icono_url; 
 
   // Caso 1: Se subió nuevo archivo
   if (iconFile) {
@@ -112,7 +115,7 @@ async update(
     }
   }
 
-  // 4. Actualización en base de datos
+  //Actualización en base de datos
   return this.prisma.category.update({
     where: { id_categoria },
     data: {
@@ -135,26 +138,23 @@ async update(
     }
   });
 }
-
+ //eliminar una categoría
   async remove(id_categoria: string): Promise<PrismaCategory> {
-    // Opcional: Verificar si la categoría tiene productos asociados antes de eliminar
-    // Si hay productos, deberías decidir si quieres eliminar en cascada,
-    // o prohibir la eliminación, o reasignar los productos.
-    // Por ahora, asumimos que Prisma manejará la cascada si está configurado en el schema,
-    // o que se lanzará un error si hay FKs restrictivas.
+
     const category = await this.prisma.category.delete({
       where: { id_categoria },
     });
-    if (!category) { // Aunque .delete() ya lanza NotFoundException si no encuentra.
+    if (!category) { 
         throw new NotFoundException(`Categoría con ID "${id_categoria}" no encontrada para eliminar.`);
     }
     return category;
   }
-
+ 
+  //obtener categorías activas
     async findActiveCategories() {
   return this.prisma.category.findMany({
     where: {
-      activo: true, // Solo categorías activas
+      activo: true, 
     },
     select: {
       id_categoria: true,

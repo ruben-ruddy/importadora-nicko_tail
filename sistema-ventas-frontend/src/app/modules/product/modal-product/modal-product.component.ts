@@ -36,10 +36,11 @@ export class ModalProductComponent implements OnInit, OnChanges {
     this.processInitialData();
   }
   
+  // Catálogos para los campos del formulario
   catalogs: any = {};
   public view = false;
   public categoriesLoaded = false;
-  public formFields: any[] = []; // NUEVO: Almacenar los fields del formulario
+  public formFields: any[] = []; 
 
   constructor(
     private productService: ProductService,
@@ -48,17 +49,20 @@ export class ModalProductComponent implements OnInit, OnChanges {
     private modalService: ModalService
   ) { }
 
+  // Detectar cambios en las entradas
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['modalData'] && changes['modalData'].currentValue) {
       this.processModalData(changes['modalData'].currentValue);
     }
   }
 
+  // Ciclo de vida del componente
   ngOnInit(): void {
     this.loadCategories();
     this.processModalData(this.modalData);
   }
 
+  // Procesar datos del modal
   private processModalData(modalData: any): void {
     if (modalData?.data) {
       this._initiaData = this.processProductData(modalData.data);
@@ -66,57 +70,45 @@ export class ModalProductComponent implements OnInit, OnChanges {
     }
   }
 
+  // Procesar datos iniciales
   private processInitialData(): void {
     if (this._initiaData) {
       this._initiaData = this.processProductData(this._initiaData);
     }
   }
 
+  // Procesar datos del producto
 private processProductData(productData: any): any {
   if (!productData) return null;
   
-  // EL PROBLEMA: id_categoria es UUID pero necesitamos encontrar el ID numérico correspondiente
-  let id_categoria = productData.id_categoria;
-  
-  // Si id_categoria es un UUID (string), necesitamos encontrar el ID numérico correspondiente
-  // Pero no podemos hacerlo aquí porque las categorías aún no están cargadas
-  // En su lugar, guardaremos el UUID y lo procesaremos después
-  
+  let id_categoria = productData.id_categoria;  
   return {
     ...productData,
     activo: Boolean(productData.activo),
     imagen_url: productData.imagen_url ? `${environment.backend_file}${productData.imagen_url}` : '',
-    id_categoria: id_categoria // Mantener el UUID por ahora
+    id_categoria: id_categoria 
   };
 }
 
+// Cargar categorías para el formulario
 async loadCategories() {
   try {
-    //console.log('Cargando categorías...');
+
     const categories: any = await this.productService.getCategories();
-   // console.log('Categorías obtenidas:', categories);
-    
-    // Preparar el catálogo de categorías
+
     this.catalogs.category = categories.map((res: any) => ({
       label: res.nombre_categoria,
-      value: res.id_categoria, // Esto debería ser el UUID
+      value: res.id_categoria, 
     }));
     
-    //console.log('Catálogos preparados:', this.catalogs);
-    
-    // NUEVO: Si tenemos datos iniciales con UUID, encontrar el ID numérico correspondiente
     if (this._initiaData && this._initiaData.id_categoria) {
-      //console.log('🔄 Buscando categoría correspondiente al UUID:', this._initiaData.id_categoria);
-      
-      // Buscar la categoría que coincida con el UUID
+
       const matchingCategory = categories.find((cat: any) => 
         cat.id_categoria === this._initiaData.id_categoria
       );
       
       if (matchingCategory) {
-        //console.log('✅ Categoría encontrada:', matchingCategory);
-        // Si necesitas el ID numérico, debería estar en otra propiedad
-        // Pero según tu estructura, parece que solo hay UUIDs
+
       } else {
         //console.warn('⚠️ No se encontró categoría para el UUID:', this._initiaData.id_categoria);
       }
@@ -137,12 +129,14 @@ async loadCategories() {
   }
 }
 
+// Generar los campos del formulario
   ProductsFormFields(catalogs: any): any[] {
     console.log('Generando formulario con catálogos:', catalogs);
     console.log('Datos iniciales para formulario:', this.initiaData);
     return productFormFields(catalogs);
   }
 
+  // Manejar cambios en el formulario
   handleFormChange(event: {
     data: any;
     valid: boolean;
@@ -153,6 +147,7 @@ async loadCategories() {
     this.formData = event;
   }
 
+  // Guardar el producto (crear o actualizar)
   async save() {
     if (this.formData?.valid) {
       try {
@@ -227,6 +222,7 @@ async loadCategories() {
     }
   }
 
+  // Cerrar el modal
   close() {
     this.modalService.close();
   }

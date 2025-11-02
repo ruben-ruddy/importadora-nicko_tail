@@ -17,6 +17,6 @@ export class TopDatesQueryDto {
   @IsNumber()
   @Min(1)
   @Max(100)
-  @Type(() => Number) // Importante: convertir query param a número
+  @Type(() => Number) 
   limit?: number = 10;
 }

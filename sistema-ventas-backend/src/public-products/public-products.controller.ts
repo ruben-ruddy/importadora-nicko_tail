@@ -12,17 +12,14 @@ export class PublicProductsController {
   async getLatestImages(): Promise<LatestProductImageDto[]> {
     return this.productsService.findLatestProductImages();
   }
-
-  // Este endpoint ahora manejará:
-  // - GET /api/public/products (todos los productos públicos)
-  // - GET /api/public/products?categoryId=xxx (productos públicos filtrados por categoría)
+// Endpoint público para obtener productos, opcionalmente filtrados por categoría
   @Get()
   async getPublicProducts(
     @Res({ passthrough: true }) res,
-    @Query('categoryId') categoryId?: string // <--- ¡AQUÍ ESTÁ EL CAMBIO CRUCIAL!
+    @Query('categoryId') categoryId?: string 
   ) {
     try {
-      const products = await this.productsService.findAllPublicProducts(categoryId); // <--- Llama con el ID
+      const products = await this.productsService.findAllPublicProducts(categoryId); 
       res.status(HttpStatus.OK);
       return products;
     } catch (error) {
@@ -30,14 +27,13 @@ export class PublicProductsController {
       return { message: error.message || 'Error al obtener productos públicos.' };
     }
   }
-
-  // El endpoint 'all' ahora es opcional. Si lo mantienes, puede seguir usando el mismo método.
+// Endpoint público para obtener todos los productos sin filtrar
   @Get('all')
   async getAllProducts(
       @Res({ passthrough: true }) res
   ) {
     try {
-      const products = await this.productsService.findAllPublicProducts(); // Llama sin categoryId para obtener todos
+      const products = await this.productsService.findAllPublicProducts(); 
       res.status(HttpStatus.OK);
       return products;
     } catch (error) {
@@ -45,8 +41,7 @@ export class PublicProductsController {
       return { message: error.message || 'Error al obtener todos los productos.' };
     }
   }
-
-  // Endpoint para el pop-up modal (getProductById) - sin cambios.
+// Endpoint público para obtener un producto por ID
   @Get(':id')
   async getProductById(
       @Param('id') id: string,

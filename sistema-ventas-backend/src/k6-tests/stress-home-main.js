@@ -32,30 +32,30 @@ export default function () {
 
   const homeResponse = http.get(`${BASE_URL}/home-main`, { headers });
   
-  // ✅ LÓGICA CORREGIDA - Status 200 es ÉXITO
+  
   const homeChecks = check(homeResponse, {
     '✅ Status es 200': (r) => r.status === 200,
     '✅ Response time < 3s': (r) => r.timings.duration < 3000,
     '✅ Body no está vacío': (r) => r.body.length > 1000,
   });
 
-  // CORRECCIÓN: Status 200 = ÉXITO, no error
+
   const isSuccess = homeChecks && homeResponse.status === 200;
   
   if (isSuccess) {
     successCounter.add(1);
     errorRate.add(false);
-    // ✅ Opcional: Log de éxito ocasional
+   
     if (Math.random() < 0.01) { // Solo loguear 1% de los éxitos
-      console.log(`✅ Request exitoso: ${homeResponse.status} - ${homeResponse.timings.duration}ms`);
+      console.log(`Request exitoso: ${homeResponse.status} - ${homeResponse.timings.duration}ms`);
     }
   } else {
     errorRate.add(true);
-    // ✅ Solo loguear errores reales (status ≠ 200)
+  
     if (homeResponse.status !== 200) {
       console.log(`❌ Error real: Status ${homeResponse.status} - ${homeResponse.error}`);
     } else {
-      // Si status es 200 pero fallaron otras checks (ej: tiempo > 3s)
+     
       console.log(`⚠️  Advertencia: Status 200 pero tiempo ${homeResponse.timings.duration}ms`);
     }
   }
@@ -65,5 +65,5 @@ export default function () {
 }
 
 export function setup() {
-  console.log('🚀 Iniciando prueba de estrés CORREGIDA...');
+  console.log('🚀 Iniciando prueba de estrés');
 }

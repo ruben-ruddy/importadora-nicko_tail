@@ -11,9 +11,6 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class ProductsService {
-  // Define la URL base de tu backend aquí
-  // Es CRUCIAL que esta URL coincida con la URL donde tu backend está sirviendo los archivos estáticos.
-  //private readonly baseUrl: string = 'http://localhost:3000'; // <--- ¡AÑADE ESTA LÍNEA!
 
   private readonly baseUrl: string;
 
@@ -23,7 +20,7 @@ export class ProductsService {
     this.baseUrl = this.configService.get('BASE_URL') || 'http://localhost:3000';
   }
 
-  // --- Métodos CRUD Existentes ---
+// crear producto
   async create(createProductDto: CreateProductDto): Promise<PrismaProduct> {
     const category = await this.prisma.category.findUnique({
       where: { id_categoria: createProductDto.id_categoria },
@@ -65,7 +62,7 @@ export class ProductsService {
       },
     });
   }
-
+// obtener todos los productos con paginación y filtros
   async findAll(query: ProductQueryDto): Promise<{ products: PrismaProduct[]; total: number; page: number; limit: number }> {
     const { search, categoryId, active, page = '1', limit = '10' } = query;
 
@@ -185,16 +182,14 @@ async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<P
     return product;
   }
 
-  // --- Métodos para el Frontend Público (Home y Carrusel) ---
-
-  // Método existente para el carrusel (lo modificamos ligeramente)
+  // Obtener las últimas imágenes de productos para el carrusel
   async findLatestProductImages(): Promise<LatestProductImageDto[]> {
     try {
       const latestProducts = await this.prisma.product.findMany({
         orderBy: {
           fecha_creacion: 'desc',
         },
-        take: 10, // Puedes ajustar la cantidad que quieras para el carrusel
+        take: 10, 
         select: {
           imagen_url: true,
           nombre_producto: true,
@@ -203,15 +198,14 @@ async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<P
         where: {
           activo: true,
           NOT: {
-            imagen_url: null, // Solo productos con imagen
+            imagen_url: null, 
           },
         },
       });
 
-      // Mapea los resultados para asegurar el formato del DTO.
-      // Aquí devolvemos la URL relativa como viene de la DB ('/uploads/...')
+
       return latestProducts.map(product => ({
-        imagen_url: product.imagen_url as string, // Ya filtramos por NOT null
+        imagen_url: product.imagen_url as string,
         nombre_producto: product.nombre_producto,
         descripcion: product.descripcion || 'Sin descripción.',
       }));
@@ -222,14 +216,14 @@ async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<P
   }
 
   // Método unificado para obtener productos públicos (todos o filtrados por categoría)
-  async findAllPublicProducts(categoryId?: string): Promise<any[]> { // <--- ¡CAMBIO AQUÍ! Acepta categoryId opcional
+  async findAllPublicProducts(categoryId?: string): Promise<any[]> { 
     try {
       const where: any = {
-        activo: true, // Siempre solo productos activos para el público
+        activo: true, 
       };
 
       if (categoryId) {
-        where.id_categoria = categoryId; // Filtra por categoría si se proporciona
+        where.id_categoria = categoryId; 
       }
 
       const products = await this.prisma.product.findMany({
@@ -242,28 +236,25 @@ async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<P
           },
         },
         orderBy: {
-          fecha_creacion: 'desc', // O por nombre_producto, según tu preferencia
+          fecha_creacion: 'desc', 
         }
       });
 
-      // Mapear los productos para añadir la URL completa de la imagen
-      // y ajustarlos al formato de ProductCarouselItem esperado por el frontend
+      
       return products.map(product => {
         let imageUrl: string | null = null;
         if (product.imagen_url) {
           imageUrl = `${this.baseUrl}${product.imagen_url}`;
         }
 
-        // Retorna un objeto que se parezca a ProductCarouselItem del frontend
-        // Asegúrate de que los nombres de las propiedades coincidan con tu interfaz ProductCarouselItem
+    
         return {
-          // id: product.id_producto, // ProductCarouselItem no tiene 'id'
-          category: product.category?.nombre_categoria || 'Sin categoría', // Propiedad 'category'
-          imagen_url: imageUrl, // Propiedad 'imagen_url'
-          nombre_producto: product.nombre_producto, // Propiedad 'nombre_producto'
-          descripcion: product.descripcion, // Propiedad 'descripcion'
-          price: parseFloat(product.precio_venta.toString()), // Propiedad 'price'
-          // No hay 'stock' en ProductCarouselItem, así que lo omitimos
+          
+          category: product.category?.nombre_categoria || 'Sin categoría', 
+          imagen_url: imageUrl,
+          nombre_producto: product.nombre_producto, 
+          descripcion: product.descripcion, 
+          price: parseFloat(product.precio_venta.toString()),
         };
       });
     } catch (error) {
@@ -271,14 +262,13 @@ async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<P
       throw new InternalServerErrorException('Error al obtener productos públicos.');
     }
   }
-
-  // NUEVO Método para obtener un producto público por ID (para el pop-up modal si hace su propia llamada)
+// Obtener un producto público por su ID
   async findPublicProductById(id_producto: string): Promise<any> {
     try {
       const product = await this.prisma.product.findUnique({
         where: {
           id_producto: id_producto,
-          activo: true, // Asegúrate de que el producto esté activo
+          activo: true, 
         },
         include: {
           category: {
@@ -295,7 +285,7 @@ async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<P
 
       let imageUrl: string | null = null;
       if (product.imagen_url) {
-        // Construye la URL ABSOLUTA para la imagen del producto detallado
+        
         imageUrl = `${this.baseUrl}${product.imagen_url}`;
       }
 
@@ -307,11 +297,11 @@ async update(id_producto: string, updateProductDto: UpdateProductDto): Promise<P
         stock: product.stock_actual,
         description: product.descripcion,
         imageUrl: imageUrl,
-        // Puedes añadir aquí otros campos del producto que sean relevantes para el pop-up/detalle
+        
       };
     } catch (error) {
       if (error instanceof NotFoundException) {
-        throw error; // Propaga la excepción NotFoundException
+        throw error; 
       }
       console.error(`Error in ProductsService.findPublicProductById for ID ${id_producto}:`, error);
       throw new InternalServerErrorException('Error al obtener el producto público por ID.');

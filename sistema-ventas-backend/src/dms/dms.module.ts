@@ -10,12 +10,12 @@ import { join } from 'path';
   imports: [
     PrismaModule,
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', '..', 'uploads'), // La carpeta 'uploads' para los archivos físicos
-      serveRoot: '/uploads', // La ruta URL para acceder a ellos
+      rootPath: join(__dirname, '..', '..', 'uploads'), 
+      serveRoot: '/uploads',
     }),
   ],
   controllers: [DmsController],
   providers: [DmsService],
   exports: [DmsService],
 })
-export class DmsModule {} // Renombrado
+export class DmsModule {} 

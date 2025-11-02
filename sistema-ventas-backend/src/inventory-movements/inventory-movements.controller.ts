@@ -1,21 +1,21 @@
 // src/inventory-movements/inventory-movements.controller.ts (o la ruta correcta)
 import { Controller, Get, Post, Body, Patch, Param, Delete, Query, UseGuards, HttpCode, HttpStatus } from '@nestjs/common';
-import { InventoryMovementsService } from './inventory-movements.service'; // Asegúrate de que esta ruta sea correcta
-import { CreateInventoryMovementDto } from './dto/create-inventory-movement.dto'; // Asumiendo que tienes estos DTOs
+import { InventoryMovementsService } from './inventory-movements.service'; 
+import { CreateInventoryMovementDto } from './dto/create-inventory-movement.dto'; 
 import { UpdateInventoryMovementDto } from './dto/update-inventory-movement.dto';
-import { InventoryMovementQueryDto } from './dto/inventory-movement-query.dto'; // Si tienes un DTO para consultas
+import { InventoryMovementQueryDto } from './dto/inventory-movement-query.dto'; 
 
 import { AuthGuard } from '@nestjs/passport';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator'; // Importa el decorador Roles
+import { Roles } from '../auth/decorators/roles.decorator'; 
 
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery } from '@nestjs/swagger';
 
 
-@ApiTags('Movimientos de Inventario') // Etiqueta para Swagger UI
-@ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
-@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador
-@Controller('inventory-movements') // Prefijo de ruta para todos los endpoints de este controlador
+@ApiTags('Movimientos de Inventario') 
+@ApiBearerAuth('access-token') 
+@UseGuards(AuthGuard('jwt'), RolesGuard) 
+@Controller('inventory-movements') 
 export class InventoryMovementsController {
   constructor(private readonly inventoryMovementsService: InventoryMovementsService) {}
 
@@ -64,9 +64,6 @@ export class InventoryMovementsController {
     return this.inventoryMovementsService.findOne(id);
   }
 
-  // Nota: Los movimientos de inventario a menudo no se "actualizan" o "eliminan" directamente
-  // para mantener un historial auditable, sino que se crean nuevos movimientos para revertir o ajustar.
-  // Sin embargo, si tu lógica de negocio lo requiere, aquí están los ejemplos:
 
   @Patch(':id')
   // Solo los Administradores y Almaceneros pueden actualizar movimientos de inventario

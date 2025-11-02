@@ -9,8 +9,6 @@ import { Client, User, Product, Sale } from '../types';
 import { SaleDetailComponent } from '../sale-detail/sale-detail.component';
 import { GeneralService } from '../../../core/gerneral.service';
 import { SaleTicketComponent } from '../sale-ticket/sale-ticket.component';
-
-// Servicio de modales
 import { ModalService } from '../../../project/services/modal.service';
 
 @Component({
@@ -50,6 +48,7 @@ export class ModalSalesComponent implements OnInit {
     this.createForm();
   }
 
+  // Crear el formulario reactivo
   createForm() {
     this.form = this.fb.group({
       id_usuario: [{ value: '', disabled: false }, Validators.required],
@@ -68,6 +67,7 @@ export class ModalSalesComponent implements OnInit {
     return this.form.get('detalle_ventas') as FormArray;
   }
 
+  // Ciclo de vida del componente
   async ngOnInit() {
     // INICIALIZAR initiaData DESPUÉS del constructor
     this.initiaData = this.modalData?.data || null;
@@ -119,6 +119,7 @@ export class ModalSalesComponent implements OnInit {
     }
   }
 
+  // Cargar datos iniciales para edición
   async loadInitialData() {
     try {
       console.log('Cargando datos iniciales para edición:', this.initiaData);
@@ -187,6 +188,7 @@ export class ModalSalesComponent implements OnInit {
     }
   }
 
+  // Actualizar totales cuando cambian los detalles
   onTotalUpdated(total: number) {
     const descuento = this.form.get('descuento')?.value || 0;
     const impuesto = this.form.get('impuesto')?.value || 0;
@@ -200,6 +202,7 @@ export class ModalSalesComponent implements OnInit {
     this.totalVenta = totalFinal;
   }
 
+  // Guardar la venta
   async save() {
     if (this.form.valid && this.detalleVentas.length > 0) {
       try {
@@ -292,6 +295,7 @@ export class ModalSalesComponent implements OnInit {
     }
   }
 
+  // Cerrar el modal
   close() {
     this.modalService.close();
   }

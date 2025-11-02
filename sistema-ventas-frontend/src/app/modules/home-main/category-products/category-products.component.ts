@@ -42,6 +42,7 @@ export class CategoryProductsComponent implements OnInit, OnDestroy {
     private modalService: ModalService
   ) { }
 
+  // Ciclo de vida del componente
   ngOnInit(): void {
     this.routeSubscription = this.route.paramMap.subscribe(params => {
       const categoryId = params.get('categoryId');
@@ -56,6 +57,7 @@ export class CategoryProductsComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Limpiar suscripciones al destruir el componente
   ngOnDestroy(): void {
     if (this.routeSubscription) {
       this.routeSubscription.unsubscribe();
@@ -65,6 +67,7 @@ export class CategoryProductsComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Cargar productos por categoría
   loadProductsByCategory(categoryId: string): void {
     this.isLoading = true;
     this.errorMessage = null;
@@ -91,10 +94,12 @@ export class CategoryProductsComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Obtener la URL completa de la imagen del producto
   getFullImageUrl(relativeUrl: string | null | undefined): string {
     return relativeUrl || 'assets/placeholder-product.png';
   }
 
+  // Abrir el modal del producto
   openProductModal(product: ProductCarouselItem): void {
     this.modalService.open(HomeProductModalComponent, {
       title: product.nombre_producto,

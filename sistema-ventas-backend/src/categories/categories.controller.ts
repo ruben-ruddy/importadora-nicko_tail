@@ -8,7 +8,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam } from '@nestjs/swagger';
 
-@ApiTags('Categorías') // Etiqueta para Swagger UI
+@ApiTags('Categorías') // Etiqueta para Swagger
 //@ApiBearerAuth('access-token') // Indica que todos los endpoints requieren token JWT
 //@UseGuards(AuthGuard('jwt'), RolesGuard) // Aplica guardias a nivel de controlador
 @Controller('categories') // Prefijo de ruta para todos los endpoints de este controlador
@@ -17,7 +17,7 @@ export class CategoriesController {
 
   @Post()
   // @Roles('Administrador') // Solo administradores pueden crear categorías
-  @HttpCode(HttpStatus.CREATED) // Código de estado 201 para creación exitosa
+  @HttpCode(HttpStatus.CREATED)
   @ApiOperation({ summary: 'Crea una nueva categoría (Solo Administradores)' })
   @ApiResponse({ status: 201, description: 'Categoría creada exitosamente.' })
   @ApiResponse({ status: 400, description: 'Datos de entrada inválidos.' })
@@ -27,7 +27,7 @@ export class CategoriesController {
   create(@Body() createCategoryDto: CreateCategoryDto) {
     return this.categoriesService.create(createCategoryDto);
   }
-
+//
   @Get()
  // @Roles('Administrador', 'Vendedor', 'Almacenero', 'Cajero') // Roles que pueden listar categorías
   @ApiOperation({ summary: 'Obtiene todas las categorías (Roles: Administrador, Vendedor, Almacenero, Cajero)' })

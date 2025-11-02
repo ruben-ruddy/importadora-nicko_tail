@@ -8,6 +8,7 @@ import { UpdateRoleDto } from './dto/update-role.dto';
 export class RolesService {
   constructor(private prisma: PrismaService) {}
 
+  // Crear un nuevo rol
   async create(createRoleDto: CreateRoleDto) {
     return this.prisma.role.create({
       data: {
@@ -18,6 +19,7 @@ export class RolesService {
     });
   }
 
+  // Obtener todos los roles activos
   async findAll() {
     return this.prisma.role.findMany({
       where: { activo: true },
@@ -30,6 +32,7 @@ export class RolesService {
     });
   }
 
+  // Obtener un rol por ID
   async findOne(id: string) {
     return this.prisma.role.findUnique({
       where: { id_rol: id },
@@ -37,6 +40,7 @@ export class RolesService {
     });
   }
 
+  // Actualizar un rol por ID
   async update(id: string, updateRoleDto: UpdateRoleDto) {
     return this.prisma.role.update({
       where: { id_rol: id },
@@ -44,6 +48,7 @@ export class RolesService {
     });
   }
 
+  // Desactivar un rol (eliminación lógica)
   async remove(id: string) {
     return this.prisma.role.update({
       where: { id_rol: id },

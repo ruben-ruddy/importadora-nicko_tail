@@ -1,4 +1,5 @@
 //sistem-ventas-frontend/src/app/modules/clients/modal-clients/schema-clients.ts
+// Definición de los campos del formulario para el módulo de clientes
 export const clientsFormFields=(catalogs: any)=> {
     return ([
         {
@@ -25,27 +26,27 @@ export const clientsFormFields=(catalogs: any)=> {
                 {
                   key: 'telefono',
                   label: 'Celular',
-                  type: 'text', // ✅ CAMBIAR de 'number' a 'text'
+                  type: 'text', 
                   validators: { 
-                    required: false, // ✅ Cambiar a false si es opcional
+                    required: false,
                     maxLength: 20,
-                    pattern: '^[0-9+()-\\s]*$' // Validar que solo tenga números y caracteres de teléfono
+                    pattern: '^[0-9+()-\\s]*$' 
                   },
                 },
                 {
                   key: 'direccion',
                   label: 'Dirección',
                   type: 'text',
-                  validators: { required: false, maxLength: 255 }, // ✅ Cambiar a false si es opcional
+                  validators: { required: false, maxLength: 255 }, 
                 },
                 {
                   key: 'documento_identidad',
                   label: 'Cédula de Identidad',
-                  type: 'text', // ✅ CAMBIAR de 'number' a 'text'
+                  type: 'text', 
                   validators: { 
-                    required: false, // ✅ Cambiar a false si es opcional
+                    required: false, 
                     maxLength: 50,
-                    pattern: '^[0-9-]*$' // Validar que solo tenga números y guiones
+                    pattern: '^[0-9-]*$' 
                   },
                 },
                                

@@ -2,6 +2,7 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
 import { IsOptional, IsString, IsNumberString, IsBooleanString, IsUUID } from 'class-validator';
 
+// DTO para consultar productos con filtros y paginación
 export class ProductQueryDto {
   @ApiPropertyOptional({ description: 'Buscar productos por nombre, descripción o código', example: 'Smartphone' })
   @IsOptional()

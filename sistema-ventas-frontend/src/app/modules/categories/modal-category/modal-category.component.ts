@@ -17,6 +17,7 @@ import { ModalService } from '../../../project/services/modal.service';
   templateUrl: './modal-category.component.html',
   styleUrl: './modal-category.component.scss'
 })
+// Componente para el modal de creación/edición de categorías
 export class ModalCategoryComponent implements OnInit, OnDestroy {
   @Input() modalData: any = {};
   @Input() modalConfig: any = {};
@@ -40,6 +41,7 @@ export class ModalCategoryComponent implements OnInit, OnDestroy {
     private apiService: ApiService
   ) { }
 
+  // Ciclo de vida del componente
   async ngOnInit() {
     console.log('Modal Category Init - modalData:', this.modalData);
     console.log('Modal Category Init - modalConfig:', this.modalConfig);
@@ -54,7 +56,7 @@ export class ModalCategoryComponent implements OnInit, OnDestroy {
     if (this.isEditing) {
       this.initialData = {
         ...this.modalData.data,
-        activo: String(this.modalData.data.activo), // Convertir a string para el select
+        activo: String(this.modalData.data.activo), 
         icono_url: this.modalData.data.icono_url ? 
           `${environment.backend_file}${this.modalData.data.icono_url}` : ''
       };
@@ -71,14 +73,17 @@ export class ModalCategoryComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Ciclo de vida del componente
   ngOnDestroy() {
     console.log('Modal Category Destroyed');
   }
 
+  // Definición de los campos del formulario
   categoryFormFields(catalogs: any): any[] {
     return categoryFormFields(catalogs);
   }
 
+  // Manejar cambios en el formulario
   handleFormChange(event: {
     data: any;
     valid: boolean;
@@ -90,6 +95,7 @@ export class ModalCategoryComponent implements OnInit, OnDestroy {
     console.log('Form changed - valid:', this.formData?.valid, 'data:', this.formData?.data);
   }
 
+  // Guardar la categoría (crear o actualizar)
   async save() {
     console.log('Save called - form valid:', this.formData?.valid);
     console.log('Current form data:', this.formData?.data);
@@ -141,7 +147,7 @@ export class ModalCategoryComponent implements OnInit, OnDestroy {
         }
 
         console.log('Category saved successfully, closing modal...');
-        this.modalService.close(true); // Pasar true para indicar éxito
+        this.modalService.close(true); 
       } catch (error) {
         console.error('Error saving category:', error);
         this.toaster.showToast({
@@ -152,7 +158,6 @@ export class ModalCategoryComponent implements OnInit, OnDestroy {
       }
     } else {
       console.log('Form is invalid, showing errors');
-      // Marcar todos los campos como touched para mostrar errores
       if (this.formReference) {
         this.formReference.markAllAsTouched();
       }
@@ -164,8 +169,9 @@ export class ModalCategoryComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Cerrar el modal sin guardar
   close() {
     console.log('Modal closed without saving');
-    this.modalService.close(false); // Pasar false para indicar cancelación
+    this.modalService.close(false); 
   }
 }

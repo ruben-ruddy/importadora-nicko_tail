@@ -10,6 +10,7 @@ import { Client as PrismaClient } from '@prisma/client';
 export class ClientsService {
   constructor(private prisma: PrismaService) {}
 
+//crear un cliente
 async create(createClientDto: CreateClientDto): Promise<PrismaClient> {
   // Verificar si el cliente ya existe por documento de identidad
   if (createClientDto.documento_identidad) {
@@ -21,7 +22,7 @@ async create(createClientDto: CreateClientDto): Promise<PrismaClient> {
     }
   }
   
-  // ✅ SOLO verificar email si se proporcionó y no está vacío
+  // SOLO verificar email si se proporcionó y no está vacío
 if (createClientDto.email && createClientDto.email.trim() !== '') {
   // Validar formato de email manualmente
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -37,12 +38,12 @@ if (createClientDto.email && createClientDto.email.trim() !== '') {
     throw new ConflictException(`Ya existe un cliente con el email "${createClientDto.email}".`);
   }
 }
-
+  // Crear el cliente
   return this.prisma.client.create({
     data: createClientDto,
   });
 }
-
+   //obtener todos los clientes con filtros y paginación
   async findAll(query: ClientQueryDto): Promise<{ clients: PrismaClient[]; total: number; page: number; limit: number; totalPages: number }> {
     const { search, active, page = '1', limit = '10' } = query;
 
@@ -84,7 +85,7 @@ if (createClientDto.email && createClientDto.email.trim() !== '') {
       totalPages 
     };
   }
-
+  //obtener un cliente por id
   async findOne(id_cliente: string): Promise<PrismaClient> {
     const client = await this.prisma.client.findUnique({
       where: { id_cliente },
@@ -94,7 +95,7 @@ if (createClientDto.email && createClientDto.email.trim() !== '') {
     }
     return client;
   }
-
+  //actualizar un cliente
   async update(id_cliente: string, updateClientDto: UpdateClientDto): Promise<PrismaClient> {
     // Verificar si el cliente existe
     const existingClientById = await this.prisma.client.findUnique({
@@ -105,7 +106,7 @@ if (createClientDto.email && createClientDto.email.trim() !== '') {
     }
 
     // Verificar si el nuevo email o documento de identidad ya existen en otro cliente
-  // ✅ SOLO verificar email si se proporcionó y no está vacío
+  //SOLO verificar email si se proporcionó y no está vacío
   if (updateClientDto.email && updateClientDto.email.trim() !== '') {
     const existingClientByEmail = await this.prisma.client.findFirst({
       where: {
@@ -134,7 +135,7 @@ if (createClientDto.email && createClientDto.email.trim() !== '') {
       data: updateClientDto,
     });
   }
-
+//eliminar un cliente
   async remove(id_cliente: string): Promise<PrismaClient> {
     const existingClient = await this.prisma.client.findUnique({
       where: { id_cliente },

@@ -1,6 +1,7 @@
 // sistema-ventas-frontend/src/environments/environment.ts
 import { environmentDefault } from "./default";
 
+// Configuración de entorno para desarrollo
 export const environment = {
     ...environmentDefault, 
     production: false,

@@ -29,6 +29,7 @@ export class PurchaseService {
 
   constructor(private http: HttpClient) { }
 
+  // Extrae un array de datos de diferentes estructuras de respuesta
   private extractArrayData(response: any): any[] {
     if (Array.isArray(response)) {
       return response;
@@ -53,6 +54,7 @@ export class PurchaseService {
     return [];
   }
 
+  // Obtener la lista de compras con parámetros de consulta opcionales
   async getPurchases(query: PurchaseQuery = {}): Promise<PurchaseResponse> {
     try {
       let params = new HttpParams();
@@ -83,6 +85,7 @@ export class PurchaseService {
     }
   }
 
+  // Obtener una compra por su ID
   async getPurchaseById(id: string): Promise<Purchase> {
     try {
       const response = await firstValueFrom(
@@ -108,6 +111,7 @@ export class PurchaseService {
     }
   }
 
+  // Obtener todos los productos sin paginación
   async getProducts(): Promise<any[]> {
     try {
       // CORREGIDO: Quitar paginación para obtener TODOS los productos
@@ -125,6 +129,7 @@ export class PurchaseService {
     }
   }
 
+  // Crear una nueva compra
   async createPurchase(data: Purchase): Promise<Purchase> {
     // Asegurarse de que no se envíe fecha_compra
     const { fecha_compra, ...purchaseData } = data;
@@ -133,6 +138,7 @@ export class PurchaseService {
     );
   }
 
+  // Actualizar una compra existente
   async updatePurchase(id: string, data: Purchase): Promise<Purchase> {
     // Asegurarse de que no se envíe fecha_compra en updates
     const { fecha_compra, id_compra, ...purchaseData } = data;
@@ -141,6 +147,7 @@ export class PurchaseService {
     );
   }
 
+  // Eliminar una compra por su ID
   deletePurchase(id: string): Promise<void> {
     return firstValueFrom(
       this.http.delete<void>(`${environment.backend}/purchases/${id}`)

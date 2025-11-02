@@ -38,6 +38,7 @@ export class ModalUserComponent implements OnInit, OnDestroy {
     private modalService: ModalService
   ) {}
 
+  // Ciclo de vida del componente
   async ngOnInit() {
     console.log('ModalUserComponent - modalData:', this.modalData);
     console.log('ModalUserComponent - modalConfig:', this.modalConfig);
@@ -97,14 +98,17 @@ export class ModalUserComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Ciclo de vida del componente
   ngOnDestroy() {
     console.log('ModalUserComponent - Destroyed');
   }
 
+  // Definición de los campos del formulario
   usersFormFields(catalogs: any): any[] {
     return userFormFields(catalogs);
   }
 
+  // Manejar cambios en el formulario
   handleFormChange(event: {
     data: any;
     valid: boolean;
@@ -116,6 +120,7 @@ export class ModalUserComponent implements OnInit, OnDestroy {
     console.log('Form changed - valid:', this.formData?.valid, 'data:', this.formData?.data);
   }
 
+  // Guardar el usuario (crear o actualizar)
   async save() {
     console.log('Save called - form valid:', this.formData?.valid);
     console.log('Current form data:', this.formData?.data);
@@ -155,7 +160,6 @@ export class ModalUserComponent implements OnInit, OnDestroy {
       } catch (error: any) {
         console.error('Error saving user:', error);
         
-        // MEJOR DEBUGGING: Mostrar detalles completos del error
         let errorDetail = 'Ocurrió un error al guardar';
         
         if (error.error) {
@@ -205,12 +209,12 @@ export class ModalUserComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Preparar y limpiar los datos antes de enviarlos al backend
   private prepareDataForBackend(formData: any): any {
     const preparedData: any = {};
     
-    // CORRECCIÓN: id_rol debe mantenerse como UUID string, NO convertirlo a número
     if (formData.id_rol) {
-      preparedData.id_rol = formData.id_rol; // Mantener como string
+      preparedData.id_rol = formData.id_rol; 
     }
     
     if (formData.nombre_usuario) {
@@ -227,7 +231,6 @@ export class ModalUserComponent implements OnInit, OnDestroy {
     
     // Campo condicional: contraseña
     if (this.isEditing) {
-      // Solo incluir password si se proporcionó uno nuevo
       if (formData.password && formData.password.trim() !== '') {
         preparedData.password = formData.password.trim();
       }
@@ -252,6 +255,7 @@ export class ModalUserComponent implements OnInit, OnDestroy {
     return preparedData;
   }
 
+  // Cerrar el modal
   close() {
     if (!this.saving) {
       this.modalService.close(false);

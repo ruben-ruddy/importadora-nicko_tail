@@ -16,6 +16,7 @@ import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags, ApiParam, ApiQuery }
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  // Endpoint para crear un nuevo usuario
   @Post()
   // Definimos los roles directamente como strings
   //@Roles('Administrador')
@@ -30,6 +31,7 @@ export class UsersController {
     return this.usersService.create(createUserDto);
   }
 
+  // Endpoint para obtener todos los usuarios
   @Get()
   // Definimos los roles directamente como strings
   //@Roles('Administrador')
@@ -45,6 +47,7 @@ export class UsersController {
     return this.usersService.findAll(query);
   }
 
+  // Endpoint para obtener un usuario por id
   @Get(':id')
   // Definimos los roles directamente como strings
   //@Roles('Administrador', 'Cajero')
@@ -58,6 +61,7 @@ export class UsersController {
     return this.usersService.findOne(id);
   }
 
+  // Endpoint para actualizar un usuario por id
   @Patch(':id')
   // Definimos los roles directamente como strings
   //@Roles('Administrador')
@@ -73,6 +77,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto);
   }
 
+  // Endpoint para eliminar un usuario por id
 @Delete(':id')
 //@Roles('Administrador')
 @HttpCode(HttpStatus.NO_CONTENT)

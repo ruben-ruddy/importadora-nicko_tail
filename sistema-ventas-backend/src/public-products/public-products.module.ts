@@ -8,7 +8,5 @@ import { PrismaModule } from '../prisma/prisma.module';
   imports: [PrismaModule],
   controllers: [PublicProductsController],
   providers: [ProductsService],
-  // Exportar ProductsService si otros módulos fuera de 'public-products' lo van a importar
-  // exports: [ProductsService], // <--- DESCOMENTA SI ES NECESARIO EN OTROS LUGARES
 })
 export class PublicProductsModule {}

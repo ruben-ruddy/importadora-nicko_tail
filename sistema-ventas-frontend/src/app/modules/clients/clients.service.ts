@@ -11,6 +11,7 @@ export class ClientsService {
 
     constructor(private http: HttpClient) { }
 
+    // Obtener la lista de clientes con paginación y búsqueda
     getClients(page: number = 1, limit: number = 10, search: string = '') {
       let params = new HttpParams()
         .set('page', page.toString())
@@ -23,15 +24,17 @@ export class ClientsService {
       return firstValueFrom(this.http.get(`${environment.backend}/clients`, { params }));
     }
 
+    // Crear un nuevo cliente
     createClients(data: any) {
       return firstValueFrom(this.http.post(`${environment.backend}/clients`, data));
     }
 
+    // Actualizar un cliente por ID
     updateClients(id: string, data: any) {
       return firstValueFrom(this.http.patch(`${environment.backend}/clients/${id}`, data));
     }
 
-    // ✅ NUEVO MÉTODO PARA ELIMINAR
+    // Eliminar un cliente por ID
     deleteClients(id: string) {
       return firstValueFrom(this.http.delete(`${environment.backend}/clients/${id}`));
     }

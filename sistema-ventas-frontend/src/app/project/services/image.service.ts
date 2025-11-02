@@ -19,10 +19,12 @@ export class ImageService {
     @Inject(PLATFORM_ID) private platformId: Object
   ) { }
 
+  // Verificar si se está ejecutando en el navegador
   private isClient(): boolean {
     return isPlatformBrowser(this.platformId);
   }
 
+  // Obtener las imágenes más recientes para el carrusel de productos
   getLatestProductImages(): Observable<ProductCarouselItem[]> {
     if (!this.isClient()) {
       return of([]);
@@ -48,6 +50,7 @@ export class ImageService {
     );
   }
 
+  // Obtener todos los productos públicos
   getAllPublicProducts(): Observable<ProductCarouselItem[]> {
     if (!this.isClient()) {
       return of([]);
@@ -65,6 +68,7 @@ export class ImageService {
     );
   }
 
+  // Obtener detalles de un producto público por ID
   getPublicProductDetails(id: string): Observable<ProductCarouselItem | null> {
     if (!this.isClient()) {
       return of(null);
@@ -82,6 +86,7 @@ export class ImageService {
     );
   }
 
+  // Obtener productos por ID de categoría
   getProductsByCategoryId(categoryId: string): Observable<ProductCarouselItem[]> {
     if (!this.isClient()) {
       return of([]);

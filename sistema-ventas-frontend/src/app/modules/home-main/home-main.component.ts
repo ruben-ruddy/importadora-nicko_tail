@@ -39,6 +39,7 @@ export class HomeMainComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Verificar el tamaño de la pantalla
   checkScreenSize() {
     if (isPlatformBrowser(this.platformId)) {
       const width = window.innerWidth;
@@ -46,6 +47,7 @@ export class HomeMainComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Ciclo de vida del componente
   ngOnInit(): void {
     if (isPlatformBrowser(this.platformId)) {
       const width = window.innerWidth;
@@ -67,24 +69,28 @@ export class HomeMainComponent implements OnInit, OnDestroy {
     });
   }
 
+  // Siguiente diapositiva en el carrusel
   nextSlide(): void {
     if (this.products.length > 0) {
       this.currentSlide = (this.currentSlide + 1) % this.products.length;
     }
   }
 
+  // Diapositiva anterior en el carrusel
   prevSlide(): void {
     if (this.products.length > 0) {
       this.currentSlide = this.currentSlide === 0 ? this.products.length - 1 : this.currentSlide - 1;
     }
   }
 
+  // Ir a una diapositiva específica
   goToSlide(index: number): void {
     if (this.products.length > 0) {
       this.currentSlide = index;
     }
   }
 
+  // Iniciar y detener la reproducción automática del carrusel
   startAutoPlay(): void {
     if (isPlatformBrowser(this.platformId) && this.products.length > 1) {
       this.autoPlayInterval = setInterval(() => {
@@ -93,12 +99,14 @@ export class HomeMainComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Detener la reproducción automática del carrusel
   stopAutoPlay(): void {
     if (this.autoPlayInterval) {
       clearInterval(this.autoPlayInterval);
     }
   }
 
+  // Limpiar al destruir el componente
   ngOnDestroy(): void {
     this.stopAutoPlay();
   }

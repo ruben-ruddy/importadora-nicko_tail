@@ -4,8 +4,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ProductCarouselItem } from '../../../../interfaces/product.interface';
 import { environment } from '../../../../../environments/environment';
-
-// Servicio de modales
 import { ModalService } from '../../../../project/services/modal.service';
 
 @Component({
@@ -25,12 +23,14 @@ export class HomeProductModalComponent implements OnInit {
 
   constructor(private modalService: ModalService) {}
 
+  // Ciclo de vida del componente
   ngOnInit(): void {
     if (this.modalData?.product) {
       this.product = this.modalData.product;
     }
   }
 
+  // Obtener la URL completa de la imagen del producto
   getFullImageUrl(relativeUrl: string | null | undefined): string {
     if (relativeUrl) {
       if (relativeUrl.startsWith('http://') || relativeUrl.startsWith('https://')) {
@@ -41,6 +41,7 @@ export class HomeProductModalComponent implements OnInit {
     return 'assets/placeholder-product.png';
   }
 
+  // Incrementar o decrementar la cantidad
   incrementQuantity(): void {
     this.quantity++;
   }
@@ -51,17 +52,18 @@ export class HomeProductModalComponent implements OnInit {
     }
   }
 
+  // Agregar el producto al carrito (simulado)
   addToCart(): void {
     if (this.product) {
       console.log('Producto agregado al carrito:', {
         product: this.product,
         quantity: this.quantity
       });
-      // Aquí puedes agregar la lógica para añadir al carrito
       this.closeModal();
     }
   }
 
+  // Cerrar el modal
   closeModal(): void {
     this.modalService.close();
   }

@@ -1,5 +1,5 @@
-
-
+// sistema-ventas-frontend/src/app/project/components/schema.ts
+// definición de los campos del formulario
 export const PatientsFormFields=(catalogs: any)=> {
     
       return ([

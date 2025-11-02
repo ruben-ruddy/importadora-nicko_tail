@@ -8,8 +8,6 @@ import { Purchase } from '../../interfaces/purchase.interface';
 import { PurchaseDetailsComponent } from './purchase-details/purchase-details.component';
 import { GeneralService } from '../../core/gerneral.service';
 import { Subject, debounceTime, distinctUntilChanged, takeUntil } from 'rxjs';
-
-// Servicios personalizados
 import { ModalService } from '../../project/services/modal.service';
 import { ToasterService } from '../../project/services/toaster.service';
 
@@ -60,16 +58,19 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     });
   }
 
+  //
   async ngOnInit() {
     await this.loadCurrentUser();
     await this.loadPurchases();
   }
 
+  // Limpieza al destruir el componente
   ngOnDestroy() {
     this.destroy$.next();
     this.destroy$.complete();
   }
 
+  // Cargar el usuario actual
   async loadCurrentUser() {
     try {
       this.currentUser = this.generalService.getUser();
@@ -79,6 +80,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Cargar las compras desde el servicio
   async loadPurchases() {
     this.loading = true;
     this.error = '';
@@ -99,7 +101,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
       this.limit = response.limit;
       this.lastPage = response.lastPage;
       
-      console.log('✅ Compras cargadas:', this.purchases.length);
+      console.log(' Compras cargadas:', this.purchases.length);
       
     } catch (error: any) {
       console.error('Error loading purchases:', error);
@@ -115,17 +117,20 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Manejar cambios en el campo de búsqueda
   onSearchChange(event: Event) {
     const searchTerm = (event.target as HTMLInputElement).value;
     this.searchSubject.next(searchTerm);
   }
 
+  // Manejar cambios en el filtro de estado
   onEstadoFilterChange(event: Event) {
     this.estadoFilter = (event.target as HTMLSelectElement).value;
     this.page = 1;
     this.loadPurchases();
   }
 
+  // Manejar cambio de página
   onPageChange(newPage: number) {
     if (newPage >= 1 && newPage <= this.lastPage) {
       this.page = newPage;
@@ -133,12 +138,14 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Manejar cambio de límite de registros por página
   onLimitChange(newLimit: number) {
     this.limit = Number(newLimit);
     this.page = 1;
     this.loadPurchases();
   }
 
+  // Limpiar filtros y búsqueda
   clearFilters() {
     this.searchTerm = '';
     this.estadoFilter = '';
@@ -146,6 +153,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     this.loadPurchases();
   }
 
+  // Obtener las páginas para la paginación
   getPages(): (number | string)[] {
     const pages: (number | string)[] = [];
     const totalPages = this.lastPage;
@@ -182,6 +190,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
     return pages;
   }
 
+  // Abrir modal para agregar nueva compra
   openAddPurchaseModal(event?: Event) {
     if (event) {
       event.stopPropagation();
@@ -191,7 +200,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
       id_usuario: this.currentUser.id_usuario 
     } : {};
     
-    console.log('➕ Abriendo modal para nueva compra');
+    console.log(' Abriendo modal para nueva compra');
     
     this.modalService.open(ModalPurchaseComponent, {
       title: 'Nueva Compra',
@@ -202,12 +211,13 @@ export class PurchaseComponent implements OnInit, OnDestroy {
       }
     }).then((reload: boolean) => {
       if (reload) {
-        console.log('🔄 Recargando lista de compras...');
+        console.log(' Recargando lista de compras...');
         this.loadPurchases();
       }
     });
   }
 
+  // Abrir modal para editar una compra existente
   openEditPurchaseModal(purchase: Purchase, event?: Event) {
     if (event) {
       event.stopPropagation();
@@ -222,7 +232,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
       return;
     }
 
-    console.log('✏️ Abriendo modal para editar compra:', purchase.numero_compra);
+    console.log(' Abriendo modal para editar compra:', purchase.numero_compra);
 
     this.modalService.open(ModalPurchaseComponent, {
       title: 'Editar Compra',
@@ -233,23 +243,24 @@ export class PurchaseComponent implements OnInit, OnDestroy {
       }
     }).then((reload: boolean) => {
       if (reload) {
-        console.log('🔄 Recargando lista de compras...');
+        console.log(' Recargando lista de compras...');
         this.loadPurchases();
       }
     });
   }
 
+  // Ver detalles de una compra
   async viewPurchaseDetails(purchase: Purchase, event?: Event) {
     if (event) {
       event.stopPropagation();
     }
     
-    console.log('👁️ Abriendo detalles de compra:', purchase.numero_compra);
+    console.log(' Abriendo detalles de compra:', purchase.numero_compra);
     
     try {
       // Cargar los detalles completos de la compra
       const purchaseWithDetails = await this.purchaseService.getPurchaseById(purchase.id_compra!);
-      console.log('✅ Detalles cargados para visualización:', purchaseWithDetails);
+      console.log(' Detalles cargados para visualización:', purchaseWithDetails);
       
       this.modalService.open(PurchaseDetailsComponent, {
         title: `Detalles de Compra - ${purchase.numero_compra}`,
@@ -257,7 +268,7 @@ export class PurchaseComponent implements OnInit, OnDestroy {
         data: { purchase: purchaseWithDetails }
       });
     } catch (error) {
-      console.error('❌ Error loading purchase details:', error);
+      console.error(' Error loading purchase details:', error);
       this.toaster.showToast({
         severity: 'error',
         summary: 'Error',

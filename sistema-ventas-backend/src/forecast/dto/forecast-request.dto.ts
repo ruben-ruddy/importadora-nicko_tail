@@ -24,7 +24,7 @@ export class ForecastRequestDto {
   metodo: string;
 
   @IsString()
-  @IsIn(['mensual']) // ✅ Solo mensual
+  @IsIn(['mensual']) 
   periodo: string;
 
   @IsString()
@@ -35,5 +35,5 @@ export class ForecastRequestDto {
 
   @ValidateNested()
   @Type(() => ForecastParameters)
-  parametros: ForecastParameters; // ✅ Ahora es obligatorio
+  parametros: ForecastParameters; 
 }

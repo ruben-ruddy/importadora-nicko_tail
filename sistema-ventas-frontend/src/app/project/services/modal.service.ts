@@ -1,5 +1,5 @@
 // sistema-ventas-frontend/src/app/project/services/modal.service.ts
-import { Injectable, ComponentRef, ViewContainerRef, inject } from '@angular/core';
+import { Injectable, ComponentRef, ViewContainerRef, inject, ChangeDetectorRef } from '@angular/core';
 
 export interface ModalConfig {
   title?: string;
@@ -16,12 +16,15 @@ export class ModalService {
   private modalContainer?: ViewContainerRef;
   private currentModal?: ComponentRef<any>;
   private modalData: any = {};
+  private resolveFunction?: (value: any) => void; 
 
+  // Establecer el contenedor donde se insertarán los modales
   setContainer(container: ViewContainerRef) {
     console.log('ModalService - Container set');
     this.modalContainer = container;
   }
 
+  // Abrir un modal con el componente y configuración especificados
   async open(component: any, config: ModalConfig = {}): Promise<any> {
     console.log('ModalService - Opening modal with config:', config);
     
@@ -36,6 +39,7 @@ export class ModalService {
 
       // Guardar datos del modal
       this.modalData = config.data || {};
+      this.resolveFunction = resolve; // ← GUARDAR LA FUNCIÓN RESOLVE
 
       try {
         // Crear el contenedor del modal primero
@@ -47,14 +51,14 @@ export class ModalService {
         backdrop.className = 'fixed inset-0 bg-black bg-opacity-50';
         backdrop.addEventListener('click', () => {
           console.log('ModalService - Backdrop clicked, closing modal');
-          this.close();
+          this.close(null); // ← PASAR null EXPLÍCITAMENTE
         });
         
         // Crear contenedor para el contenido del modal con scroll
         const contentContainer = document.createElement('div');
         contentContainer.className = 'relative z-[10000] w-full max-w-2xl my-8';
         contentContainer.addEventListener('click', (event) => {
-          event.stopPropagation(); // Prevenir cierre al hacer clic en el contenido
+          event.stopPropagation();
         });
         
         // Agregar elementos al DOM
@@ -70,9 +74,8 @@ export class ModalService {
         const hostEl = (this.currentModal.location.nativeElement as HTMLElement);
         contentContainer.appendChild(hostEl);
 
-        // Pasar datos al componente modal - MEJORADO
+        // Pasar datos al componente modal
         if (this.currentModal.instance) {
-          // Asignar modalData y modalConfig
           this.currentModal.instance.modalData = this.modalData;
           this.currentModal.instance.modalConfig = config;
           
@@ -84,25 +87,25 @@ export class ModalService {
         (this.currentModal as any).wrapper = wrapper;
         (this.currentModal as any).contentContainer = contentContainer;
 
-        // Configurar resolución cuando el modal se cierre
-        const originalNgOnDestroy = this.currentModal.instance.ngOnDestroy;
-        this.currentModal.instance.ngOnDestroy = () => {
-          if (originalNgOnDestroy) {
-            originalNgOnDestroy.apply(this.currentModal!.instance);
-          }
-          this.cleanupModalElements();
-          resolve(this.modalData.result);
-        };
-
         console.log('ModalService - Modal opened successfully');
 
       } catch (error) {
         console.error('ModalService - Error opening modal:', error);
-        resolve(null);
+        this.resolvePromise(null); // ← USAR MÉTODO NUEVO
       }
     });
   }
 
+  // NUEVO MÉTODO: Resolver la promesa de manera controlada
+  private resolvePromise(result: any) {
+    if (this.resolveFunction) {
+      console.log('ModalService - Resolving promise with:', result);
+      this.resolveFunction(result);
+      this.resolveFunction = undefined;
+    }
+  }
+
+  // NUEVO MÉTODO: Limpiar elementos del DOM del modal
   private cleanupModalElements() {
     if (this.currentModal) {
       const backdrop = (this.currentModal as any).backdrop;
@@ -125,17 +128,19 @@ export class ModalService {
     }
   }
 
+  // Obtener los datos pasados al modal
   getData(): any {
     return this.modalData;
   }
 
+  // Cerrar el modal y resolver la promesa con el resultado
   close(result?: any) {
     console.log('ModalService - Closing modal with result:', result);
     
+    // NUEVO: Resolver la promesa ANTES de limpiar
+    this.resolvePromise(result);
+    
     if (this.currentModal) {
-      // Guardar resultado
-      this.modalData.result = result;
-      
       // Limpiar elementos del DOM
       this.cleanupModalElements();
       
@@ -143,5 +148,8 @@ export class ModalService {
       this.currentModal.destroy();
       this.currentModal = undefined;
     }
+    
+    // Limpiar datos del modal
+    this.modalData = {};
   }
 }

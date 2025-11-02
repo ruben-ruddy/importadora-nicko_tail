@@ -1,5 +1,6 @@
 // sistema-ventas-frontend/src/app/modules/sales/types.ts
 
+// Definición de la interfaz Client para representar un cliente
 export interface Client {
   id_cliente: string;
   nombre_completo: string;
@@ -14,6 +15,7 @@ export interface Client {
   label?: string;
 }
 
+// Definición de la interfaz User para representar un usuario
 export interface User {
   id_usuario: string;
   nombre_usuario: string;
@@ -28,6 +30,7 @@ export interface User {
   label?: string;
 }
 
+// Definición de la interfaz Product para representar un producto
 export interface Product {
   id_producto: string;
   id_categoria: string;
@@ -47,6 +50,7 @@ export interface Product {
   };
 }
 
+// Definición de la interfaz Sale para representar una venta
 export interface Sale {
   id_venta: string;
   id_usuario: string;
@@ -64,6 +68,7 @@ export interface Sale {
   detalle_ventas?: SaleDetail[];
 }
 
+// Definición de la interfaz SaleDetail para los detalles de una venta
 export interface SaleDetail {
   id_detalle_venta?: string;
   id_venta?: string;
@@ -72,7 +77,6 @@ export interface SaleDetail {
   precio_unitario: number;
   subtotal: number;
   producto?: Product;
-  // Agregar estas propiedades opcionales
   nombre_producto?: string;
   codigo_producto?: string;
   stock_actual?: number;

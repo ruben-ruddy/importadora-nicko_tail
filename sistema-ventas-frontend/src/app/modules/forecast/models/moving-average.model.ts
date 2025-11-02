@@ -1,6 +1,7 @@
 // sistema-ventas-frontend/src/app/modules/forecast/models/moving-average.model.ts
 
 export class MovingAverageModel {
+  // Realizar predicciones utilizando el método de media móvil con suavizado exponencial
   static predict(data: number[], periods: number, windowSize: number, alpha: number): { predictions: number[], accuracy: number } {
     const predictions: number[] = [];
     const forecastData: number[] = [...data];
@@ -14,8 +15,6 @@ export class MovingAverageModel {
       forecastData.push(smoothedPrediction);
     }
 
-    // Cálculo de la precisión (MAPE) comparando valores pronosticados con los últimos valores reales.
-    // Para una implementación completa, se usaría un conjunto de validación.
     const actualsForAccuracy = data.slice(-predictions.length);
     const predictionsForAccuracy = predictions.slice(0, actualsForAccuracy.length);
 
@@ -29,8 +28,8 @@ export class MovingAverageModel {
     return { predictions, accuracy };
   }
 
+  // Calcular intervalos de confianza para las predicciones
   static calculateConfidenceInterval(predictions: number[], actuals: number[]): { inferior: number; superior: number }[] {
-    // Implementación de un intervalo de confianza simple.
     const confidenceIntervals = predictions.map(pred => ({
       inferior: pred * 0.9,
       superior: pred * 1.1,

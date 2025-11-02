@@ -6,28 +6,24 @@ import {
   ConflictException,
   BadRequestException,
 } from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service'; // Asegúrate que esta ruta sea correcta
-import { CreateSaleDto, DtoSaleState, CreateSaleDetailDto } from './dto/create-sale.dto'; // Importa ambos
+import { PrismaService } from '../prisma/prisma.service'; 
+import { CreateSaleDto, DtoSaleState, CreateSaleDetailDto } from './dto/create-sale.dto'; 
 import { UpdateSaleDto } from './dto/update-sale.dto';
 import { SaleQueryDto } from './dto/sale-query.dto';
-import { Product, SaleState, MovementType } from '@prisma/client'; // Ya lo estás importando, genial.
-
-
-// Si tus enums de Prisma son así, podrías necesitarlos para tipado estricto
-// import { SaleState, MovementType } from '@prisma/client';
+import { Product, SaleState, MovementType } from '@prisma/client'; 
 
 @Injectable()
 export class SalesService {
   constructor(private prisma: PrismaService) {}
 
+  // Crear una nueva venta
   async create(createSaleDto: CreateSaleDto) {
     const {
       id_usuario,
       id_cliente,
-      //numero_venta,
       detalle_ventas,
       observaciones,
-      subtotal, // asumiendo que el cliente puede enviarlos, pero los recalculamos
+      subtotal, 
       descuento,
       impuesto,
       total,
@@ -73,7 +69,7 @@ export class SalesService {
 
     // 4. Pre-procesar los detalles de la venta y verificar stock
     let calculatedSubtotal = 0;
-    const productsToUpdate: { product: Product; quantity: number }[] = []; // Usando 'Product' importado
+    const productsToUpdate: { product: Product; quantity: number }[] = []; 
 
     for (const detail of detalle_ventas) {
       const product = await this.prisma.product.findUnique({
@@ -94,19 +90,11 @@ export class SalesService {
       productsToUpdate.push({ product, quantity: detail.cantidad });
     }
 
-    // === MOVER ESTAS DECLARACIONES AQUÍ, FUERA DEL BUCLE PERO ANTES DE LA TRANSACCIÓN ===
-    // Recalcular totales (opcional, pero recomendado para evitar manipulación del cliente)
     const finalSubtotal = subtotal !== undefined ? subtotal : calculatedSubtotal;
-    const finalDescuento = descuento !== undefined ? descuento : 0; // Podrías tener lógica para calcular un descuento global
-    const finalImpuesto = impuesto !== undefined ? impuesto : 0; // Podrías tener lógica para calcular un impuesto
+    const finalDescuento = descuento !== undefined ? descuento : 0; 
+    const finalImpuesto = impuesto !== undefined ? impuesto : 0; 
     const finalTotal = total !== undefined ? total : (finalSubtotal - finalDescuento + finalImpuesto);
-
-    // Convertir el estado del DTO (string) al tipo de enum de Prisma (si es diferente)
-    //const prismaSaleState = estado ? (estado.toUpperCase() as any) : DtoSaleState.PENDIENTE.toUpperCase() as any;
     const finalEstado = estado;
-    // ====================================================================================
-
-
     // 5. Iniciar una transacción para asegurar la atomicidad
     const result = await this.prisma.$transaction(async (prisma) => {
       // Crear la venta principal
@@ -115,12 +103,12 @@ export class SalesService {
           id_usuario,
           id_cliente, // Puede ser null
           numero_venta: nextSaleNumber, // Usar el número de venta generado
-          fecha_venta: new Date(), // Siempre usa la fecha del servidor, o createSaleDto.fecha_venta si la mandan
-          subtotal: finalSubtotal, // Ahora sí están definidos
-          descuento: finalDescuento, // Ahora sí están definidos
-          impuesto: finalImpuesto, // Ahora sí están definidos
-          total: finalTotal, // Ahora sí están definidos
-          estado: finalEstado, // Ahora sí están definidos
+          fecha_venta: new Date(),
+          subtotal: finalSubtotal, 
+          descuento: finalDescuento, 
+          impuesto: finalImpuesto, 
+          total: finalTotal, 
+          estado: finalEstado,
           observaciones,
           detalle_ventas: {
             create: detalle_ventas.map((detail) => ({
@@ -128,9 +116,6 @@ export class SalesService {
               cantidad: detail.cantidad,
               precio_unitario: detail.precio_unitario,
               subtotal: (detail.cantidad * detail.precio_unitario) - (detail.descuento_item || 0),
-              // Aquí no hay 'descuento_item' en tu esquema de SaleDetail.
-              // Si lo necesitas, deberías añadirlo a SaleDetail en schema.prisma.
-              // descuento_item: detail.descuento_item || 0, // Esto iría si el campo existiera
             })),
           },
         },
@@ -148,7 +133,7 @@ export class SalesService {
         await prisma.inventoryMovement.create({
             data: {
                 id_producto: product.id_producto,
-                id_usuario: id_usuario, // Usuario que hizo la venta
+                id_usuario: id_usuario,
                 tipo_movimiento: MovementType.salida,
                 cantidad: quantity,
                 observaciones: `Salida por Venta #${sale.numero_venta} (ID: ${sale.id_venta})`,
@@ -160,8 +145,7 @@ export class SalesService {
 
     return result;
   }
-
-  // ... (el resto de tus métodos findAll, findOne, update, remove) ...
+// Obtener todas las ventas con filtros y paginación
 async findAll(query: SaleQueryDto) {
   const { 
     id_cliente, 
@@ -256,6 +240,7 @@ async findAll(query: SaleQueryDto) {
   };
 }
 
+// Obtener una venta por id
   async findOne(id_venta: string) {
     const sale = await this.prisma.sale.findUnique({
       where: { id_venta }, // Usa id_venta como el campo ID único
@@ -266,7 +251,7 @@ async findAll(query: SaleQueryDto) {
         },
         detalle_ventas: {
           include: {
-            producto: true, // Asegúrate que la relación se llama 'producto' en SaleDetail
+            producto: true, 
           },
         },
       },
@@ -281,7 +266,7 @@ async findAll(query: SaleQueryDto) {
 async update(id_venta: string, updateSaleDto: UpdateSaleDto) {
   const existingSale = await this.prisma.sale.findUnique({
     where: { id_venta },
-    include: { detalle_ventas: true }, // Incluir detalles existentes para futuras lógicas
+    include: { detalle_ventas: true }, 
   });
 
   if (!existingSale) {
@@ -317,12 +302,6 @@ async update(id_venta: string, updateSaleDto: UpdateSaleDto) {
       throw new ConflictException(`El número de venta '${updateSaleDto.numero_venta}' ya está en uso.`);
     }
   }
-
-  // // Permitir solo ciertos campos para actualización
-  // const allowedFields = ['id_cliente', 'estado', 'observaciones', 'descuento', 'impuesto'];
-  // const hasDisallowedFields = Object.keys(updateSaleDto).some(key => 
-  //   !allowedFields.includes(key) && updateSaleDto[key] !== undefined
-  // );
 
   if (hasDisallowedFields) {
     throw new BadRequestException('Solo se permiten actualizar los campos: id_cliente, estado, observaciones, descuento e impuesto.');
@@ -360,7 +339,7 @@ async update(id_venta: string, updateSaleDto: UpdateSaleDto) {
     });
     return updatedSale;
   } catch (error) {
-    if (error.code === 'P2025') { // Por ejemplo, si intentas conectar a un usuario/cliente inexistente
+    if (error.code === 'P2025') { 
       throw new NotFoundException('Uno de los IDs relacionados (usuario, cliente) no fue encontrado.');
     }
     if (error.code === 'P2002' && error.meta?.target?.includes('numero_venta')) {
@@ -370,10 +349,11 @@ async update(id_venta: string, updateSaleDto: UpdateSaleDto) {
   }
 }
 
+// Eliminar una venta
   async remove(id_venta: string) {
     const existingSale = await this.prisma.sale.findUnique({
       where: { id_venta },
-      include: { detalle_ventas: true }, // Necesitamos los detalles para revertir stock
+      include: { detalle_ventas: true },
     });
 
     if (!existingSale) {
@@ -388,16 +368,16 @@ async update(id_venta: string, updateSaleDto: UpdateSaleDto) {
             where: { id_producto: detail.id_producto },
             data: {
               stock_actual: {
-                increment: detail.cantidad, // Sumar la cantidad al stock
+                increment: detail.cantidad, 
               },
             },
           });
-          // Crear un movimiento de inventario de "entrada" por la anulación/eliminación
+
           await prisma.inventoryMovement.create({
               data: {
                   id_producto: detail.id_producto,
-                  id_usuario: existingSale.id_usuario, // Usuario que hizo la venta (o un usuario de sistema para la anulación)
-                  tipo_movimiento: MovementType.entrada, // Asegúrate que coincida con tu enum de MovementType
+                  id_usuario: existingSale.id_usuario,
+                  tipo_movimiento: MovementType.entrada, 
                   cantidad: detail.cantidad,
                   observaciones: `Entrada por anulación/eliminación de Venta #${existingSale.numero_venta} (ID: ${existingSale.id_venta})`,
               }
@@ -415,7 +395,7 @@ async update(id_venta: string, updateSaleDto: UpdateSaleDto) {
         });
       });
     } catch (error) {
-      if (error.code === 'P2003') { // Foreign key constraint failed
+      if (error.code === 'P2003') { 
         throw new ConflictException('No se puede eliminar la venta debido a dependencias existentes.');
       }
       throw error;
@@ -423,11 +403,11 @@ async update(id_venta: string, updateSaleDto: UpdateSaleDto) {
   }
 
 
-
+// Funciones privadas para manejar cancelación y reactivación de ventas
   private async cancelSale(sale: any) {
-  // Revertir stock y crear movimientos de inventario
+
   return await this.prisma.$transaction(async (prisma) => {
-    // Revertir stock para cada producto
+
     for (const detail of sale.detalle_ventas) {
       await prisma.product.update({
         where: { id_producto: detail.id_producto },
@@ -465,6 +445,7 @@ async update(id_venta: string, updateSaleDto: UpdateSaleDto) {
   });
 }
 
+// Re-activar una venta cancelada
 private async activateSale(sale: any, updateSaleDto: any) {
   // Verificar stock antes de reactivar
   for (const detail of sale.detalle_ventas) {

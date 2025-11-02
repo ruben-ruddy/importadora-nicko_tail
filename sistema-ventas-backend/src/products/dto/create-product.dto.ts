@@ -12,7 +12,7 @@ import {
   Max,
   IsUrl
 } from 'class-validator';
-
+// DTO para crear un nuevo producto
 export class CreateProductDto {
   @ApiProperty({ description: 'ID de la categoría a la que pertenece el producto (UUID)', example: 'a1b2c3d4-e5f6-7890-1234-567890abcdef' })
   @IsUUID('4', { message: 'El ID de categoría debe ser un UUID válido.' })
@@ -52,28 +52,21 @@ export class CreateProductDto {
   @ApiProperty({ description: 'Precio de compra unitario del producto', example: 600.00 })
   @IsNumber({}, { message: 'El precio de compra debe ser un número.' })
   @IsNotEmpty({ message: 'El precio de compra es obligatorio.' })
-  precio_compra: number; // <-- ¡NUEVO CAMPO!
+  precio_compra: number; 
 
   @ApiProperty({ description: 'Stock inicial disponible del producto', example: 150 })
   @IsNumber({}, { message: 'El stock debe ser un número.' })
   @IsNotEmpty({ message: 'El stock es obligatorio.' })
-  stock_actual: number; // Renombrado a 'stock_actual' para claridad con el schema
+  stock_actual: number; 
 
   @ApiProperty({ description: 'Stock inicial disponible del producto', example: 150 })
   @IsNumber({}, { message: 'El stock debe ser un número.' })
   @IsNotEmpty({ message: 'El stock es obligatorio.' })
-  stock_minimo: number; // Renombrado a 'stock_actual' para claridad con el schema
-  // @ApiProperty({ description: 'URL de la imagen principal del producto (opcional)', example: 'http://example.com/image.jpg', required: false })
-  // @IsUrl({}, { message: 'La URL de la imagen principal debe ser una URL válida.' })
-  // @IsOptional()
-  // imagen_url?: string;
-  // === El campo imagen_url permanece aquí, ahora se llenará con la URL del DMS ===
+  stock_minimo: number; 
   @ApiPropertyOptional({ description: 'URL de la imagen del producto (obtenida del DMS)', example: '/uploads/1678912345-mi-imagen.jpg' })
   @IsOptional()
   @IsString()
-  imagen_url?: string; // Ahora contendrá la URL devuelta por el servicio DMS
-
-
+  imagen_url?: string; 
 
   @ApiProperty({
     description: 'Estado del producto (activo/inactivo)',

@@ -11,14 +11,15 @@ export class CategoriesService {
 
   constructor(private http: HttpClient) { }
 
+        // Obtener la lista de categorías
         getCategory() {
           return firstValueFrom(this.http.get(`${environment.backend}/categories`));
          }
-  
+         // Crear una nueva categoría
          createCategory(data:any) {
           return firstValueFrom(this.http.post(`${environment.backend}/categories`, data));
         }
-  
+         // Actualizar una categoría existente
          updateCategory(id:string,data:any) {
           return firstValueFrom(this.http.patch(`${environment.backend}/categories/${id}`, data));
         }

@@ -13,11 +13,13 @@ export class SalesService {
 
   constructor(private http: HttpClient) { }
 
+  // Manejo de errores genérico
   private handleError(error: any): never {
     console.error('Error en servicio de ventas:', error);
     throw error;
   }
 
+  // Obtener la lista de ventas con parámetros de consulta opcionales
   async getSales(queryParams?: any): Promise<any> {
     try {
       let params = new HttpParams();
@@ -39,6 +41,7 @@ export class SalesService {
     }
   }
 
+  // Obtener una venta por su ID
   async getSale(id: string): Promise<Sale> {
     try {
       const response: any = await firstValueFrom(
@@ -50,6 +53,7 @@ export class SalesService {
     }
   }
 
+  // Crear una nueva venta
   async createSale(data: any): Promise<Sale> {
     try {
       const response: any = await firstValueFrom(this.http.post(`${this.apiUrl}/sales`, data));
@@ -59,6 +63,7 @@ export class SalesService {
     }
   }
 
+  // Actualizar una venta existente
   async updateSale(id: string, data: any): Promise<Sale> {
     try {
       const response: any = await firstValueFrom(this.http.patch(`${this.apiUrl}/sales/${id}`, data));
@@ -68,6 +73,7 @@ export class SalesService {
     }
   }
 
+  // Eliminar una venta por su ID
   async deleteSale(id: string): Promise<void> {
     try {
       await firstValueFrom(this.http.delete(`${this.apiUrl}/sales/${id}`));
@@ -76,6 +82,7 @@ export class SalesService {
     }
   }
 
+  // Obtener la lista de clientes
   async getClients(): Promise<Client[]> {
     try {
       const response: any = await firstValueFrom(this.http.get(`${this.apiUrl}/clients`));
@@ -85,6 +92,7 @@ export class SalesService {
     }
   }
 
+  // Obtener la lista de usuarios
   async getUsers(): Promise<User[]> {
     try {
       const response: any = await firstValueFrom(this.http.get(`${this.apiUrl}/users`));
@@ -94,11 +102,12 @@ export class SalesService {
     }
   }
 
+  // Obtener la lista de productos
   async getProducts(): Promise<Product[]> {
     try {
       // QUITAR PAGINACIÓN para obtener todos los productos
       const response: any = await firstValueFrom(
-        this.http.get(`${this.apiUrl}/products?limit=1000`) // Aumentar límite o quitar paginación
+        this.http.get(`${this.apiUrl}/products?limit=1000`) 
       );
       return response.products || response.data || [];
     } catch (error) {
@@ -106,6 +115,7 @@ export class SalesService {
     }
   }
 
+  // Verificar stock de un producto
   async checkStock(productId: string, quantity: number): Promise<boolean> {
     try {
       const products = await this.getProducts();
@@ -117,6 +127,7 @@ export class SalesService {
     }
   }
 
+  // Obtener una venta con sus detalles
   async getSaleWithDetails(id: string): Promise<Sale> {
     try {
       const response: any = await firstValueFrom(

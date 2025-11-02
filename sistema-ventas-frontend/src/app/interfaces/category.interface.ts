@@ -4,16 +4,17 @@ export interface Category {
   nombre_categoria: string;
   descripcion?: string | null;
   icono_url?: string | null;
-  activo: boolean; // <--- ASEGÚRATE DE QUE ESTA PROPIEDAD ESTÉ AQUÍ
-  fecha_creacion: string; // <--- Y QUE ESTA PROPIEDAD ESTÉ AQUÍ (string si viene como ISO, Date si la parseas)
+  activo: boolean; 
+  fecha_creacion: string; 
 }
-// Deja estas si las necesitas, pero el problema es con la primera
+// Payload para crear una categoría
 export interface CreateCategoryPayload {
   nombre_categoria: string;
   descripcion?: string | null;
   activo?: boolean;
 }
 
+// Payload para actualizar una categoría
 export interface UpdateCategoryPayload {
   nombre_categoria?: string;
   descripcion?: string | null;

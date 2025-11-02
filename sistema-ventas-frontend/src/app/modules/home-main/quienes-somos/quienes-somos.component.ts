@@ -12,6 +12,5 @@ import { HeaderHomeMainComponent } from "../header-home-main/header-home-main.co
   styleUrls: ['./quienes-somos.component.scss']
 })
 export class QuienesSomosComponent {
-  // Este componente no tenía lógica específica de PrimeNG, 
-  // solo mantenemos la estructura básica
+
 }
