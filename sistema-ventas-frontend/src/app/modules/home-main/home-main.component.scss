@@ -1,0 +1,13 @@
+/* En tu archivo de estilos global */
+@keyframes progress {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.animate-progress {
+  animation: progress linear forwards;
+}

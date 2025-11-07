@@ -1,43 +1,120 @@
+<div class="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+    
+    <!-- Fondo animado moderno -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute -inset-10 opacity-20">
+            <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+            <div class="absolute top-1/3 right-1/4 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
+            <div class="absolute bottom-1/4 left-1/3 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
+        </div>
+    </div>
 
-<div class="design3 min-h-screen relative overflow-hidden bg-gradient-to-br from-dark-blue-bg via-medium-blue-bg to-light-blue-bg">
-   
+    <app-header-home-main></app-header-home-main>
 
-    <div class="absolute inset-0 z-0 radial-gradient-overlay"></div>
- <app-header-home-main></app-header-home-main>
-    <main class="relative z-10 py-16 px-8 min-h-[calc(100vh-120px)] flex flex-col items-center">
+    <main class="relative z-10 py-20 px-8 min-h-[calc(100vh-120px)] flex flex-col items-center">
         
-        <h2 class="text-3xl font-bold text-center mb-8 text-white ">EXPLORAR CATEGORÍAS</h2>
-
-        <div class="search-bar flex justify-center mb-12 w-full max-w-2xl px-4">
-            <input
-                type="text"
-                [(ngModel)]="searchTerm"
-                (input)="filterCategories()"
-                placeholder="Buscar categoría..."
-                class="w-full p-3 text-gray-900 bg-white rounded-lg shadow-lg
-                     focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-            />
+        <!-- Título principal mejorado -->
+        <div class="text-center mb-16">
+            <h2 class="text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                EXPLORAR CATEGORÍAS
+            </h2>
+            <p class="text-xl text-blue-100 opacity-80 max-w-2xl mx-auto">
+                Descubre nuestros productos organizados por categorías especializadas
+            </p>
         </div>
 
-        <div *ngIf="isLoading" class="text-white text-center col-span-full text-lg mb-4">Cargando categorías...</div>
-        <div *ngIf="errorMessage" class="text-red-500 text-center col-span-full text-lg mb-4">{{ errorMessage }}</div>
+        <!-- Barra de búsqueda mejorada -->
+        <div class="search-bar flex justify-center mb-16 w-full max-w-2xl px-4">
+            <div class="relative w-full">
+                <input
+                    type="text"
+                    [(ngModel)]="searchTerm"
+                    (input)="filterCategories()"
+                    placeholder="Buscar categoría..."
+                    class="w-full p-4 pl-12 text-gray-900 bg-white/95 backdrop-blur-sm rounded-2xl
+                         focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent
+                         shadow-lg border border-white/20 transition-all duration-300
+                         placeholder-gray-500"
+                />
+                <svg class="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-500" 
+                     fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                          d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                </svg>
+            </div>
+        </div>
 
-        <div *ngIf="!isLoading && !errorMessage" class="categories-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-6xl w-full">
+        <!-- Estados de carga y error -->
+        <div *ngIf="isLoading" class="text-center col-span-full py-16">
+            <div class="inline-flex items-center gap-3 text-white text-lg bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-4">
+                <div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Cargando categorías...
+            </div>
+        </div>
+        
+        <div *ngIf="errorMessage" class="text-center col-span-full py-8">
+            <div class="inline-flex items-center gap-3 text-red-300 bg-red-500/10 backdrop-blur-sm rounded-2xl px-6 py-4 border border-red-500/30">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ errorMessage }}
+            </div>
+        </div>
+
+        <!-- Grid de categorías mejorado -->
+        <div *ngIf="!isLoading && !errorMessage" 
+             class="categories-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-7xl w-full">
+            
             <button *ngFor="let category of filteredCategories"
                     (click)="viewProductsByCategory(category.id_categoria, category.nombre_categoria)"
-                    class="category-button flex flex-col items-center p-6 bg-white/10 rounded-xl shadow-lg
-                           hover:bg-white/20 transition-all duration-300 ease-in-out transform hover:-translate-y-1
-                           border border-white/5 text-white cursor-pointer">
-                <img [src]="getFullImageUrl(category.icono_url)"
-                     [alt]="category.nombre_categoria"
-                     class="w-50 h-50 object-cover rounded-xl mb-4 border-2 border-purple-400 p-1">
-                <span class="text-xl font-semibold font-montserrat">{{ category.nombre_categoria }}</span>
-                <span *ngIf="category.descripcion" class="text-sm text-gray-300 mt-2">{{ category.descripcion }}</span>
+                    class="category-button group flex flex-col items-center p-8 bg-white/5 backdrop-blur-lg rounded-2xl 
+                           shadow-xl border border-white/10 hover:border-white/20 transition-all duration-500 ease-out 
+                           transform hover:-translate-y-2 hover:shadow-2xl text-white cursor-pointer relative overflow-hidden">
+
+                <!-- Efecto de fondo hover -->
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500"></div>
+
+                <!-- Contenedor de icono con efectos -->
+                <div class="relative mb-6 w-32 h-32">
+                    <div class="absolute -inset-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-all duration-300"></div>
+                    <img [src]="getFullImageUrl(category.icono_url)"
+                         [alt]="category.nombre_categoria"
+                         class="relative w-full h-full object-cover rounded-xl border-2 border-white/20 group-hover:border-purple-400/50 transition-all duration-300 transform group-hover:scale-105 p-2">
+                </div>
+
+                <!-- Información de la categoría -->
+                <div class="text-center w-full relative z-10">
+                    <span class="text-xl font-bold font-montserrat text-white mb-3 line-clamp-2 group-hover:text-blue-100 transition-colors duration-300">
+                        {{ category.nombre_categoria }}
+                    </span>
+
+                    <span *ngIf="category.descripcion" 
+                          class="text-sm text-blue-100/80 leading-relaxed line-clamp-3 bg-white/5 rounded-xl p-3 border border-white/10">
+                        {{ category.descripcion }}
+                    </span>
+
+                    <!-- Indicador de acción -->
+                    <div class="mt-4 inline-flex items-center gap-2 text-sm text-purple-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                        <span>Ver productos</span>
+                        <svg class="w-4 h-4 transform group-hover:translate-x-1 transition-transform duration-300" 
+                             fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                        </svg>
+                    </div>
+                </div>
             </button>
 
-            <p *ngIf="filteredCategories.length === 0 && !isLoading && !errorMessage" class="text-white text-center col-span-full text-lg">
-                No se encontraron categorías para "{{ searchTerm }}".
-            </p>
+            <!-- Mensaje sin resultados -->
+            <div *ngIf="filteredCategories.length === 0 && !isLoading && !errorMessage" 
+                 class="col-span-full text-center py-16">
+                <div class="inline-flex flex-col items-center gap-4 text-white/70 bg-white/5 backdrop-blur-sm rounded-2xl px-8 py-12 border border-white/10">
+                    <svg class="w-16 h-16 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p class="text-xl font-semibold">No se encontraron categorías</p>
+                    <p class="text-sm opacity-70">"{{ searchTerm }}"</p>
+                </div>
+            </div>
         </div>
     </main>
 </div>

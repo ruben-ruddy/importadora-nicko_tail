@@ -1,37 +1,94 @@
-<div class="design3 min-h-screen relative overflow-hidden bg-gradient-to-br from-dark-blue-bg via-medium-blue-bg to-light-blue-bg">
-
-    <div class="absolute inset-0 z-0 radial-gradient-overlay"></div>
+<div class="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+    
+    <!-- Fondo animado moderno -->
+    <div class="absolute inset-0 z-0">
+        <div class="absolute -inset-10 opacity-20">
+            <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse"></div>
+            <div class="absolute top-1/3 right-1/4 w-72 h-72 bg-yellow-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-2000"></div>
+            <div class="absolute bottom-1/4 left-1/3 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl animate-pulse animation-delay-4000"></div>
+        </div>
+    </div>
 
     <app-header-home-main></app-header-home-main>
 
-    <main class="relative z-10 py-16 px-8 min-h-[calc(100vh-120px)] flex flex-col items-center">
-        <h1 class="text-4xl font-extrabold text-white mb-8 text-center products-title-gradient">{{ categoryName }}</h1>
+    <main class="relative z-10 py-20 px-8 min-h-[calc(100vh-120px)] flex flex-col items-center">
+        
+        <!-- Título de la categoría mejorado -->
+        <div class="text-center mb-16">
+            <h1 class="text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent">
+                {{ categoryName }}
+            </h1>
+            <p class="text-xl text-blue-100 opacity-80 max-w-2xl mx-auto">
+                Descubre todos nuestros productos en esta categoría especializada
+            </p>
+        </div>
 
-        <div *ngIf="isLoading" class="text-white text-center col-span-full text-lg mb-4">Cargando productos...</div>
-        <div *ngIf="errorMessage" class="text-red-500 text-center col-span-full text-lg mb-4">{{ errorMessage }}</div>
+        <!-- Estados de carga y error mejorados -->
+        <div *ngIf="isLoading" class="text-center col-span-full py-16">
+            <div class="inline-flex items-center gap-3 text-white text-lg bg-white/10 backdrop-blur-sm rounded-2xl px-6 py-4">
+                <div class="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                Cargando productos...
+            </div>
+        </div>
+        
+        <div *ngIf="errorMessage" class="text-center col-span-full py-8">
+            <div class="inline-flex items-center gap-3 text-red-300 bg-red-500/10 backdrop-blur-sm rounded-2xl px-6 py-4 border border-red-500/30">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ errorMessage }}
+            </div>
+        </div>
 
-        <div *ngIf="!isLoading && !errorMessage" class="products-grid grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 max-w-6xl w-full">
+        <!-- Grid de productos mejorado -->
+        <div *ngIf="!isLoading && !errorMessage" 
+             class="products-grid grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 max-w-7xl w-full">
+            
             <div *ngFor="let product of products"
-                 class="product-card flex flex-col items-center p-6 bg-white/10 rounded-xl shadow-lg
-                        hover:bg-white/20 transition-all duration-300 ease-in-out transform hover:-translate-y-1
-                        border border-white/5 text-white cursor-pointer"
-                 (click)="openProductModal(product)"> <img [src]="product.imagen_url"
-                     [alt]="product.nombre_producto"
-                     class="w-40 h-40 object-cover rounded-md mb-4 border-2 border-green-400 p-1">
+                 class="product-card group flex flex-col items-center p-6 bg-white/5 backdrop-blur-lg rounded-2xl 
+                        shadow-xl border border-white/10 hover:border-white/20 transition-all duration-500 ease-out 
+                        transform hover:-translate-y-2 hover:shadow-2xl text-white cursor-pointer relative overflow-hidden"
+                 (click)="openProductModal(product)">
 
-                <span class="text-xl font-semibold font-montserrat text-center mb-2">{{ product.nombre_producto }}</span>
+                <!-- Efecto de fondo hover -->
+                <div class="absolute inset-0 bg-gradient-to-br from-blue-500/0 to-purple-500/0 group-hover:from-blue-500/5 group-hover:to-purple-500/5 transition-all duration-500"></div>
 
-                <span *ngIf="product.category" class="text-sm text-gray-300 mb-2">{{ product.category }}</span>
+                <!-- Contenedor de imagen con efectos -->
+                <div class="relative mb-6 w-40 h-40">
+                    <div class="absolute -inset-3 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl blur opacity-30 group-hover:opacity-50 transition-all duration-300"></div>
+                    <img [src]="product.imagen_url"
+                         [alt]="product.nombre_producto"
+                         class="relative w-full h-full object-cover rounded-xl border-2 border-white/20 group-hover:border-purple-400/50 transition-all duration-300 transform group-hover:scale-105">
+                </div>
 
-                <!-- <span class="text-2xl font-bold text-yellow-300">{{ product.price | currency:'Bs. ':'symbol':'1.2-2' }}</span> -->
+                <!-- Información del producto -->
+                <div class="text-center w-full relative z-10">
+                    <span class="text-xl font-bold font-montserrat text-white mb-3 line-clamp-2 group-hover:text-blue-100 transition-colors duration-300">
+                        {{ product.nombre_producto }}
+                    </span>
+
+                    <span *ngIf="product.category" 
+                          class="inline-block px-3 py-1 text-sm bg-purple-500/20 text-purple-200 rounded-full border border-purple-500/30 mb-3">
+                        {{ product.category }}
+                    </span>
+
+                    <!-- <span class="text-2xl font-bold text-yellow-300">{{ product.price | currency:'Bs. ':'symbol':'1.2-2' }}</span> -->
+                </div>
             </div>
 
-            <p *ngIf="products.length === 0 && !isLoading && !errorMessage" class="text-white text-center col-span-full text-lg">
-                No se encontraron productos para esta categoría.
-            </p>
+            <!-- Mensaje sin productos -->
+            <div *ngIf="products.length === 0 && !isLoading && !errorMessage" 
+                 class="col-span-full text-center py-16">
+                <div class="inline-flex flex-col items-center gap-4 text-white/70 bg-white/5 backdrop-blur-sm rounded-2xl px-8 py-12 border border-white/10">
+                    <svg class="w-16 h-16 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                    </svg>
+                    <p class="text-xl font-semibold">No se encontraron productos</p>
+                    <p class="text-sm opacity-70">No hay productos disponibles en esta categoría actualmente</p>
+                </div>
+            </div>
         </div>
     </main>
 
     <app-footer-home-main></app-footer-home-main>
-
-    </div>
+</div>
