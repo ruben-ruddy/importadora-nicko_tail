@@ -33,7 +33,7 @@ export class HomeMainComponent implements OnInit, OnDestroy {
   ) { }
 
   @HostListener('window:resize', ['$event'])
-  onResize() {
+  onResize(event: Event) {
     if (isPlatformBrowser(this.platformId)) {
       this.checkScreenSize();
     }
